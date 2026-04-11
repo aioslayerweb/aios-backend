@@ -5,6 +5,7 @@ import os
 
 app = FastAPI()
 
+# ✅ API key is loaded from Render environment variables
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class Event(BaseModel):

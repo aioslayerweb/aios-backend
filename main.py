@@ -5,6 +5,7 @@ import os
 
 app = FastAPI()
 
+# OpenAI client (will fail if no billing, so we handle it safely)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class Event(BaseModel):
@@ -17,8 +18,7 @@ def root():
 
 @app.post("/generate-insight")
 def generate_insight(event: Event):
-    try:
-        prompt = f"""
+    prompt = f"""
 You are an AI business analyst.
 
 Event:
@@ -32,6 +32,8 @@ Generate:
 2. A short description
 """
 
+    try:
+        # Try real OpenAI call
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -40,8 +42,14 @@ Generate:
         )
 
         return {
-            "insight": response.choices[0].message.content
+            "insight": response.choices[0].message.content,
+            "mode": "ai"
         }
 
     except Exception as e:
-        return {"error": str(e)}
+        # Fallback mode (NO billing required)
+        return {
+            "insight": f"[MOCK INSIGHT] Event '{event.event_name}' from {event.event_data} detected. This is a high-value user interaction.",
+            "mode": "mock",
+            "error": str(e)
+        }

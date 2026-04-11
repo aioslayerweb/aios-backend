@@ -5,7 +5,7 @@ import os
 
 app = FastAPI()
 
-# ✅ API key is loaded from Render environment variables
+# API key is loaded securely from Render environment variables
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class Event(BaseModel):
@@ -18,7 +18,8 @@ def root():
 
 @app.post("/generate-insight")
 def generate_insight(event: Event):
-    prompt = f"""
+    try:
+        prompt = f"""
 You are an AI business analyst.
 
 Event:
@@ -29,16 +30,22 @@ Data:
 
 Generate:
 1. A short title
-2. A short description
+2. A short insight description
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
 
-    text = response.choices[0].message.content
+        return {
+            "insight": response.choices[0].message.content
+        }
 
-    return {"insight": text}
+    except Exception as e:
+        # This helps you debug in Render logs
+        return {
+            "error": str(e)
+        }

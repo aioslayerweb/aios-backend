@@ -1,19 +1,15 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from supabase import create_client
-from openai import OpenAI
 import os
 
-app = FastAPI(title="AIOS Backend", version="0.2.0")
+app = FastAPI(title="AIOS Backend", version="0.3.0")
 
 # =========================
 # ENV
 # =========================
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
@@ -41,7 +37,7 @@ def root():
 @app.post("/generate-insight")
 def generate_insight(event: Event):
 
-    print("🚀 NEW EVENT:", event)
+    print("🚀 EVENT:", event)
 
     # -------------------------
     # 1. STORE EVENT
@@ -52,11 +48,8 @@ def generate_insight(event: Event):
             "event_name": event.event_name,
             "event_data": event.event_data
         }).execute()
-
-        print("✅ Event stored")
-
     except Exception as e:
-        print("❌ Insert error:", e)
+        print("Insert error:", e)
 
     # -------------------------
     # 2. FETCH HISTORY
@@ -64,58 +57,58 @@ def generate_insight(event: Event):
     try:
         history = supabase.table("events") \
             .select("*") \
+            .eq("event_name", "lesson_completed") \
             .order("created_at", desc=True) \
-            .limit(10) \
+            .limit(5) \
             .execute()
 
         events_history = history.data
-        print("📊 History fetched:", events_history)
-
     except Exception as e:
-        print("❌ Fetch error:", e)
+        print("Fetch error:", e)
         events_history = []
 
     # -------------------------
-    # 3. BUILD AI INPUT
+    # 3. EXTRACT SCORES
     # -------------------------
-    history_text = "\n".join([
-        f"{e['event_name']} → {e['event_data']}"
-        for e in events_history
-    ])
+    scores = []
 
-    prompt = f"""
-You are an AI product analyst.
+    for e in events_history:
+        data = e.get("event_data", {})
+        if isinstance(data, dict) and "score" in data:
+            scores.append(data["score"])
 
-User recent activity:
-{history_text}
+    scores.reverse()  # oldest → newest
 
-Latest event:
-{event.event_name} → {event.event_data}
-
-Give 1 short insight about user behavior.
-"""
+    print("📊 Scores:", scores)
 
     # -------------------------
-    # 4. GENERATE AI INSIGHT
+    # 4. RULE-BASED INTELLIGENCE
     # -------------------------
-    insight_text = None
+    insight = "Not enough data yet."
 
-    if client:
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}]
-            )
+    if len(scores) >= 2:
 
-            insight_text = response.choices[0].message.content
-            print("🤖 AI insight:", insight_text)
+        # improving trend
+        if scores[-1] > scores[0]:
+            insight = "User is improving — consider increasing difficulty."
 
-        except Exception as e:
-            print("❌ OpenAI error:", e)
+        # declining trend
+        elif scores[-1] < scores[0]:
+            insight = "User performance is dropping — review previous lessons."
 
-    # fallback
-    if not insight_text:
-        insight_text = f"[MOCK] Based on recent activity, user triggered {event.event_name}"
+        # stagnation
+        elif scores[-1] == scores[0]:
+            insight = "User progress is stagnant — introduce variation."
+
+    # low performance
+    if scores and scores[-1] < 60:
+        insight = "User is struggling — suggest easier content."
+
+    # high performance
+    if scores and scores[-1] > 80:
+        insight = "User is performing well — increase difficulty."
+
+    print("💡 Insight:", insight)
 
     # -------------------------
     # 5. STORE INSIGHT
@@ -123,18 +116,15 @@ Give 1 short insight about user behavior.
     try:
         supabase.table("insights").insert({
             "user_id": None,
-            "insight_text": insight_text
+            "insight_text": insight
         }).execute()
-
-        print("✅ Insight stored")
-
     except Exception as e:
-        print("❌ Insight insert error:", e)
+        print("Insight insert error:", e)
 
     # -------------------------
     # RESPONSE
     # -------------------------
     return {
-        "insight": insight_text,
-        "mode": "ai" if client else "mock"
+        "insight": insight,
+        "mode": "rule-based"
     }

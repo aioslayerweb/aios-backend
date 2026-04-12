@@ -4,41 +4,22 @@ from supabase import create_client
 from openai import OpenAI
 import os
 
-app = FastAPI(title="AIOS Backend", version="0.1.0")
+app = FastAPI(title="AIOS Backend", version="0.2.0")
 
 # =========================
-# ENV VARIABLES
+# ENV
 # =========================
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# =========================
-# DEBUG STARTUP LOGS
-# =========================
-print("=== AIOS STARTUP ===")
-print("SUPABASE_URL:", SUPABASE_URL)
-print("SUPABASE_ANON_KEY exists:", bool(SUPABASE_ANON_KEY))
-print("OPENAI_API_KEY exists:", bool(OPENAI_API_KEY))
-
-# =========================
-# CLIENT INIT
-# =========================
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
-supabase = None
-if SUPABASE_URL and SUPABASE_ANON_KEY:
-    try:
-        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-        print("✅ Supabase client initialized")
-    except Exception as e:
-        print("❌ Supabase init error:", e)
-else:
-    print("❌ Supabase not initialized (missing env vars)")
+supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 
 # =========================
-# DATA MODEL
+# MODEL
 # =========================
 class Event(BaseModel):
     user_id: str
@@ -51,20 +32,7 @@ class Event(BaseModel):
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS backend is running"}
-
-
-# =========================
-# DEBUG ENDPOINT
-# =========================
-@app.get("/debug-env")
-def debug_env():
-    return {
-        "SUPABASE_URL": SUPABASE_URL,
-        "SUPABASE_ANON_KEY": bool(SUPABASE_ANON_KEY),
-        "OPENAI_API_KEY": bool(OPENAI_API_KEY),
-        "SUPABASE_CLIENT": supabase is not None
-    }
+    return {"message": "AIOS backend running"}
 
 
 # =========================
@@ -73,44 +41,64 @@ def debug_env():
 @app.post("/generate-insight")
 def generate_insight(event: Event):
 
-    # -------------------------
-    # DEBUG LOGS
-    # -------------------------
-    print("🚀 ENTERED generate_insight endpoint")
-    print("EVENT RECEIVED:", event)
-    print("SUPABASE CLIENT:", supabase)
+    print("🚀 NEW EVENT:", event)
 
     # -------------------------
-    # SUPABASE INSERT (FIXED)
+    # 1. STORE EVENT
     # -------------------------
-    if supabase:
-        try:
-            print("➡️ Inserting into Supabase...")
+    try:
+        supabase.table("events").insert({
+            "user_id": None,
+            "event_name": event.event_name,
+            "event_data": event.event_data
+        }).execute()
 
-            result = supabase.table("events").insert({
-                "user_id": None,  # 👈 FIX: avoid UUID conflict
-                "event_name": event.event_name,
-                "event_data": event.event_data
-            }).execute()
+        print("✅ Event stored")
 
-            print("✅ Supabase insert success")
-            print("RESULT:", result)
-
-        except Exception as e:
-            print("❌ Supabase insert error:", str(e))
-    else:
-        print("❌ Supabase client is None (skipping insert)")
+    except Exception as e:
+        print("❌ Insert error:", e)
 
     # -------------------------
-    # AI RESPONSE (optional)
+    # 2. FETCH HISTORY
     # -------------------------
+    try:
+        history = supabase.table("events") \
+            .select("*") \
+            .order("created_at", desc=True) \
+            .limit(10) \
+            .execute()
+
+        events_history = history.data
+        print("📊 History fetched:", events_history)
+
+    except Exception as e:
+        print("❌ Fetch error:", e)
+        events_history = []
+
+    # -------------------------
+    # 3. BUILD AI INPUT
+    # -------------------------
+    history_text = "\n".join([
+        f"{e['event_name']} → {e['event_data']}"
+        for e in events_history
+    ])
+
     prompt = f"""
-User ID: {event.user_id}
-Event: {event.event_name}
-Data: {event.event_data}
+You are an AI product analyst.
 
-Generate a short insight.
+User recent activity:
+{history_text}
+
+Latest event:
+{event.event_name} → {event.event_data}
+
+Give 1 short insight about user behavior.
 """
+
+    # -------------------------
+    # 4. GENERATE AI INSIGHT
+    # -------------------------
+    insight_text = None
 
     if client:
         try:
@@ -119,18 +107,34 @@ Generate a short insight.
                 messages=[{"role": "user", "content": prompt}]
             )
 
-            return {
-                "insight": response.choices[0].message.content,
-                "mode": "ai"
-            }
+            insight_text = response.choices[0].message.content
+            print("🤖 AI insight:", insight_text)
 
         except Exception as e:
-            print("OpenAI error:", e)
+            print("❌ OpenAI error:", e)
+
+    # fallback
+    if not insight_text:
+        insight_text = f"[MOCK] Based on recent activity, user triggered {event.event_name}"
 
     # -------------------------
-    # FALLBACK RESPONSE
+    # 5. STORE INSIGHT
+    # -------------------------
+    try:
+        supabase.table("insights").insert({
+            "user_id": None,
+            "insight_text": insight_text
+        }).execute()
+
+        print("✅ Insight stored")
+
+    except Exception as e:
+        print("❌ Insight insert error:", e)
+
+    # -------------------------
+    # RESPONSE
     # -------------------------
     return {
-        "insight": f"[MOCK INSIGHT] User {event.user_id} did {event.event_name}",
-        "mode": "mock"
+        "insight": insight_text,
+        "mode": "ai" if client else "mock"
     }

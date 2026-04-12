@@ -9,21 +9,35 @@ app = FastAPI(title="AIOS Backend", version="0.1.0")
 # ----------------------------
 # ENV VARIABLES
 # ----------------------------
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # ----------------------------
-# CLIENTS (SAFE INIT)
+# DEBUG LOG (IMPORTANT)
+# ----------------------------
+print("=== AIOS STARTUP DEBUG ===")
+print("SUPABASE_URL:", SUPABASE_URL)
+print("SUPABASE_ANON_KEY exists:", bool(SUPABASE_ANON_KEY))
+print("OPENAI_API_KEY exists:", bool(OPENAI_API_KEY))
+
+# ----------------------------
+# CLIENTS
 # ----------------------------
 client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 supabase = None
 if SUPABASE_URL and SUPABASE_ANON_KEY:
-    supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
+        print("Supabase client initialized successfully")
+    except Exception as e:
+        print("Supabase init error:", e)
+else:
+    print("Supabase NOT initialized (missing env vars)")
 
 # ----------------------------
-# REQUEST MODEL (UPDATED)
+# REQUEST MODEL
 # ----------------------------
 class Event(BaseModel):
     user_id: str
@@ -38,13 +52,25 @@ def root():
     return {"message": "AIOS backend is running"}
 
 # ----------------------------
+# DEBUG ENDPOINT (CRITICAL)
+# ----------------------------
+@app.get("/debug-env")
+def debug_env():
+    return {
+        "SUPABASE_URL": SUPABASE_URL,
+        "SUPABASE_ANON_KEY": bool(SUPABASE_ANON_KEY),
+        "OPENAI_API_KEY": bool(OPENAI_API_KEY),
+        "SUPABASE_CLIENT": supabase is not None
+    }
+
+# ----------------------------
 # MAIN ENDPOINT
 # ----------------------------
 @app.post("/generate-insight")
 def generate_insight(event: Event):
 
     # ----------------------------
-    # 1. STORE EVENT IN SUPABASE
+    # SUPABASE INSERT
     # ----------------------------
     if supabase:
         try:
@@ -54,42 +80,37 @@ def generate_insight(event: Event):
                 "event_data": event.event_data
             }).execute()
 
-            print("Supabase insert success:", result)
+            print("Supabase insert success")
+            print(result)
 
         except Exception as e:
             print("Supabase insert error:", e)
+    else:
+        print("Supabase skipped (client is None)")
 
     # ----------------------------
-    # 2. BUILD AI PROMPT
+    # AI PROMPT
     # ----------------------------
     prompt = f"""
-You are an AI learning and business analyst.
+User ID: {event.user_id}
 
-User ID:
-{event.user_id}
+Event: {event.event_name}
 
-Event:
-{event.event_name}
-
-Data:
-{event.event_data}
+Data: {event.event_data}
 
 Generate:
-1. A short title
-2. A short insight description
-3. One recommendation for improvement
+1. Insight
+2. Recommendation
 """
 
     # ----------------------------
-    # 3. TRY OPENAI
+    # OPENAI (optional)
     # ----------------------------
     if client:
         try:
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
+                messages=[{"role": "user", "content": prompt}]
             )
 
             return {
@@ -101,9 +122,9 @@ Generate:
             print("OpenAI error:", e)
 
     # ----------------------------
-    # 4. FALLBACK (ALWAYS WORKS)
+    # FALLBACK
     # ----------------------------
     return {
-        "insight": f"[MOCK INSIGHT] User '{event.user_id}' performed '{event.event_name}' with data {event.event_data}. This indicates engagement and progress.",
+        "insight": f"[MOCK INSIGHT] User {event.user_id} did {event.event_name}",
         "mode": "mock"
     }

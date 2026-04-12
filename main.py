@@ -81,14 +81,14 @@ def generate_insight(event: Event):
     print("SUPABASE CLIENT:", supabase)
 
     # -------------------------
-    # SUPABASE INSERT
+    # SUPABASE INSERT (FIXED)
     # -------------------------
     if supabase:
         try:
             print("➡️ Inserting into Supabase...")
 
             result = supabase.table("events").insert({
-                "user_id": event.user_id,
+                "user_id": None,  # 👈 FIX: avoid UUID conflict
                 "event_name": event.event_name,
                 "event_data": event.event_data
             }).execute()

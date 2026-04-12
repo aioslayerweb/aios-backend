@@ -10,7 +10,6 @@ app = FastAPI(title="AIOS Backend", version="0.1.0")
 # ENV VARIABLES
 # ----------------------------
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
@@ -24,14 +23,15 @@ if SUPABASE_URL and SUPABASE_ANON_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 # ----------------------------
-# REQUEST MODEL
+# REQUEST MODEL (UPDATED)
 # ----------------------------
 class Event(BaseModel):
+    user_id: str
     event_name: str
     event_data: dict
 
 # ----------------------------
-# ROOT (IMPORTANT - makes /docs work properly)
+# ROOT
 # ----------------------------
 @app.get("/")
 def root():
@@ -44,22 +44,29 @@ def root():
 def generate_insight(event: Event):
 
     # ----------------------------
-    # 1. SAVE TO SUPABASE (IF AVAILABLE)
+    # 1. STORE EVENT IN SUPABASE
     # ----------------------------
     if supabase:
         try:
-            supabase.table("events").insert({
+            result = supabase.table("events").insert({
+                "user_id": event.user_id,
                 "event_name": event.event_name,
                 "event_data": event.event_data
             }).execute()
+
+            print("Supabase insert success:", result)
+
         except Exception as e:
             print("Supabase insert error:", e)
 
     # ----------------------------
-    # 2. BUILD PROMPT
+    # 2. BUILD AI PROMPT
     # ----------------------------
     prompt = f"""
-You are an AI business analyst.
+You are an AI learning and business analyst.
+
+User ID:
+{event.user_id}
 
 Event:
 {event.event_name}
@@ -70,6 +77,7 @@ Data:
 Generate:
 1. A short title
 2. A short insight description
+3. One recommendation for improvement
 """
 
     # ----------------------------
@@ -93,9 +101,9 @@ Generate:
             print("OpenAI error:", e)
 
     # ----------------------------
-    # 4. FALLBACK MODE (ALWAYS WORKS)
+    # 4. FALLBACK (ALWAYS WORKS)
     # ----------------------------
     return {
-        "insight": f"[MOCK INSIGHT] Event '{event.event_name}' from {event.event_data} detected. This is a high-value user interaction.",
+        "insight": f"[MOCK INSIGHT] User '{event.user_id}' performed '{event.event_name}' with data {event.event_data}. This indicates engagement and progress.",
         "mode": "mock"
     }

@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from supabase import create_client
 import os
 
-app = FastAPI(title="AIOS Backend", version="0.3.0")
+app = FastAPI(title="AIOS Backend", version="0.3.1")
 
 # =========================
 # ENV
@@ -13,7 +13,6 @@ SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
 supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-
 # =========================
 # MODEL
 # =========================
@@ -22,14 +21,12 @@ class Event(BaseModel):
     event_name: str
     event_data: dict
 
-
 # =========================
 # ROOT
 # =========================
 @app.get("/")
 def root():
     return {"message": "AIOS backend running"}
-
 
 # =========================
 # MAIN ENDPOINT
@@ -44,12 +41,15 @@ def generate_insight(event: Event):
     # -------------------------
     try:
         supabase.table("events").insert({
-            "user_id": None,
+            "user_id": None,  # keep NULL for now
             "event_name": event.event_name,
             "event_data": event.event_data
         }).execute()
+
+        print("✅ Event stored")
+
     except Exception as e:
-        print("Insert error:", e)
+        print("❌ Event insert error:", e)
 
     # -------------------------
     # 2. FETCH HISTORY
@@ -63,8 +63,9 @@ def generate_insight(event: Event):
             .execute()
 
         events_history = history.data
+
     except Exception as e:
-        print("Fetch error:", e)
+        print("❌ Fetch error:", e)
         events_history = []
 
     # -------------------------
@@ -88,38 +89,36 @@ def generate_insight(event: Event):
 
     if len(scores) >= 2:
 
-        # improving trend
         if scores[-1] > scores[0]:
             insight = "User is improving — consider increasing difficulty."
 
-        # declining trend
         elif scores[-1] < scores[0]:
             insight = "User performance is dropping — review previous lessons."
 
-        # stagnation
-        elif scores[-1] == scores[0]:
+        else:
             insight = "User progress is stagnant — introduce variation."
 
-    # low performance
-    if scores and scores[-1] < 60:
-        insight = "User is struggling — suggest easier content."
+    if scores:
+        if scores[-1] < 60:
+            insight = "User is struggling — suggest easier content."
 
-    # high performance
-    if scores and scores[-1] > 80:
-        insight = "User is performing well — increase difficulty."
+        elif scores[-1] > 80:
+            insight = "User is performing well — increase difficulty."
 
     print("💡 Insight:", insight)
 
     # -------------------------
-    # 5. STORE INSIGHT
+    # 5. STORE INSIGHT (FIXED)
     # -------------------------
     try:
         supabase.table("insights").insert({
-            "user_id": None,
-            "insight_text": insight
+            "insight_text": insight   # 👈 ONLY THIS FIELD
         }).execute()
+
+        print("✅ Insight stored")
+
     except Exception as e:
-        print("Insight insert error:", e)
+        print("❌ Insight insert error:", e)
 
     # -------------------------
     # RESPONSE

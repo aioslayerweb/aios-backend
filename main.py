@@ -30,8 +30,9 @@ class InsightRequest(BaseModel):
 
 class InsightResponse(BaseModel):
     success: bool
-    insight_text: str | None = None
     score: int | None = None
+    user_segment: str | None = None
+    insight_text: str | None = None
     message: str | None = None
 
 
@@ -41,7 +42,7 @@ class InsightResponse(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "AIOS backend v2 running"}
+    return {"message": "AIOS backend v3 running"}
 
 @app.get("/health")
 def health():
@@ -72,46 +73,75 @@ def track_event(request: InsightRequest):
 
 
 # =========================
-# INTELLIGENCE ENGINE (CORE)
+# INTELLIGENCE ENGINE v3
 # =========================
 
-def calculate_score(events: list) -> int:
-    """
-    AIOS v2 scoring logic
-    """
+def calculate_base_score(events):
+    return min(len(events) * 10, 60)
 
-    count = len(events)
 
-    if count == 0:
+def calculate_recency_score(events):
+    if not events:
         return 0
 
-    # base score from activity volume
-    score = min(count * 10, 60)
+    now = datetime.utcnow()
+    score = 0
 
-    # bonus for diversity of event types
-    event_types = set(e.get("event_name") for e in events)
-    score += len(event_types) * 5
+    for e in events:
+        created_at = e.get("created_at")
+        if not created_at:
+            continue
 
-    # cap at 100
-    return min(score, 100)
+        try:
+            event_time = datetime.fromisoformat(created_at.replace("Z", ""))
+            diff_hours = (now - event_time).total_seconds() / 3600
+
+            if diff_hours < 24:
+                score += 20
+            elif diff_hours < 72:
+                score += 10
+            else:
+                score += 2
+        except:
+            continue
+
+    return min(score, 40)
 
 
-def generate_insight_text(score: int, count: int) -> str:
+def detect_burst(events):
+    if len(events) >= 5:
+        return 10
+    return 0
 
+
+def classify_user(score):
+    if score >= 80:
+        return "🔥 Power User"
+    elif score >= 50:
+        return "🟢 Active User"
+    elif score >= 20:
+        return "🟡 Casual User"
+    return "⚫ Dormant User"
+
+
+def generate_insight_text(segment, score, count):
     if count == 0:
-        return "No activity detected for this user."
+        return "No user activity detected."
 
-    if score < 30:
-        return "Low engagement user with minimal interaction patterns."
+    if segment == "🔥 Power User":
+        return "Highly engaged user with strong consistent activity patterns."
 
-    if score < 70:
-        return "Moderate engagement user with consistent activity."
+    if segment == "🟢 Active User":
+        return "Active user with regular engagement and healthy interaction levels."
 
-    return "High engagement power user with strong behavioral signals."
+    if segment == "🟡 Casual User":
+        return "Occasional user with moderate engagement patterns."
+
+    return "Low activity user with minimal interaction signals."
 
 
 # =========================
-# GENERATE INSIGHT (V2)
+# GENERATE INSIGHT v3
 # =========================
 
 @app.post("/generate-insight", response_model=InsightResponse)
@@ -121,7 +151,6 @@ def generate_insight(request: InsightRequest):
         if not supabase:
             raise HTTPException(status_code=500, detail="Supabase not configured")
 
-        # Fetch user events
         res = supabase.table("events") \
             .select("*") \
             .eq("user_id", request.user_id) \
@@ -129,11 +158,15 @@ def generate_insight(request: InsightRequest):
 
         events = res.data or []
 
-        # AIOS v2 intelligence
-        score = calculate_score(events)
-        insight_text = generate_insight_text(score, len(events))
+        base = calculate_base_score(events)
+        recency = calculate_recency_score(events)
+        burst = detect_burst(events)
 
-        # Save insight
+        total_score = min(base + recency + burst, 100)
+        segment = classify_user(total_score)
+
+        insight_text = generate_insight_text(segment, total_score, len(events))
+
         supabase.table("insights").insert({
             "user_id": request.user_id,
             "insight_type": request.insight_type,
@@ -142,8 +175,9 @@ def generate_insight(request: InsightRequest):
 
         return InsightResponse(
             success=True,
-            insight_text=insight_text,
-            score=score
+            score=total_score,
+            user_segment=segment,
+            insight_text=insight_text
         )
 
     except Exception as e:
@@ -156,4 +190,4 @@ def generate_insight(request: InsightRequest):
 
 @app.on_event("startup")
 def startup_event():
-    print("AIOS backend v2 started successfully")
+    print("AIOS backend v3 started successfully")

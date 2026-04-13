@@ -2,22 +2,16 @@ import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-# IMPORTANT: do NOT initialize Supabase here
-supabase = None
-
 app = FastAPI()
 
-
-# ----------------------------
-# ENV VARIABLES
-# ----------------------------
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+supabase = None
 
 
 # ----------------------------
-# LAZY SUPABASE INIT (SAFE)
+# SAFE SUPABASE INIT (NO CRASH)
 # ----------------------------
 def get_supabase():
     global supabase
@@ -26,6 +20,7 @@ def get_supabase():
         return supabase
 
     if not SUPABASE_URL or not SUPABASE_KEY:
+        print("Supabase env missing - running without DB")
         return None
 
     try:
@@ -38,7 +33,7 @@ def get_supabase():
 
 
 # ----------------------------
-# REQUEST MODEL
+# MODELS
 # ----------------------------
 class InsightRequest(BaseModel):
     user_id: str
@@ -47,35 +42,39 @@ class InsightRequest(BaseModel):
 
 
 # ----------------------------
-# HEALTH CHECK
+# HEALTH CHECK (RENDER CRITICAL)
 # ----------------------------
 @app.get("/")
 def root():
-    return {"message": "AIOS backend is running"}
+    return {
+        "status": "ok",
+        "service": "aios-backend",
+        "runtime": "stable"
+    }
 
 
 # ----------------------------
-# MAIN ENDPOINT
+# INSIGHT ENDPOINT
 # ----------------------------
 @app.post("/generate-insight")
 def generate_insight(req: InsightRequest):
+
     supabase_client = get_supabase()
 
-    # If Supabase is broken, still return something (DON'T crash server)
+    # SAFE MODE (never crash)
     if supabase_client is None:
         return {
             "status": "ok",
-            "warning": "Supabase not available",
+            "mode": "fallback",
             "insight_type": req.insight_type,
-            "insight_text": "Fallback insight generated (Supabase unavailable).",
+            "insight_text": "Fallback insight (DB unavailable)"
         }
 
     try:
-        # Example DB insert (adjust table name if needed)
         response = supabase_client.table("insights").insert({
             "user_id": req.user_id,
             "insight_type": req.insight_type,
-            "data": req.data,
+            "data": req.data
         }).execute()
 
         return {

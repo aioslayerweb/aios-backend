@@ -1,134 +1,71 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from supabase import create_client
 import os
 
-app = FastAPI(title="AIOS Backend", version="0.5.0")
+app = FastAPI()
 
 # =========================
-# ENV VARIABLES
+# Models
 # =========================
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 
-supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-# =========================
-# DATA MODEL
-# =========================
-class Event(BaseModel):
+class InsightRequest(BaseModel):
     user_id: str
-    event_name: str
-    event_data: dict
+    insight_type: str = "behavior"
+    data: dict | None = None
+
+
+class InsightResponse(BaseModel):
+    success: bool
+    insight_text: str | None = None
+    message: str | None = None
+
 
 # =========================
-# ROOT
+# Health check
 # =========================
+
 @app.get("/")
 def root():
-    return {"message": "AIOS backend running"}
+    return {"message": "AIOS backend is running"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 
 # =========================
-# GENERATE INSIGHT
+# Core endpoint
 # =========================
-@app.post("/generate-insight")
-def generate_insight(event: Event):
 
-    print("\n🚀 NEW EVENT RECEIVED")
-    print(event)
+@app.post("/generate-insight", response_model=InsightResponse)
+def generate_insight(request: InsightRequest):
 
-    # -------------------------
-    # 1. STORE EVENT
-    # -------------------------
     try:
-        supabase.table("events").insert({
-            "user_id": event.user_id,
-            "event_name": event.event_name,
-            "event_data": event.event_data
-        }).execute()
+        # Placeholder logic (replace with AI / Supabase later)
+        user_id = request.user_id
+        insight_type = request.insight_type
+        data = request.data or {}
 
-        print("✅ Event stored")
+        # Simple mock insight generator
+        insight_text = (
+            f"Generated {insight_type} insight for user {user_id}. "
+            f"Data points received: {len(data)}"
+        )
+
+        return InsightResponse(
+            success=True,
+            insight_text=insight_text
+        )
 
     except Exception as e:
-        print("❌ Event insert error:", e)
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # -------------------------
-    # 2. FETCH USER HISTORY
-    # -------------------------
-    try:
-        response = supabase.table("events") \
-            .select("*") \
-            .eq("user_id", event.user_id) \
-            .eq("event_name", "lesson_completed") \
-            .order("created_at", desc=True) \
-            .limit(5) \
-            .execute()
 
-        history = response.data
+# =========================
+# Startup log (SAFE VERSION)
+# =========================
 
-    except Exception as e:
-        print("❌ Fetch error:", e)
-        history = []
-
-    # -------------------------
-    # 3. EXTRACT SCORES
-    # -------------------------
-    scores = []
-
-    for item in history:
-        data = item.get("event_data", {})
-        if isinstance(data, dict) and "score" in data:
-            scores.append(data["score"])
-
-    scores.reverse()
-
-    print("📊 Scores:", scores)
-
-    # -------------------------
-    # 4. GENERATE INSIGHT
-    # -------------------------
-    insight = None
-    insight_type = "performance"
-
-    if len(scores) >= 2:
-
-        if scores[-1] > scores[0]:
-            insight = "User is improving — consider increasing difficulty."
-
-        elif scores[-1] < scores[0]:
-            insight = "User performance is dropping — review previous lessons."
-
-        else:
-            insight = "User progress is stagnant — introduce variation."
-
-    if scores:
-        if scores[-1] < 60:
-            insight = "User is struggling — suggest easier content."
-
-        elif scores[-1] > 80:
-            insight = "User is performing well — increase difficulty."
-
-    if insight is None:
-        insight = "Not enough data yet."
-
-    print("💡 Insight:", insight)
-
-    # -------------------------
-    # 5. STORE INSIGHT (SAFE)
-    # -------------------------
-    try:
-        if insight:
-
-            supabase.table("insights").insert({
-                "user_id": event.user_id,
-                "insight_text": insight,
-                "insight_type": insight_type
-            }).execute()
-
-            print("✅ Insight stored")
-
-        else:
-            print("⚠️ Insight empty — not stored")
-
-    except Exception as e:
-        print("
+@app.on_event("startup")
+def startup_event():
+    print("AIOS backend started successfully")

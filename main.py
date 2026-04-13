@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from supabase import create_client
 import os
+from datetime import datetime
 
 app = FastAPI()
 
@@ -30,6 +31,7 @@ class InsightRequest(BaseModel):
 class InsightResponse(BaseModel):
     success: bool
     insight_text: str | None = None
+    score: int | None = None
     message: str | None = None
 
 
@@ -39,8 +41,7 @@ class InsightResponse(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "AIOS backend is running"}
-
+    return {"message": "AIOS backend v2 running"}
 
 @app.get("/health")
 def health():
@@ -64,17 +65,53 @@ def track_event(request: InsightRequest):
             "event_data": request.data or {}
         }).execute()
 
-        return {
-            "success": True,
-            "message": "event stored"
-        }
+        return {"success": True, "message": "event stored"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 # =========================
-# GENERATE INSIGHT
+# INTELLIGENCE ENGINE (CORE)
+# =========================
+
+def calculate_score(events: list) -> int:
+    """
+    AIOS v2 scoring logic
+    """
+
+    count = len(events)
+
+    if count == 0:
+        return 0
+
+    # base score from activity volume
+    score = min(count * 10, 60)
+
+    # bonus for diversity of event types
+    event_types = set(e.get("event_name") for e in events)
+    score += len(event_types) * 5
+
+    # cap at 100
+    return min(score, 100)
+
+
+def generate_insight_text(score: int, count: int) -> str:
+
+    if count == 0:
+        return "No activity detected for this user."
+
+    if score < 30:
+        return "Low engagement user with minimal interaction patterns."
+
+    if score < 70:
+        return "Moderate engagement user with consistent activity."
+
+    return "High engagement power user with strong behavioral signals."
+
+
+# =========================
+# GENERATE INSIGHT (V2)
 # =========================
 
 @app.post("/generate-insight", response_model=InsightResponse)
@@ -84,21 +121,19 @@ def generate_insight(request: InsightRequest):
         if not supabase:
             raise HTTPException(status_code=500, detail="Supabase not configured")
 
+        # Fetch user events
         res = supabase.table("events") \
             .select("*") \
             .eq("user_id", request.user_id) \
             .execute()
 
         events = res.data or []
-        count = len(events)
 
-        if count == 0:
-            insight_text = "No activity detected yet."
-        elif count < 3:
-            insight_text = f"Low activity user ({count} events)."
-        else:
-            insight_text = f"High activity user ({count} events)."
+        # AIOS v2 intelligence
+        score = calculate_score(events)
+        insight_text = generate_insight_text(score, len(events))
 
+        # Save insight
         supabase.table("insights").insert({
             "user_id": request.user_id,
             "insight_type": request.insight_type,
@@ -107,7 +142,8 @@ def generate_insight(request: InsightRequest):
 
         return InsightResponse(
             success=True,
-            insight_text=insight_text
+            insight_text=insight_text,
+            score=score
         )
 
     except Exception as e:
@@ -115,9 +151,9 @@ def generate_insight(request: InsightRequest):
 
 
 # =========================
-# STARTUP LOG
+# STARTUP
 # =========================
 
 @app.on_event("startup")
 def startup_event():
-    print("AIOS backend started successfully")
+    print("AIOS backend v2 started successfully")

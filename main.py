@@ -1,11 +1,24 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from supabase import create_client
 import os
 
 app = FastAPI()
 
 # =========================
-# Models
+# SUPABASE SETUP
+# =========================
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if SUPABASE_URL and SUPABASE_KEY:
+    supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+else:
+    supabase = None
+
+
+# =========================
+# MODELS
 # =========================
 
 class InsightRequest(BaseModel):
@@ -21,7 +34,7 @@ class InsightResponse(BaseModel):
 
 
 # =========================
-# Health check
+# HEALTH CHECK
 # =========================
 
 @app.get("/")
@@ -35,23 +48,66 @@ def health():
 
 
 # =========================
-# Core endpoint
+# TRACK EVENT
+# =========================
+
+@app.post("/track-event")
+def track_event(request: InsightRequest):
+
+    try:
+        if not supabase:
+            raise HTTPException(status_code=500, detail="Supabase not configured")
+
+        supabase.table("events").insert({
+            "user_id": request.user_id,
+            "event_type": request.insight_type,
+            "event_data": request.data or {}
+        }).execute()
+
+        return {
+            "success": True,
+            "message": "event stored"
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# =========================
+# GENERATE INSIGHT
 # =========================
 
 @app.post("/generate-insight", response_model=InsightResponse)
 def generate_insight(request: InsightRequest):
 
     try:
-        # Placeholder logic (replace with AI / Supabase later)
-        user_id = request.user_id
-        insight_type = request.insight_type
-        data = request.data or {}
+        if not supabase:
+            raise HTTPException(status_code=500, detail="Supabase not configured")
 
-        # Simple mock insight generator
-        insight_text = (
-            f"Generated {insight_type} insight for user {user_id}. "
-            f"Data points received: {len(data)}"
-        )
+        # Fetch events for user
+        res = supabase.table("events") \
+            .select("*") \
+            .eq("user_id", request.user_id) \
+            .execute()
+
+        events = res.data or []
+
+        event_count = len(events)
+
+        # Simple intelligence logic (upgrade later to AI)
+        if event_count == 0:
+            insight_text = "No user activity detected yet."
+        elif event_count < 3:
+            insight_text = f"Low activity user with {event_count} events."
+        else:
+            insight_text = f"High activity user with {event_count} events."
+
+        # Store insight
+        supabase.table("insights").insert({
+            "user_id": request.user_id,
+            "insight_type": request.insight_type,
+            "insight_text": insight_text
+        }).execute()
 
         return InsightResponse(
             success=True,
@@ -63,7 +119,7 @@ def generate_insight(request: InsightRequest):
 
 
 # =========================
-# Startup log (SAFE VERSION)
+# STARTUP LOG
 # =========================
 
 @app.on_event("startup")

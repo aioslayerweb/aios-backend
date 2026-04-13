@@ -1,86 +1,165 @@
-import os
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Dict, Any, Optional
+import uuid
+import os
+import requests
 
-app = FastAPI()
+app = FastAPI(title="AIOS Phase 2 - Action Engine")
 
+# -------------------------
+# CONFIG (Supabase)
+# -------------------------
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-supabase = None
+HEADERS = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": f"Bearer {SUPABASE_KEY}",
+    "Content-Type": "application/json"
+}
 
-
-# ----------------------------
-# SAFE SUPABASE INIT (NO CRASH)
-# ----------------------------
-def get_supabase():
-    global supabase
-
-    if supabase is not None:
-        return supabase
-
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        print("Supabase env missing - running without DB")
-        return None
-
-    try:
-        from supabase import create_client
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-        return supabase
-    except Exception as e:
-        print("Supabase init failed:", e)
-        return None
-
-
-# ----------------------------
+# -------------------------
 # MODELS
-# ----------------------------
-class InsightRequest(BaseModel):
+# -------------------------
+class ActionCreate(BaseModel):
     user_id: str
-    insight_type: str = "behavior"
-    data: dict = {}
+    type: str
+    payload: Dict[str, Any]
 
+class InsightToAction(BaseModel):
+    insight_text: str
+    user_id: str
 
-# ----------------------------
-# HEALTH CHECK (RENDER CRITICAL)
-# ----------------------------
+# -------------------------
+# HEALTH CHECK
+# -------------------------
 @app.get("/")
 def root():
-    return {
-        "status": "ok",
-        "service": "aios-backend",
-        "runtime": "stable"
+    return {"status": "AIOS Phase 2 backend running"}
+
+# -------------------------
+# CREATE ACTION
+# -------------------------
+@app.post("/actions/create")
+def create_action(action: ActionCreate):
+    action_id = str(uuid.uuid4())
+
+    data = {
+        "id": action_id,
+        "user_id": action.user_id,
+        "type": action.type,
+        "payload": action.payload,
+        "status": "pending"
     }
 
+    res = requests.post(
+        f"{SUPABASE_URL}/rest/v1/actions",
+        headers=HEADERS,
+        json=data
+    )
 
-# ----------------------------
-# INSIGHT ENDPOINT
-# ----------------------------
-@app.post("/generate-insight")
-def generate_insight(req: InsightRequest):
+    if res.status_code >= 300:
+        raise HTTPException(status_code=400, detail=res.text)
 
-    supabase_client = get_supabase()
+    return {"message": "Action created", "id": action_id}
 
-    # SAFE MODE (never crash)
-    if supabase_client is None:
-        return {
-            "status": "ok",
-            "mode": "fallback",
-            "insight_type": req.insight_type,
-            "insight_text": "Fallback insight (DB unavailable)"
+# -------------------------
+# AI DECIDES ACTION FROM INSIGHT
+# -------------------------
+@app.post("/ai/decide-action")
+def decide_action(body: InsightToAction):
+
+    text = body.insight_text.lower()
+
+    # VERY SIMPLE FREE LOGIC (no OpenAI cost yet)
+    if "email" in text or "send" in text:
+        action_type = "webhook"
+        payload = {
+            "url": "https://example.com/send-email",
+            "message": body.insight_text
         }
 
-    try:
-        response = supabase_client.table("insights").insert({
-            "user_id": req.user_id,
-            "insight_type": req.insight_type,
-            "data": req.data
-        }).execute()
-
-        return {
-            "status": "ok",
-            "data": response.data
+    elif "remind" in text or "task" in text:
+        action_type = "task"
+        payload = {
+            "title": body.insight_text,
+            "priority": "medium"
         }
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    else:
+        action_type = "notification"
+        payload = {
+            "text": body.insight_text
+        }
+
+    action_id = str(uuid.uuid4())
+
+    data = {
+        "id": action_id,
+        "user_id": body.user_id,
+        "type": action_type,
+        "payload": payload,
+        "status": "pending"
+    }
+
+    requests.post(
+        f"{SUPABASE_URL}/rest/v1/actions",
+        headers=HEADERS,
+        json=data
+    )
+
+    return {
+        "message": "Action generated from insight",
+        "action": data
+    }
+
+# -------------------------
+# RUN PENDING ACTIONS
+# -------------------------
+@app.post("/actions/run")
+def run_actions():
+
+    res = requests.get(
+        f"{SUPABASE_URL}/rest/v1/actions?status=eq.pending",
+        headers=HEADERS
+    )
+
+    if res.status_code >= 300:
+        raise HTTPException(status_code=400, detail=res.text)
+
+    actions = res.json()
+
+    results = []
+
+    for action in actions:
+
+        action_type = action["type"]
+
+        # ---------------- EMAIL / WEBHOOK MOCK ----------------
+        if action_type == "webhook":
+            try:
+                r = requests.post(
+                    action["payload"]["url"],
+                    json=action["payload"]
+                )
+                status = "done" if r.status_code < 300 else "failed"
+            except:
+                status = "failed"
+
+        elif action_type == "task":
+            status = "done"
+
+        else:
+            status = "done"
+
+        # update status
+        requests.patch(
+            f"{SUPABASE_URL}/rest/v1/actions?id=eq.{action['id']}",
+            headers=HEADERS,
+            json={"status": status}
+        )
+
+        results.append({"id": action["id"], "status": status})
+
+    return {"processed": len(results), "results": results}

@@ -3,10 +3,10 @@ from pydantic import BaseModel
 from supabase import create_client
 import os
 
-app = FastAPI(title="AIOS Backend", version="0.3.1")
+app = FastAPI(title="AIOS Backend", version="0.5.0")
 
 # =========================
-# ENV
+# ENV VARIABLES
 # =========================
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
@@ -14,7 +14,7 @@ SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 # =========================
-# MODEL
+# DATA MODEL
 # =========================
 class Event(BaseModel):
     user_id: str
@@ -29,19 +29,20 @@ def root():
     return {"message": "AIOS backend running"}
 
 # =========================
-# MAIN ENDPOINT
+# GENERATE INSIGHT
 # =========================
 @app.post("/generate-insight")
 def generate_insight(event: Event):
 
-    print("🚀 EVENT:", event)
+    print("\n🚀 NEW EVENT RECEIVED")
+    print(event)
 
     # -------------------------
     # 1. STORE EVENT
     # -------------------------
     try:
         supabase.table("events").insert({
-            "user_id": None,  # keep NULL for now
+            "user_id": event.user_id,
             "event_name": event.event_name,
             "event_data": event.event_data
         }).execute()
@@ -52,40 +53,42 @@ def generate_insight(event: Event):
         print("❌ Event insert error:", e)
 
     # -------------------------
-    # 2. FETCH HISTORY
+    # 2. FETCH USER HISTORY
     # -------------------------
     try:
-        history = supabase.table("events") \
+        response = supabase.table("events") \
             .select("*") \
+            .eq("user_id", event.user_id) \
             .eq("event_name", "lesson_completed") \
             .order("created_at", desc=True) \
             .limit(5) \
             .execute()
 
-        events_history = history.data
+        history = response.data
 
     except Exception as e:
         print("❌ Fetch error:", e)
-        events_history = []
+        history = []
 
     # -------------------------
     # 3. EXTRACT SCORES
     # -------------------------
     scores = []
 
-    for e in events_history:
-        data = e.get("event_data", {})
+    for item in history:
+        data = item.get("event_data", {})
         if isinstance(data, dict) and "score" in data:
             scores.append(data["score"])
 
-    scores.reverse()  # oldest → newest
+    scores.reverse()
 
     print("📊 Scores:", scores)
 
     # -------------------------
-    # 4. RULE-BASED INTELLIGENCE
+    # 4. GENERATE INSIGHT
     # -------------------------
-    insight = "Not enough data yet."
+    insight = None
+    insight_type = "performance"
 
     if len(scores) >= 2:
 
@@ -105,25 +108,27 @@ def generate_insight(event: Event):
         elif scores[-1] > 80:
             insight = "User is performing well — increase difficulty."
 
+    if insight is None:
+        insight = "Not enough data yet."
+
     print("💡 Insight:", insight)
 
     # -------------------------
-    # 5. STORE INSIGHT (FIXED)
+    # 5. STORE INSIGHT (SAFE)
     # -------------------------
     try:
-        supabase.table("insights").insert({
-            "insight_text": insight   # 👈 ONLY THIS FIELD
-        }).execute()
+        if insight:
 
-        print("✅ Insight stored")
+            supabase.table("insights").insert({
+                "user_id": event.user_id,
+                "insight_text": insight,
+                "insight_type": insight_type
+            }).execute()
+
+            print("✅ Insight stored")
+
+        else:
+            print("⚠️ Insight empty — not stored")
 
     except Exception as e:
-        print("❌ Insight insert error:", e)
-
-    # -------------------------
-    # RESPONSE
-    # -------------------------
-    return {
-        "insight": insight,
-        "mode": "rule-based"
-    }
+        print("

@@ -34,7 +34,7 @@ class InsightResponse(BaseModel):
 
 
 # =========================
-# HEALTH CHECK
+# HEALTH
 # =========================
 
 @app.get("/")
@@ -60,7 +60,7 @@ def track_event(request: InsightRequest):
 
         supabase.table("events").insert({
             "user_id": request.user_id,
-            "event_type": request.insight_type,
+            "event_name": request.insight_type,
             "event_data": request.data or {}
         }).execute()
 
@@ -84,25 +84,21 @@ def generate_insight(request: InsightRequest):
         if not supabase:
             raise HTTPException(status_code=500, detail="Supabase not configured")
 
-        # Fetch events for user
         res = supabase.table("events") \
             .select("*") \
             .eq("user_id", request.user_id) \
             .execute()
 
         events = res.data or []
+        count = len(events)
 
-        event_count = len(events)
-
-        # Simple intelligence logic (upgrade later to AI)
-        if event_count == 0:
-            insight_text = "No user activity detected yet."
-        elif event_count < 3:
-            insight_text = f"Low activity user with {event_count} events."
+        if count == 0:
+            insight_text = "No activity detected yet."
+        elif count < 3:
+            insight_text = f"Low activity user ({count} events)."
         else:
-            insight_text = f"High activity user with {event_count} events."
+            insight_text = f"High activity user ({count} events)."
 
-        # Store insight
         supabase.table("insights").insert({
             "user_id": request.user_id,
             "insight_type": request.insight_type,

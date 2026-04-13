@@ -3,19 +3,28 @@ from pydantic import BaseModel
 from supabase import create_client
 import os
 from datetime import datetime
+from openai import OpenAI
 
 app = FastAPI()
 
 # =========================
-# SUPABASE SETUP
+# CONFIG
 # =========================
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Supabase
 if SUPABASE_URL and SUPABASE_KEY:
     supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 else:
     supabase = None
+
+# OpenAI
+if OPENAI_API_KEY:
+    client = OpenAI(api_key=OPENAI_API_KEY)
+else:
+    client = None
 
 
 # =========================
@@ -42,7 +51,7 @@ class InsightResponse(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "AIOS backend v3 running"}
+    return {"message": "AIOS backend v4 running"}
 
 @app.get("/health")
 def health():
@@ -55,7 +64,6 @@ def health():
 
 @app.post("/track-event")
 def track_event(request: InsightRequest):
-
     try:
         if not supabase:
             raise HTTPException(status_code=500, detail="Supabase not configured")
@@ -73,7 +81,7 @@ def track_event(request: InsightRequest):
 
 
 # =========================
-# INTELLIGENCE ENGINE v3
+# V3 SCORING ENGINE
 # =========================
 
 def calculate_base_score(events):
@@ -109,9 +117,7 @@ def calculate_recency_score(events):
 
 
 def detect_burst(events):
-    if len(events) >= 5:
-        return 10
-    return 0
+    return 10 if len(events) >= 5 else 0
 
 
 def classify_user(score):
@@ -124,24 +130,54 @@ def classify_user(score):
     return "⚫ Dormant User"
 
 
-def generate_insight_text(segment, score, count):
-    if count == 0:
-        return "No user activity detected."
+# =========================
+# AI INSIGHT (OPENAI)
+# =========================
 
-    if segment == "🔥 Power User":
-        return "Highly engaged user with strong consistent activity patterns."
+def generate_ai_insight(events, score, segment):
+    if not client:
+        return "AI not configured."
 
-    if segment == "🟢 Active User":
-        return "Active user with regular engagement and healthy interaction levels."
+    try:
+        # Prepare summary of events
+        event_summary = []
+        for e in events[-10:]:  # last 10 events
+            event_summary.append(f"{e.get('event_name')} -> {e.get('event_data')}")
 
-    if segment == "🟡 Casual User":
-        return "Occasional user with moderate engagement patterns."
+        prompt = f"""
+You are an AI behavioral analyst.
 
-    return "Low activity user with minimal interaction signals."
+User segment: {segment}
+Score: {score}
+
+Recent user activity:
+{event_summary}
+
+Generate a concise insight explaining:
+- user behavior
+- engagement level
+- possible pattern
+
+Keep it short and clear.
+"""
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You analyze user behavior."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=120
+        )
+
+        return response.choices[0].message.content.strip()
+
+    except Exception as e:
+        return f"AI insight error: {str(e)}"
 
 
 # =========================
-# GENERATE INSIGHT v3
+# GENERATE INSIGHT v4
 # =========================
 
 @app.post("/generate-insight", response_model=InsightResponse)
@@ -165,8 +201,10 @@ def generate_insight(request: InsightRequest):
         total_score = min(base + recency + burst, 100)
         segment = classify_user(total_score)
 
-        insight_text = generate_insight_text(segment, total_score, len(events))
+        # 🔥 AI-generated insight
+        insight_text = generate_ai_insight(events, total_score, segment)
 
+        # Save insight
         supabase.table("insights").insert({
             "user_id": request.user_id,
             "insight_type": request.insight_type,
@@ -190,4 +228,4 @@ def generate_insight(request: InsightRequest):
 
 @app.on_event("startup")
 def startup_event():
-    print("AIOS backend v3 started successfully")
+    print("AIOS backend v4 started successfully")

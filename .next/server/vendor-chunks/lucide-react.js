@@ -311,6 +311,16 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 /***/ }),
 
+/***/ "(rsc)/./node_modules/lucide-react/dist/esm/icons/trending-up.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/lucide-react/dist/esm/icons/trending-up.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ TrendingUp)\n/* harmony export */ });\n/* harmony import */ var _createLucideIcon_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../createLucideIcon.js */ \"(rsc)/./node_modules/lucide-react/dist/esm/createLucideIcon.js\");\n/**\n * @license lucide-react v0.468.0 - ISC\n *\n * This source code is licensed under the ISC license.\n * See the LICENSE file in the root directory of this source tree.\n */ \nconst TrendingUp = (0,_createLucideIcon_js__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(\"TrendingUp\", [\n    [\n        \"polyline\",\n        {\n            points: \"22 7 13.5 15.5 8.5 10.5 2 17\",\n            key: \"126l90\"\n        }\n    ],\n    [\n        \"polyline\",\n        {\n            points: \"16 7 22 7 22 13\",\n            key: \"kwv8wd\"\n        }\n    ]\n]);\n //# sourceMappingURL=trending-up.js.map\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiKHJzYykvLi9ub2RlX21vZHVsZXMvbHVjaWRlLXJlYWN0L2Rpc3QvZXNtL2ljb25zL3RyZW5kaW5nLXVwLmpzIiwibWFwcGluZ3MiOiI7Ozs7O0FBQUE7Ozs7O0NBS0MsR0FFcUQ7QUFFdEQsTUFBTUMsYUFBYUQsZ0VBQWdCQSxDQUFDLGNBQWM7SUFDaEQ7UUFBQztRQUFZO1lBQUVFLFFBQVE7WUFBZ0NDLEtBQUs7UUFBUztLQUFFO0lBQ3ZFO1FBQUM7UUFBWTtZQUFFRCxRQUFRO1lBQW1CQyxLQUFLO1FBQVM7S0FBRTtDQUMzRDtBQUVnQyxDQUNqQyx1Q0FBdUMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9haW9zLWRhc2hib2FyZC8uL25vZGVfbW9kdWxlcy9sdWNpZGUtcmVhY3QvZGlzdC9lc20vaWNvbnMvdHJlbmRpbmctdXAuanM/MTk3YyJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlIGx1Y2lkZS1yZWFjdCB2MC40NjguMCAtIElTQ1xuICpcbiAqIFRoaXMgc291cmNlIGNvZGUgaXMgbGljZW5zZWQgdW5kZXIgdGhlIElTQyBsaWNlbnNlLlxuICogU2VlIHRoZSBMSUNFTlNFIGZpbGUgaW4gdGhlIHJvb3QgZGlyZWN0b3J5IG9mIHRoaXMgc291cmNlIHRyZWUuXG4gKi9cblxuaW1wb3J0IGNyZWF0ZUx1Y2lkZUljb24gZnJvbSAnLi4vY3JlYXRlTHVjaWRlSWNvbi5qcyc7XG5cbmNvbnN0IFRyZW5kaW5nVXAgPSBjcmVhdGVMdWNpZGVJY29uKFwiVHJlbmRpbmdVcFwiLCBbXG4gIFtcInBvbHlsaW5lXCIsIHsgcG9pbnRzOiBcIjIyIDcgMTMuNSAxNS41IDguNSAxMC41IDIgMTdcIiwga2V5OiBcIjEyNmw5MFwiIH1dLFxuICBbXCJwb2x5bGluZVwiLCB7IHBvaW50czogXCIxNiA3IDIyIDcgMjIgMTNcIiwga2V5OiBcImt3djh3ZFwiIH1dXG5dKTtcblxuZXhwb3J0IHsgVHJlbmRpbmdVcCBhcyBkZWZhdWx0IH07XG4vLyMgc291cmNlTWFwcGluZ1VSTD10cmVuZGluZy11cC5qcy5tYXBcbiJdLCJuYW1lcyI6WyJjcmVhdGVMdWNpZGVJY29uIiwiVHJlbmRpbmdVcCIsInBvaW50cyIsImtleSIsImRlZmF1bHQiXSwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///(rsc)/./node_modules/lucide-react/dist/esm/icons/trending-up.js\n");
+
+/***/ }),
+
 /***/ "(rsc)/./node_modules/lucide-react/dist/esm/shared/src/utils.js":
 /*!****************************************************************!*\
   !*** ./node_modules/lucide-react/dist/esm/shared/src/utils.js ***!

@@ -1,21 +1,21 @@
 from fastapi import FastAPI
 from backend.routes import events, insights
 
-app = FastAPI(
-    title="AIOS Backend",
-    version="2.0"
-)
+app = FastAPI()
 
-
-# 🧠 ROUTES
+# -----------------------------
+# ROUTES
+# -----------------------------
 app.include_router(events.router)
 app.include_router(insights.router)
 
 
-# ❤️ HEALTH CHECK
+# -----------------------------
+# HEALTH CHECK
+# -----------------------------
 @app.get("/")
 def root():
     return {
         "status": "AIOS backend running",
-        "layer": "AIOS Intelligence Layer v2"
+        "layer": "AIOS Intelligence Layer v2.1"
     }

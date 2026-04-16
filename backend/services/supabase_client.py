@@ -1,16 +1,15 @@
 import os
+from supabase import create_client, Client
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-supabase = None
+print("=== DEBUG SUPABASE ===")
+print("URL:", SUPABASE_URL)
+print("KEY EXISTS:", bool(SUPABASE_KEY))
+print("=====================")
 
-try:
-    if SUPABASE_URL and SUPABASE_KEY:
-        from supabase import create_client
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-    else:
-        print("⚠️ Missing Supabase env vars - running without DB")
-except Exception as e:
-    print("⚠️ Supabase init failed:", e)
+if not SUPABASE_URL or not SUPABASE_KEY:
     supabase = None
+else:
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)

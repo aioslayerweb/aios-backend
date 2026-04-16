@@ -5,33 +5,81 @@ from backend.services.supabase_client import supabase
 router = APIRouter(prefix="/api")
 
 
-# 🔵 GLOBAL INSIGHTS (all agents)
+# -----------------------------
+# GLOBAL AIOS INSIGHTS
+# -----------------------------
 @router.get("/insights")
 def get_insights():
     return run_all_agents()
 
 
-# 🟢 USER-SPECIFIC INSIGHTS
+# -----------------------------
+# USER-SPECIFIC INSIGHTS
+# -----------------------------
 @router.get("/insights/{user_id}")
 def get_user_insights(user_id: str):
-    return run_all_agents(user_id)
+
+    # Fetch events from Supabase
+    response = (
+        supabase
+        .table("events")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+    )
+
+    events = response.data or []
+
+    total_events = len(events)
+
+    # Event breakdown
+    event_breakdown = {}
+    for e in events:
+        name = e.get("event_name")
+        event_breakdown[name] = event_breakdown.get(name, 0) + 1
+
+    # Last event
+    last_event = events[-1]["event_name"] if events else None
+
+    # AIOS scoring (simple MVP logic)
+    aios_score = min(100, total_events * 10)
+
+    # Churn logic
+    churn_risk = "low"
+    if total_events < 3:
+        churn_risk = "high"
+    elif total_events < 10:
+        churn_risk = "medium"
+
+    # Response
+    return {
+        "user_id": user_id,
+        "total_events": total_events,
+        "event_breakdown": event_breakdown,
+        "last_event": last_event,
+        "aios_score": aios_score,
+        "churn_risk": churn_risk,
+        "agent_insights": run_all_agents()  # ✅ FIXED (no user_id here)
+    }
 
 
-# 🔥 OPTIONAL STEP (PERSIST INSIGHTS INTO SUPABASE)
+# -----------------------------
+# SAVE INSIGHTS (OPTIONAL)
+# -----------------------------
 @router.post("/insights/save/{user_id}")
 def save_user_insights(user_id: str):
 
-    insights = run_all_agents(user_id)
+    insights = run_all_agents()
 
     saved = []
 
-    for item in insights.get("agent_insights", []):
+    for item in insights:
         row = {
             "user_id": user_id,
-            "agent": item["agent"],
-            "insight": item["insight"],
-            "impact_score": item["impact_score"],
-            "severity": item["severity"],
+            "agent": item.get("agent"),
+            "insight": item.get("insight"),
+            "impact_score": item.get("impact_score"),
+            "severity": item.get("severity"),
         }
 
         result = supabase.table("user_insights").insert(row).execute()

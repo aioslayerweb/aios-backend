@@ -1,6 +1,6 @@
 import os
 import json
-import random
+import requests
 from datetime import datetime, timezone
 from openai import OpenAI
 
@@ -23,45 +23,42 @@ EVENT_WEIGHTS = {
 }
 
 # -----------------------------
-# RECENCY DECAY
+# RECENCY
 # -----------------------------
 def recency_weight(hours_ago: float) -> float:
-    decay_rate = 0.85
-    return decay_rate ** (hours_ago / 24)
+    return 0.85 ** (hours_ago / 24)
 
 
 # -----------------------------
-# AIOS SCORE ENGINE
+# SCORE ENGINE
 # -----------------------------
 def calculate_aios_score(events: list) -> int:
     if not events:
         return 0
 
-    score = 0
     now = datetime.now(timezone.utc)
+    score = 0
 
-    for event in events:
-        event_name = event.get("event_name", "login")
-        created_at = event.get("created_at")
+    for e in events:
+        name = e.get("event_name", "login")
+        created_at = e.get("created_at")
 
-        base_weight = EVENT_WEIGHTS.get(event_name, 1)
+        weight = EVENT_WEIGHTS.get(name, 1)
 
         try:
-            event_time = datetime.fromisoformat(
-                created_at.replace("Z", "+00:00")
-            )
-        except Exception:
-            event_time = now
+            t = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+        except:
+            t = now
 
-        hours_ago = max((now - event_time).total_seconds() / 3600, 0)
+        hours = max((now - t).total_seconds() / 3600, 0)
 
-        score += base_weight * recency_weight(hours_ago)
+        score += weight * recency_weight(hours)
 
     return min(int(score * 10), 100)
 
 
 # -----------------------------
-# CHURN RISK MODEL
+# CHURN MODEL
 # -----------------------------
 def calculate_churn_risk(score: int, total_events: int) -> str:
     if total_events == 0:
@@ -74,178 +71,83 @@ def calculate_churn_risk(score: int, total_events: int) -> str:
 
 
 # -----------------------------
-# PREDICTIVE LAYER 5.4
+# PREDICTIONS (from 5.4)
 # -----------------------------
-
-def predict_churn_probability(score: int, total_events: int, churn_risk: str) -> float:
+def predict_churn_probability(score, total_events, churn_risk):
     base = 100 - score
-
     if churn_risk == "high":
         base += 25
-    elif churn_risk == "medium":
-        base += 10
-
     if total_events == 0:
         base += 30
-
     return max(0, min(100, base))
 
 
-def predict_revenue_potential(score: int, events: list) -> float:
-    event_value = {
-        "login": 1,
-        "view_product": 3,
-        "add_to_cart": 7,
-        "purchase": 20,
-        "signup": 5
-    }
-
-    activity_score = 0
-
-    for e in events:
-        activity_score += event_value.get(e.get("event_name", ""), 1)
-
-    return min(100, (score * 0.6) + (activity_score * 2))
-
-
-def predict_next_best_action(score: int, churn_risk: str, events: list) -> str:
+def predict_next_best_action(score, churn_risk, events):
     has_purchase = any(e.get("event_name") == "purchase" for e in events)
     has_cart = any(e.get("event_name") == "add_to_cart" for e in events)
 
     if churn_risk == "high":
-        return "Send re-engagement campaign"
+        return "send_email_reengagement"
 
     if has_cart and not has_purchase:
-        return "Offer discount to complete purchase"
-
-    if not has_cart and score > 50:
-        return "Trigger product recommendation flow"
+        return "send_discount_offer"
 
     if score > 70:
-        return "Upsell premium plan"
+        return "upsell_premium"
 
-    return "Continue monitoring behavior"
-
-
-# -----------------------------
-# FALLBACK AGENTS
-# -----------------------------
-def fallback_agents(score: int, churn_risk: str):
-    return [
-        {
-            "agent": "sales",
-            "insight": "Revenue opportunity detected" if score > 50 else "Low purchase activity",
-            "impact_score": min(score + 10, 100),
-            "recommended_action": "Optimize pricing funnel",
-            "severity": "high" if score < 40 else "medium"
-        },
-        {
-            "agent": "customer_success",
-            "insight": "Engagement stable" if churn_risk == "low"
-            else "Churn risk increasing",
-            "impact_score": min(score + 5, 100),
-            "recommended_action": "Trigger engagement campaign",
-            "severity": churn_risk
-        },
-        {
-            "agent": "operations",
-            "insight": "System stable" if score > 60 else "Operational friction detected",
-            "impact_score": min(score, 100),
-            "recommended_action": "Improve workflow efficiency",
-            "severity": "medium"
-        }
-    ]
+    return "monitor"
 
 
 # -----------------------------
-# LLM AGENT REASONING
+# 🔥 AUTONOMOUS ACTION ENGINE (NEW)
 # -----------------------------
-def ai_agent_reasoning(agent_name: str, context: dict):
-    prompt = f"""
-You are an AI business intelligence agent.
+def execute_action(action: str, user_id: str, score: int):
+    """
+    This is where AIOS actually acts.
+    Replace with real integrations later (SendGrid, Slack, Stripe, etc.)
+    """
 
-Agent: {agent_name}
-
-Context:
-{json.dumps(context, indent=2)}
-
-Return ONLY JSON:
-{{
-  "insight": "...",
-  "impact_score": 0-100,
-  "recommended_action": "...",
-  "severity": "low|medium|high"
-}}
-"""
-
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a business intelligence engine."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4
-        )
-
-        return response.choices[0].message.content
-
-    except Exception:
-        return None
-
-
-# -----------------------------
-# MAIN AGENT ENGINE
-# -----------------------------
-def run_all_agents(events: list = None, user_id: str = None):
-    if events is None:
-        events = []
-
-    score = calculate_aios_score(events)
-    churn_risk = calculate_churn_risk(score, len(events))
-
-    context = {
+    payload = {
         "user_id": user_id,
-        "total_events": len(events),
-        "aios_score": score,
-        "churn_risk": churn_risk,
-        "events": events
+        "action": action,
+        "score": score,
+        "timestamp": datetime.now(timezone.utc).isoformat()
     }
 
-    agents = ["sales", "customer_success", "operations"]
-    results = []
+    # -----------------------------
+    # SIMULATED ACTIONS (SAFE DEFAULT)
+    # -----------------------------
 
-    for agent in agents:
-        ai_output = ai_agent_reasoning(agent, context)
+    if action == "send_email_reengagement":
+        print("📧 Sending re-engagement email...")
+        return {"status": "email_sent", "payload": payload}
 
-        parsed = None
-        if ai_output:
-            try:
-                parsed = json.loads(ai_output)
-            except:
-                parsed = None
+    if action == "send_discount_offer":
+        print("🎯 Sending discount offer...")
+        return {"status": "discount_sent", "payload": payload}
 
-        if parsed:
-            results.append({
-                "agent": agent,
-                "insight": parsed.get("insight"),
-                "impact_score": parsed.get("impact_score", 50),
-                "recommended_action": parsed.get("recommended_action"),
-                "severity": parsed.get("severity", "medium")
-            })
-        else:
-            fallback = fallback_agents(score, churn_risk)
-            results.append(next(f for f in fallback if f["agent"] == agent))
+    if action == "upsell_premium":
+        print("🚀 Triggering upsell flow...")
+        return {"status": "upsell_triggered", "payload": payload}
 
-    return results
+    print("🧠 No action executed")
+    return {"status": "no_action", "payload": payload}
 
 
 # -----------------------------
-# USER INSIGHTS (PREDICTIVE OUTPUT)
+# USER INSIGHTS (UPDATED)
 # -----------------------------
 def build_user_insights(user_id: str, events: list):
     score = calculate_aios_score(events)
     churn_risk = calculate_churn_risk(score, len(events))
+
+    churn_probability = predict_churn_probability(score, len(events), churn_risk)
+    next_action = predict_next_best_action(score, churn_risk, events)
+
+    # -----------------------------
+    # AUTONOMOUS EXECUTION (NEW)
+    # -----------------------------
+    action_result = execute_action(next_action, user_id, score)
 
     breakdown = {}
     last_event = None
@@ -255,28 +157,19 @@ def build_user_insights(user_id: str, events: list):
         breakdown[name] = breakdown.get(name, 0) + 1
         last_event = name
 
-    # -----------------------------
-    # PREDICTIONS (5.4)
-    # -----------------------------
-    churn_probability = predict_churn_probability(score, len(events), churn_risk)
-    revenue_potential = predict_revenue_potential(score, events)
-    next_action = predict_next_best_action(score, churn_risk, events)
-
     return {
         "user_id": user_id,
         "total_events": len(events),
         "event_breakdown": breakdown,
         "last_event": last_event,
 
-        # CORE
         "aios_score": score,
         "churn_risk": churn_risk,
 
-        # PREDICTIVE LAYER
+        # predictions
         "churn_probability": round(churn_probability, 2),
-        "revenue_potential": round(revenue_potential, 2),
         "next_best_action": next_action,
 
-        # AGENTS
-        "agent_insights": run_all_agents(events, user_id)
+        # 🔥 AUTONOMOUS ACTION OUTPUT
+        "action_result": action_result
     }

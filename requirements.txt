@@ -1,12 +1,9 @@
 fastapi==0.109.2
 uvicorn==0.27.1
-
 supabase==2.5.0
 httpx==0.25.2
 gotrue==2.9.0
-postgrest==0.13.2
 storage3==0.5.3
 realtime==1.0.0
-
 python-dotenv==1.0.1
 openai==1.30.1

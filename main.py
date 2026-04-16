@@ -2,42 +2,46 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes import insights
-
-# =========================
-# AIOS Backend App
-# =========================
+from backend.routes import events
 
 app = FastAPI(
     title="AIOS Backend",
-    description="Autonomous Business Optimization System API",
     version="1.0.0"
 )
 
-# =========================
-# CORS (important for Next.js frontend)
-# =========================
-
+# ----------------------------
+# CORS (IMPORTANT for frontend)
+# ----------------------------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # in production, replace with your Vercel domain
+    allow_origins=["*"],  # in production you should restrict this
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# =========================
-# Routes
-# =========================
-
+# ----------------------------
+# ROUTES
+# ----------------------------
 app.include_router(insights.router)
+app.include_router(events.router)
 
-# =========================
-# Health Check
-# =========================
 
+# ----------------------------
+# HEALTH CHECK
+# ----------------------------
 @app.get("/")
 def root():
     return {
         "status": "AIOS backend running",
-        "message": "Welcome to AIOS API"
+        "version": "1.0.0",
+        "modules": [
+            "insights",
+            "events"
+        ]
     }
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}

@@ -5,8 +5,9 @@ import { Bell, Search } from "lucide-react";
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Welcome back — here's what's happening today." },
-  "/agents": { title: "AI Agents", subtitle: "Manage and monitor your active AI agents." },
-  "/sales": { title: "Sales", subtitle: "Track pipeline, deals, and revenue performance." },
+  "/insights": { title: "Insights", subtitle: "AI-powered recommendations and analysis." },
+  "/agents": { title: "AI Agents", subtitle: "Manage and monitor your autonomous agents." },
+  "/activity": { title: "Activity Log", subtitle: "Monitor all system events and agent activities." },
   "/settings": { title: "Settings", subtitle: "Configure your workspace and preferences." },
 };
 
@@ -15,7 +16,7 @@ export default function Topbar() {
   const page = pageTitles[pathname] ?? pageTitles["/"];
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 shadow-sm">
+    <header className="fixed top-0 left-64 right-0 h-16 bg-white/95 border-b border-slate-200 backdrop-blur-sm flex items-center justify-between px-8 z-10">
       <div>
         <h1 className="text-lg font-semibold text-slate-900 leading-tight">{page.title}</h1>
         <p className="text-xs text-slate-400 mt-0.5">{page.subtitle}</p>

@@ -6,15 +6,17 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Bot,
-  TrendingUp,
+  Lightbulb,
+  Activity,
   Settings,
   ChevronRight,
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
+  { label: "Insights", href: "/insights", icon: Lightbulb },
   { label: "AI Agents", href: "/agents", icon: Bot },
-  { label: "Sales", href: "/sales", icon: TrendingUp },
+  { label: "Activity Log", href: "/activity", icon: Activity },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -22,8 +24,8 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 flex flex-col z-20 shadow-sm">
-      <div className="flex items-center px-6 py-5 border-b border-slate-100">
+    <aside className="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-white to-slate-50 border-r border-slate-200 flex flex-col z-20">
+      <div className="flex items-center px-6 py-5 border-b border-slate-100/50">
         <Image
           src="/aios_logo_horizontal.png"
           alt="AIOS Layer"
@@ -64,7 +66,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-slate-100">
+      <div className="px-4 py-4 border-t border-slate-100/50">
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-50">
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center text-white text-xs font-semibold">
             A

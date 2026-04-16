@@ -1,6 +1,6 @@
 "use client";
 
-import { TrendingUp, TrendingDown, Video as LucideIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, type LucideIcon } from "lucide-react";
 
 interface KpiCardProps {
   title: string;

@@ -5,64 +5,40 @@ from backend.services.supabase_client import supabase
 router = APIRouter(prefix="/api")
 
 
-# GLOBAL AIOS INTELLIGENCE (no user needed)
+# 🔵 GLOBAL INSIGHTS (all agents)
 @router.get("/insights")
 def get_insights():
     return run_all_agents()
 
 
-# USER-SPECIFIC INTELLIGENCE LAYER
+# 🟢 USER-SPECIFIC INSIGHTS
 @router.get("/insights/{user_id}")
 def get_user_insights(user_id: str):
-    # Fetch events for this user
-    response = (
-        supabase
-        .table("events")
-        .select("*")
-        .eq("user_id", user_id)
-        .execute()
-    )
+    return run_all_agents(user_id)
 
-    events = response.data or []
 
-    if not events:
-        return {
+# 🔥 OPTIONAL STEP (PERSIST INSIGHTS INTO SUPABASE)
+@router.post("/insights/save/{user_id}")
+def save_user_insights(user_id: str):
+
+    insights = run_all_agents(user_id)
+
+    saved = []
+
+    for item in insights.get("agent_insights", []):
+        row = {
             "user_id": user_id,
-            "total_events": 0,
-            "event_breakdown": {},
-            "last_event": None,
-            "aios_score": 0,
-            "churn_risk": "unknown",
-            "agent_insights": []
+            "agent": item["agent"],
+            "insight": item["insight"],
+            "impact_score": item["impact_score"],
+            "severity": item["severity"],
         }
 
-    # Build breakdown
-    breakdown = {}
-    for e in events:
-        name = e.get("event_name")
-        breakdown[name] = breakdown.get(name, 0) + 1
-
-    last_event = events[-1].get("event_name")
-
-    # Simple AIOS scoring logic (replace later with real model)
-    total_events = len(events)
-    aios_score = min(100, total_events * 10)
-
-    churn_risk = "low"
-    if total_events < 3:
-        churn_risk = "high"
-    elif total_events < 10:
-        churn_risk = "medium"
-
-    # reuse agent engine
-    agent_insights = run_all_agents()
+        result = supabase.table("user_insights").insert(row).execute()
+        saved.append(result.data)
 
     return {
-        "user_id": user_id,
-        "total_events": total_events,
-        "event_breakdown": breakdown,
-        "last_event": last_event,
-        "aios_score": aios_score,
-        "churn_risk": churn_risk,
-        "agent_insights": agent_insights
+        "status": "saved",
+        "count": len(saved),
+        "data": saved
     }

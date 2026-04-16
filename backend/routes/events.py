@@ -1,35 +1,21 @@
-from fastapi import APIRouter, Header, HTTPException
+from fastapi import APIRouter
 from backend.services.supabase_client import supabase
-import jwt
-import os
+from backend.services.intelligence import update_user_insights
 
 router = APIRouter()
 
-SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET")
-
-def get_user_id_from_token(token: str):
-    try:
-        decoded = jwt.decode(token, options={"verify_signature": False})
-        return decoded["sub"]
-    except Exception:
-        raise HTTPException(status_code=401, detail="Invalid token")
 
 @router.post("/events")
-def create_event(payload: dict, authorization: str = Header(None)):
+def create_event(payload: dict):
+    # 1. store raw event
+    response = supabase.table("events").insert(payload).execute()
 
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing token")
-
-    token = authorization.replace("Bearer ", "")
-    user_id = get_user_id_from_token(token)
-
-    event = {
-        "user_id": user_id,
-        "event_name": payload.get("event_name"),
-        "event_data": payload.get("event_data", {})
-    }
-
-    response = supabase.table("events").insert(event).execute()
+    # 2. run AIOS intelligence layer
+    update_user_insights(
+        user_id=payload.get("user_id"),
+        event_name=payload.get("event_name"),
+        event_data=payload.get("event_data", {})
+    )
 
     return {
         "status": "event received",

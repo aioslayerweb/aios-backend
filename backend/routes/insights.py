@@ -1,92 +1,82 @@
 from fastapi import APIRouter
 from backend.services.agent_engine import run_all_agents
 from backend.services.supabase_client import supabase
+from collections import Counter
+import random
 
 router = APIRouter(prefix="/api")
 
-
-# -----------------------------
-# GLOBAL AIOS INSIGHTS
-# -----------------------------
+# ========================================
+# GLOBAL INSIGHTS (ALL USERS)
+# ========================================
 @router.get("/insights")
 def get_insights():
     return run_all_agents()
 
 
-# -----------------------------
-# USER-SPECIFIC INSIGHTS
-# -----------------------------
+# ========================================
+# USER INTELLIGENCE (COMPUTED)
+# ========================================
 @router.get("/insights/{user_id}")
 def get_user_insights(user_id: str):
+    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+    events = response.data
 
-    # Fetch events from Supabase
-    response = (
-        supabase
-        .table("events")
-        .select("*")
-        .eq("user_id", user_id)
-        .execute()
-    )
+    if not events:
+        return {
+            "user_id": user_id,
+            "message": "No data available"
+        }
 
-    events = response.data or []
+    event_names = [e["event_name"] for e in events]
+    event_count = len(events)
+    breakdown = Counter(event_names)
 
-    total_events = len(events)
+    last_event = events[-1]["event_name"]
 
-    # Event breakdown
-    event_breakdown = {}
-    for e in events:
-        name = e.get("event_name")
-        event_breakdown[name] = event_breakdown.get(name, 0) + 1
+    # AIOS scoring logic (simple v1)
+    aios_score = event_count * 10
 
-    # Last event
-    last_event = events[-1]["event_name"] if events else None
-
-    # AIOS scoring (simple MVP logic)
-    aios_score = min(100, total_events * 10)
-
-    # Churn logic
     churn_risk = "low"
-    if total_events < 3:
+    if event_count < 3:
         churn_risk = "high"
-    elif total_events < 10:
+    elif event_count < 6:
         churn_risk = "medium"
 
-    # Response
+    # Run agents dynamically
+    agent_insights = run_all_agents()
+
     return {
         "user_id": user_id,
-        "total_events": total_events,
-        "event_breakdown": event_breakdown,
+        "total_events": event_count,
+        "event_breakdown": dict(breakdown),
         "last_event": last_event,
         "aios_score": aios_score,
         "churn_risk": churn_risk,
-        "agent_insights": run_all_agents()  # ✅ FIXED (no user_id here)
+        "agent_insights": agent_insights
     }
 
 
-# -----------------------------
-# SAVE INSIGHTS (OPTIONAL)
-# -----------------------------
-@router.post("/insights/save/{user_id}")
-def save_user_insights(user_id: str):
+# ========================================
+# STORE AI INSIGHTS (NEW)
+# ========================================
+@router.post("/insights/store")
+def store_user_insight(payload: dict):
+    """
+    Expected payload:
+    {
+        "user_id": "...",
+        "insight": "...",
+        "agent": "sales",
+        "impact_score": 85,
+        "recommended_action": "...",
+        "severity": "high"
+    }
+    """
 
-    insights = run_all_agents()
-
-    saved = []
-
-    for item in insights:
-        row = {
-            "user_id": user_id,
-            "agent": item.get("agent"),
-            "insight": item.get("insight"),
-            "impact_score": item.get("impact_score"),
-            "severity": item.get("severity"),
-        }
-
-        result = supabase.table("user_insights").insert(row).execute()
-        saved.append(result.data)
+    response = supabase.table("user_insights").insert(payload).execute()
 
     return {
-        "status": "saved",
-        "count": len(saved),
-        "data": saved
+        "status": "insight stored",
+        "data": response.data
     }

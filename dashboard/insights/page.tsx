@@ -12,18 +12,23 @@ type Insight = {
 export default function InsightsPage() {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchInsights() {
       try {
         const res = await fetch(
-          "https://YOUR-RENDER-URL.onrender.com/api/insights"
+          "https://aios-backend-3.onrender.com/api/insights"
         );
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
 
         const data = await res.json();
         setInsights(data);
-      } catch (err) {
-        console.error("Failed to load insights", err);
+      } catch (err: any) {
+        setError(err.message || "Failed to load insights");
       } finally {
         setLoading(false);
       }
@@ -33,32 +38,41 @@ export default function InsightsPage() {
   }, []);
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">AIOS Insights</h1>
+    <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold">AIOS Insights</h1>
 
       {loading && (
         <p className="text-gray-500">Loading AI insights...</p>
       )}
 
-      {!loading && (
-        <div className="grid gap-4 md:grid-cols-2">
+      {error && (
+        <p className="text-red-500">
+          Error: {error}
+        </p>
+      )}
+
+      {!loading && !error && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {insights.map((insight, i) => (
             <div
               key={i}
-              className="border rounded-xl p-4 shadow-sm bg-white"
+              className="border rounded-xl p-5 shadow-sm bg-white hover:shadow-md transition"
             >
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold">{insight.title}</h2>
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="font-semibold text-lg">
+                  {insight.title}
+                </h2>
+
                 <span className="text-xs px-2 py-1 bg-gray-100 rounded">
                   {insight.category}
                 </span>
               </div>
 
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 text-sm mb-4">
                 {insight.description}
               </p>
 
-              <div className="mt-3 text-sm">
+              <div className="text-sm">
                 Impact Score:{" "}
                 <span className="font-bold">
                   {insight.impact_score}

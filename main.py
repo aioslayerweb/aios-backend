@@ -3,7 +3,7 @@ from backend.routes import events, insights
 
 app = FastAPI(
     title="AIOS Backend",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # -----------------------
@@ -19,5 +19,5 @@ app.include_router(insights.router)
 def root():
     return {
         "status": "AIOS backend running",
-        "layer": "AIOS Intelligence Layer v1"
+        "layer": "AIOS Intelligence Layer v2"
     }

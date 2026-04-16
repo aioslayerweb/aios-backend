@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from backend.services.ai_engine import generate_insights
+from backend.services.agent_engine import run_all_agents
 
 router = APIRouter(prefix="/api")
 
 @router.get("/insights")
 def get_insights():
-    return generate_insights()
+    return run_all_agents()

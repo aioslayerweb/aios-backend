@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from backend.services.supabase_client import supabase
+from backend.services.ai_worker import run_ai_async
 
 router = APIRouter()
 
@@ -8,9 +9,6 @@ router = APIRouter()
 def create_event(payload: dict):
 
     try:
-        # -----------------------------
-        # 1. Extract payload safely
-        # -----------------------------
         user_id = payload.get("user_id")
         event_name = payload.get("event_name")
         event_data = payload.get("event_data", {})
@@ -22,47 +20,21 @@ def create_event(payload: dict):
                 "message": "missing user_id or event_name"
             }
 
-        # -----------------------------
-        # 2. Store event in Supabase
-        # -----------------------------
+        # 1. Store event
         db_response = supabase.table("events").insert({
             "user_id": user_id,
             "event_name": event_name,
-            "event_data": event_data,
-            "user_email": user_email
+            "event_data": event_data
         }).execute()
 
-        # -----------------------------
-        # 3. Try AI processing safely (NO CRASH)
-        # -----------------------------
-        ai_result = None
+        # 2. FIRE AND FORGET AI (NO WAIT)
+        run_ai_async(user_id, user_email)
 
-        try:
-            from backend.services.event_processor import process_event
-
-            events_response = supabase.table("events") \
-                .select("*") \
-                .eq("user_id", user_id) \
-                .order("created_at", desc=False) \
-                .execute()
-
-            events = events_response.data or []
-
-            ai_result = process_event(user_id, events, user_email)
-
-        except Exception as ai_error:
-            ai_result = {
-                "status": "ai_layer_error",
-                "message": str(ai_error)
-            }
-
-        # -----------------------------
-        # 4. Return safe response
-        # -----------------------------
+        # 3. instant response
         return {
             "status": "event_saved",
             "inserted": db_response.data,
-            "aios": ai_result
+            "ai": "processing_async"
         }
 
     except Exception as e:

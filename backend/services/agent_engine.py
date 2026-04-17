@@ -1,72 +1,48 @@
-# backend/services/agent_engine.py
-
 def calculate_aios_score(events):
     """
     Simple scoring logic based on number of events
     """
-    count = len(events)
+    if not events:
+        return 0
 
-    if count > 10:
-        return 80
-    elif count > 5:
-        return 60
-    elif count > 2:
-        return 40
-    else:
-        return 20
-
-
-def build_user_insights(events):
-    """
-    Generate insight text from events
-    """
-    count = len(events)
-
-    if count > 10:
-        return {"score": 80, "insight": "Highly engaged user"}
-    elif count > 5:
-        return {"score": 60, "insight": "Moderately active user"}
-    elif count > 2:
-        return {"score": 40, "insight": "Active user"}
-    else:
-        return {"score": 20, "insight": "Low engagement"}
+    return min(len(events) * 10, 100)
 
 
 def predict_churn(events):
     """
-    Very simple churn prediction
+    Simple churn prediction:
+    fewer events = higher churn risk
     """
-    count = len(events)
+    if not events:
+        return 0.9
 
-    if count > 10:
-        return 0.1
-    elif count > 5:
-        return 0.3
-    elif count > 2:
+    if len(events) < 3:
+        return 0.7
+    elif len(events) < 5:
         return 0.5
     else:
-        return 0.8
+        return 0.2
 
 
-def decide_action(churn_risk):
+def build_user_insights(score, churn):
     """
-    Decide what to do based on churn risk
+    Build human-readable insights
     """
-    if churn_risk > 0.7:
-        return "send_discount"
-    elif churn_risk > 0.4:
-        return "send_reengagement_email"
+    if score > 70:
+        insight = "Highly engaged user"
+    elif score > 40:
+        insight = "Active user"
     else:
-        return "no_action"
+        insight = "Low engagement"
 
-
-def execute_action(action, user_email):
-    """
-    Execute the decided action
-    """
-    if action == "send_discount":
-        print(f"Sending discount email to {user_email}")
-    elif action == "send_reengagement_email":
-        print(f"Sending re-engagement email to {user_email}")
+    if churn > 0.7:
+        insight += " — High churn risk"
+    elif churn > 0.4:
+        insight += " — Medium churn risk"
     else:
-        print("No action needed")
+        insight += " — Low churn risk"
+
+    return {
+        "score": score,
+        "insight": insight
+    }

@@ -1,157 +1,125 @@
-# backend/services/agent_engine.py
-
-import random
-from datetime import datetime
-
-# Optional email service (safe fallback)
-try:
-    from backend.services.email_service import send_email
-except Exception:
-    def send_email(*args, **kwargs):
-        return None
+from backend.services.supabase_client import supabase
+from backend.services.email_service import send_email
 
 
 # =========================
-# 1. AIOS SCORE ENGINE
+# 1. EVENT SCORING
 # =========================
 
-def calculate_aios_score(events: list) -> int:
-    if not events:
-        return 0
-
-    score = 0
-
-    for e in events:
-        name = e.get("event_name", "")
-
-        if name == "login":
-            score += 10
-        elif name == "view_pricing":
-            score += 15
-        elif name == "upgrade":
-            score += 50
-        elif name == "cancel_subscription":
-            score -= 60
-        elif name == "support_ticket":
-            score += 5
-        else:
-            score += 2
-
-    return max(0, score)
+def calculate_aios_score(event_name: str) -> int:
+    scores = {
+        "login": 5,
+        "view_pricing": 15,
+        "signup": 25,
+        "cancel_subscription": -30,
+    }
+    return scores.get(event_name, 1)
 
 
 # =========================
-# 2. CHURN PREDICTION
+# 2. USER INSIGHTS GENERATION
 # =========================
 
-def predict_churn(events: list, score: int) -> str:
-    if score < 20:
-        return "high"
-    elif score < 50:
-        return "medium"
-    return "low"
+def build_user_insights(user_id: str):
+    events = supabase.table("events") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .execute()
 
+    data = events.data or []
 
-# =========================
-# 3. AGENT SYSTEM
-# =========================
-
-def run_all_agents(events: list) -> list:
-    return [
-        {
-            "agent": "sales",
-            "insight": "Revenue anomaly detected in mid-tier customers",
-            "impact_score": random.randint(70, 98),
-            "recommended_action": "Review pricing conversion funnel",
-            "severity": "high"
-        },
-        {
-            "agent": "customer_success",
-            "insight": "Churn risk increased for inactive accounts",
-            "impact_score": random.randint(60, 99),
-            "recommended_action": "Trigger re-engagement campaign",
-            "severity": "high"
-        },
-        {
-            "agent": "operations",
-            "insight": "Support ticket resolution time is increasing",
-            "impact_score": random.randint(55, 90),
-            "recommended_action": "Optimize support workflow routing",
-            "severity": "medium"
-        }
-    ]
-
-
-# =========================
-# 4. ACTION DECISION ENGINE (NEW FIX)
-# =========================
-
-def decide_action(aios_score: int, churn_risk: str) -> dict:
-    """
-    Determines whether system should trigger automation actions.
-    """
-
-    if churn_risk == "high":
+    if not data:
         return {
-            "trigger": True,
-            "action": "send_recovery_email",
-            "priority": "urgent"
+            "score": 0,
+            "insight": "No activity yet"
         }
 
-    if aios_score > 70:
-        return {
-            "trigger": True,
-            "action": "upsell_email",
-            "priority": "medium"
-        }
+    total_score = 0
+
+    for e in data:
+        total_score += calculate_aios_score(e.get("event_name", ""))
+
+    insight = "Low engagement"
+
+    if total_score > 50:
+        insight = "Highly engaged user"
+    elif total_score > 20:
+        insight = "Active user"
+    elif total_score < 0:
+        insight = "At risk of churn"
 
     return {
-        "trigger": False,
-        "action": None,
-        "priority": "low"
+        "score": total_score,
+        "insight": insight
     }
 
 
 # =========================
-# 5. USER INSIGHTS BUILDER
+# 3. CHURN PREDICTION
 # =========================
 
-def build_user_insights(user_id: str, events: list) -> dict:
+def predict_churn(user_id: str) -> float:
+    data = build_user_insights(user_id)
+    score = data["score"]
 
-    score = calculate_aios_score(events)
-    churn = predict_churn(events, score)
-    agents = run_all_agents(events)
-    action = decide_action(score, churn)
+    if score < 0:
+        return 0.9
+    elif score < 20:
+        return 0.6
+    elif score < 50:
+        return 0.3
+    else:
+        return 0.1
 
-    # Optional: trigger email (safe hook)
-    if action["trigger"]:
+
+# =========================
+# 4. DECISION ENGINE
+# =========================
+
+def decide_action(user_id: str):
+    churn_risk = predict_churn(user_id)
+
+    if churn_risk > 0.7:
+        return "send_email_winback"
+    elif churn_risk > 0.4:
+        return "send_email_engagement"
+    else:
+        return "do_nothing"
+
+
+# =========================
+# 5. EXECUTION ENGINE
+# =========================
+
+def execute_action(user_id: str, user_email: str, action: str):
+    if action == "send_email_winback":
         send_email(
-            to_email=f"{user_id}@aios.com",
-            subject="AIOS Insight Alert",
-            content=f"Action: {action['action']}"
+            user_email,
+            "We miss you at AIOS",
+            "Come back and see what's new!"
         )
 
+    elif action == "send_email_engagement":
+        send_email(
+            user_email,
+            "AIOS insights for you",
+            "You're becoming an active user!"
+        )
+
+    return {"status": "executed", "action": action}
+
+
+# =========================
+# 6. MAIN ENTRYPOINT
+# =========================
+
+def run_ai_pipeline(user_id: str, user_email: str):
+    insights = build_user_insights(user_id)
+    action = decide_action(user_id)
+    result = execute_action(user_id, user_email, action)
+
     return {
-        "user_id": user_id,
-        "total_events": len(events),
-        "event_breakdown": _group_events(events),
-        "last_event": events[-1]["event_name"] if events else None,
-        "aios_score": score,
-        "churn_risk": churn,
-        "agent_insights": agents,
-        "automation": action
+        "insights": insights,
+        "action": action,
+        "result": result
     }
-
-
-# =========================
-# 6. HELPERS
-# =========================
-
-def _group_events(events: list) -> dict:
-    result = {}
-
-    for e in events:
-        name = e.get("event_name", "unknown")
-        result[name] = result.get(name, 0) + 1
-
-    return result

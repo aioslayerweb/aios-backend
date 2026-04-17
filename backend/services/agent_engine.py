@@ -1,142 +1,119 @@
-import json
-from datetime import datetime, timezone
-from openai import OpenAI
-import os
+from collections import Counter
+from backend.services.email_service import send_email
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# -----------------------------
-# EVENT WEIGHTS
-# -----------------------------
 EVENT_WEIGHTS = {
-    "login": 1,
-    "signup": 3,
-    "view_product": 2,
-    "add_to_cart": 4,
-    "purchase": 8,
-    "support_ticket": 5,
-    "cancel_subscription": 10
+    "login": 5,
+    "view_pricing": 10,
+    "start_trial": 25,
+    "feature_used": 15,
+    "cancel_subscription": -40
 }
 
-# -----------------------------
-# SCORE ENGINE
-# -----------------------------
-def calculate_aios_score(events: list) -> int:
-    if not events:
-        return 0
 
-    now = datetime.now(timezone.utc)
+def calculate_aios_score(events):
     score = 0
-
     for e in events:
-        name = e.get("event_name", "login")
-        created_at = e.get("created_at")
-
-        weight = EVENT_WEIGHTS.get(name, 1)
-
-        try:
-            t = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-        except:
-            t = now
-
-        hours = max((now - t).total_seconds() / 3600, 0)
-        decay = 0.85 ** (hours / 24)
-
-        score += weight * decay
-
-    return min(int(score * 10), 100)
+        score += EVENT_WEIGHTS.get(e.get("event_name"), 0)
+    return max(score, 0)
 
 
-# -----------------------------
-# CHURN RISK
-# -----------------------------
-def calculate_churn_risk(score: int, total_events: int) -> str:
-    if total_events == 0:
+def predict_churn(events, score):
+    if not events:
+        return "unknown"
+
+    breakdown = Counter([e.get("event_name") for e in events])
+    last_event = events[-1].get("event_name")
+
+    if "cancel_subscription" in breakdown:
+        return "critical"
+
+    if score < 20:
         return "high"
-    if score >= 70:
-        return "low"
-    if score >= 40:
+
+    if last_event == "login" and breakdown.get("feature_used", 0) == 0:
         return "medium"
-    return "high"
+
+    return "low"
 
 
-# -----------------------------
-# AI AGENT (REAL LLM)
-# -----------------------------
-def generate_ai_agent_insight(agent_name: str, events: list, score: int):
-    prompt = f"""
-You are an AI business intelligence agent.
+def decide_action(score, churn_risk):
+    if churn_risk == "critical":
+        return "send_discount_offer"
+    if churn_risk == "high":
+        return "send_email_reengagement"
+    if score > 50:
+        return "upsell_premium"
+    return None
 
-Agent: {agent_name}
 
-User events:
-{json.dumps(events[:20], default=str)}
-
-AIOS score: {score}
-
-Return ONLY valid JSON:
-{{
-  "agent": "{agent_name}",
-  "insight": "...",
-  "impact_score": 0-100,
-  "recommended_action": "...",
-  "severity": "low|medium|high"
-}}
-"""
-
+def execute_action(action, user_email):
     try:
-        res = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a strict JSON generator."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.4
-        )
+        if not action or not user_email:
+            return {"status": "no_action"}
 
-        return json.loads(res.choices[0].message.content)
+        if action == "send_email_reengagement":
+            return send_email(
+                to_email=user_email,
+                subject="We miss you at AIOS 🚀",
+                content="<h1>Come back!</h1>"
+            )
+
+        if action == "send_discount_offer":
+            return send_email(
+                to_email=user_email,
+                subject="Special Offer 💡",
+                content="<h1>20% discount</h1>"
+            )
+
+        if action == "upsell_premium":
+            return send_email(
+                to_email=user_email,
+                subject="Upgrade 🚀",
+                content="<h1>Go Pro</h1>"
+            )
 
     except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+    return {"status": "unknown_action"}
+
+
+def build_user_insights(user_id, events, user_email=None):
+
+    if not events:
         return {
-            "agent": agent_name,
-            "insight": "AI offline (fallback mode)",
-            "impact_score": 50,
-            "recommended_action": "monitor system",
-            "severity": "medium",
-            "mode": "fallback",
-            "error": str(e)
+            "user_id": user_id,
+            "total_events": 0,
+            "aios_score": 0,
+            "churn_risk": "unknown",
+            "agent_insights": []
         }
 
-
-# -----------------------------
-# MAIN FUNCTION (THIS FIXES YOUR IMPORT ERROR)
-# -----------------------------
-def build_user_insights(user_id: str, events: list):
+    breakdown = Counter([e.get("event_name") for e in events])
+    last_event = events[-1].get("event_name")
 
     score = calculate_aios_score(events)
-    churn_risk = calculate_churn_risk(score, len(events))
+    churn_risk = predict_churn(events, score)
 
-    agents = ["sales", "customer_success", "operations"]
+    # SAFE email extraction fallback
+    if not user_email:
+        user_email = next(
+            (e.get("user_email") for e in events if e.get("user_email")),
+            None
+        )
 
-    agent_insights = [
-        generate_ai_agent_insight(agent, events, score)
-        for agent in agents
-    ]
-
-    breakdown = {}
-    last_event = None
-
-    for e in events:
-        name = e.get("event_name", "unknown")
-        breakdown[name] = breakdown.get(name, 0) + 1
-        last_event = name
+    action = decide_action(score, churn_risk)
+    action_result = execute_action(action, user_email)
 
     return {
         "user_id": user_id,
+        "user_email": user_email,
         "total_events": len(events),
-        "event_breakdown": breakdown,
+        "event_breakdown": dict(breakdown),
         "last_event": last_event,
         "aios_score": score,
         "churn_risk": churn_risk,
-        "agent_insights": agent_insights
+        "recommended_action": action,
+        "action_result": action_result
     }

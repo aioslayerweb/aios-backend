@@ -1,24 +1,23 @@
-from fastapi import APIRouter
-from backend.services.supabase_client import supabase
+from fastapi import APIRouter, HTTPException
+from backend.services.event_processor import get_user_events
 from backend.services.agent_engine import build_user_insights
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 
-@router.get("/insights")
-def get_global_insights():
-    return [
-        {"agent": "sales", "insight": "Revenue anomaly detected", "impact_score": 85, "severity": "high"},
-        {"agent": "customer_success", "insight": "Churn risk rising", "impact_score": 90, "severity": "high"},
-        {"agent": "operations", "insight": "Support delays increasing", "impact_score": 78, "severity": "medium"}
-    ]
+@router.get("/api/insights/{user_id}")
+def get_insights(user_id: str):
+    try:
+        # 1. Get user events (from DB or mock layer)
+        events = get_user_events(user_id)
 
+        # 2. Generate AIOS insights (single source of truth)
+        result = build_user_insights(user_id=user_id, events=events)
 
-@router.get("/insights/{user_id}")
-def get_user_insights(user_id: str):
+        return result
 
-    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
-
-    events = response.data if response.data else []
-
-    return build_user_insights(user_id, events)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Insights generation failed: {str(e)}"
+        )

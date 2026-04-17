@@ -1,42 +1,38 @@
+# backend/services/event_processor.py
+
+from backend.services.supabase_client import supabase
 from backend.services.agent_engine import (
+    calculate_aios_score,
     build_user_insights,
     predict_churn,
     decide_action,
     execute_action
 )
 
-from backend.services.supabase_client import supabase
 
+def process_event(user_id: str, user_email: str, event_name: str):
+    """
+    Main pipeline triggered after event is stored
+    """
 
-def get_user_events(user_id: str):
-    response = supabase.table("events") \
-        .select("*") \
-        .eq("user_id", user_id) \
-        .execute()
+    # 1. Get all user events
+    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+    events = response.data or []
 
-    return response.data or []
+    # 2. Compute intelligence
+    score = calculate_aios_score(events)
+    insights = build_user_insights(events)
+    churn = predict_churn(events)
 
+    # 3. Decide action
+    action = decide_action(churn)
 
-def process_event(event: dict):
-    user_id = event.get("user_id")
-    user_email = event.get("user_email")
-
-    if not user_id:
-        return {"error": "missing user_id"}
-
-    # 🔥 STEP 1 — compute intelligence
-    insights = build_user_insights(user_id)
-    churn = predict_churn(user_id)
-
-    # 🔥 STEP 2 — decide action
-    action = decide_action(user_id)
-
-    # 🔥 STEP 3 — execute action automatically
-    result = execute_action(user_id, user_email, action)
+    # 4. Execute action
+    execute_action(action, user_email)
 
     return {
+        "score": score,
         "insights": insights,
-        "churn_risk": churn,
-        "action": action,
-        "result": result
+        "churn": churn,
+        "action": action
     }

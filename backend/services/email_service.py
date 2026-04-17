@@ -1,30 +1,27 @@
 import os
 import resend
 
-resend.api_key = os.getenv("RESEND_API_KEY")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+
+resend.api_key = RESEND_API_KEY
 
 
-FROM_EMAIL = os.getenv("FROM_EMAIL", "AIOS <onboarding@resend.dev>")
-
-
-def send_email(to_email: str, subject: str, html: str):
+def send_email(to_email: str, subject: str, content: str):
+    """
+    Sends email via Resend
+    """
 
     try:
         response = resend.Emails.send({
-            "from": FROM_EMAIL,
-            "to": [to_email],
+            "from": "AIOS <onboarding@resend.dev>",
+            "to": to_email,
             "subject": subject,
-            "html": html
+            "html": content,
         })
 
-        return {
-            "status": "sent",
-            "provider": "resend",
-            "response": response
-        }
+        print("Email sent:", response)
+        return {"status": "sent", "response": response}
 
     except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+        print("Email error:", e)
+        return {"status": "error", "error": str(e)}

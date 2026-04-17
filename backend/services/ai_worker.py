@@ -10,7 +10,11 @@ from backend.services.agent_engine import (
 from backend.services.email_service import send_email
 
 
-def run_ai_async(event: dict):
+def run_ai_async(event, *args, **kwargs):
+    """
+    FIXED:
+    Accepts extra args safely so FastAPI won't break it
+    """
     thread = threading.Thread(target=process_event_pipeline, args=(event,))
     thread.start()
 
@@ -52,8 +56,8 @@ def process_event_pipeline(event: dict):
             content=f"""
                 <h2>AIOS Insight</h2>
                 <p>{insights['insight']}</p>
-                <p><b>We noticed low activity in your account.</b></p>
-                <p>Come back and explore new insights.</p>
+                <p><b>We noticed activity changes in your account.</b></p>
+                <p>Come back and explore insights.</p>
             """
         )
 
@@ -62,7 +66,7 @@ def process_event_pipeline(event: dict):
             to_email=user_email,
             subject="Unlock Premium AI Insights 🚀",
             content=f"""
-                <h2>You're power user status: {insights['score']}</h2>
+                <h2>Your AIOS Score: {insights['score']}</h2>
                 <p>Upgrade to unlock deeper analytics and automation.</p>
             """
         )

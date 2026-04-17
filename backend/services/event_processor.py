@@ -1,48 +1,31 @@
 from backend.services.supabase_client import supabase
-from backend.services.agent_engine import (
-    calculate_aios_score,
-    predict_churn,
-    build_user_insights,
-    decide_action,
-    execute_action
-)
+
+# Optional fallback (in case Supabase fails)
+EVENT_STORE = {}
 
 
-# =========================
-# FETCH USER EVENTS
-# =========================
-def get_user_events(user_id: str):
-    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
-    return response.data if response.data else []
-
-
-# =========================
-# PROCESS EVENT (CORE PIPELINE)
-# =========================
 def process_event(event: dict):
+    """
+    Save event to Supabase
+    """
+    try:
+        supabase.table("events").insert(event).execute()
+    except Exception as e:
+        print("Supabase error:", e)
+
+    # fallback storage
     user_id = event.get("user_id")
+    if user_id:
+        EVENT_STORE.setdefault(user_id, []).append(event)
 
-    # 1. Fetch all events
-    events = get_user_events(user_id)
 
-    # 2. AI scoring
-    score = calculate_aios_score(events)
-
-    # 3. Churn prediction
-    churn = predict_churn(events)
-
-    # 4. Insights
-    insights = build_user_insights(score, churn)
-
-    # 5. Decision
-    action = decide_action(score, churn)
-
-    # 6. Execute action (email, etc.)
-    execute_action(user_id, action)
-
-    return {
-        "score": score,
-        "churn": churn,
-        "insights": insights,
-        "action": action
-    }
+def get_user_events(user_id: str):
+    """
+    Fetch events from Supabase
+    """
+    try:
+        response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+        return response.data or []
+    except Exception as e:
+        print("Fetch error:", e)
+        return EVENT_STORE.get(user_id, [])

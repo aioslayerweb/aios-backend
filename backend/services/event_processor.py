@@ -1,57 +1,35 @@
-from backend.services.supabase_client import supabase
 from backend.services.insights_engine import build_user_insights
+from backend.services.email_service import send_email
 
 
-def get_user_events(user_id: str):
+def process_event(event: dict):
     """
-    Fetch all events for a given user from Supabase
+    Process incoming event and trigger AI + actions
     """
-    try:
-        response = (
-            supabase
-            .table("events")
-            .select("*")
-            .eq("user_id", user_id)
-            .order("created_at", desc=False)
-            .execute()
+
+    user_id = event.get("user_id")
+    user_email = event.get("user_email")
+
+    # 1. Build insights
+    insights = build_user_insights(user_id)
+
+    # 2. Decide action (simple MVP logic)
+    action = None
+
+    if insights["churn_risk"] > 0.5:
+        action = "send_reengagement_email"
+    else:
+        action = "none"
+
+    # 3. Execute action
+    if action == "send_reengagement_email" and user_email:
+        send_email(
+            to_email=user_email,
+            subject="AIOS Insight",
+            content=insights["insights"]["insight"]
         )
 
-        return response.data if response.data else []
-
-    except Exception as e:
-        print("ERROR fetching events:", str(e))
-        return []
-
-
-def process_event(user_id: str):
-    """
-    Core pipeline:
-    1. Get user events
-    2. Build insights
-    3. Return structured result
-    """
-
-    try:
-        events = get_user_events(user_id)
-
-        if not events:
-            return {
-                "user_id": user_id,
-                "events_count": 0,
-                "churn_risk": 1.0,
-                "insight": "No activity detected"
-            }
-
-        insights = build_user_insights(events)
-
-        return insights
-
-    except Exception as e:
-        print("ERROR processing event:", str(e))
-
-        return {
-            "user_id": user_id,
-            "events_count": 0,
-            "churn_risk": 1.0,
-            "insight": "Processing error"
-        }
+    return {
+        "insights": insights,
+        "action": action
+    }

@@ -1,38 +1,19 @@
 from fastapi import APIRouter
 from backend.services.event_processor import get_user_events
-from backend.services.agent_engine import (
-    calculate_aios_score,
-    predict_churn,
-    build_user_insights
-)
+from backend.services.insights_engine import build_user_insights
 
 router = APIRouter()
 
-
-@router.get("/api/insights/{user_id}")
+@router.get("/insights/{user_id}")
 def get_insights(user_id: str):
-    try:
-        print(f"[INSIGHTS] Fetching events for user: {user_id}")
+    events = get_user_events(user_id)
 
-        events = get_user_events(user_id)
-        print(f"[INSIGHTS] Events fetched: {len(events)}")
-
-        score = calculate_aios_score(events)
-        print(f"[INSIGHTS] Score: {score}")
-
-        churn = predict_churn(events)
-        print(f"[INSIGHTS] Churn: {churn}")
-
-        insights = build_user_insights(score, churn)
-        print(f"[INSIGHTS] Insights: {insights}")
-
+    if not events:
         return {
             "user_id": user_id,
-            "events_count": len(events),
-            "insights": insights,
-            "churn_risk": churn
+            "events_count": 0,
+            "churn_risk": 0.0,
+            "insight": "No activity yet"
         }
 
-    except Exception as e:
-        print(f"[ERROR] {str(e)}")
-        return {"error": str(e)}
+    return build_user_insights(events)

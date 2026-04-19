@@ -1,5 +1,6 @@
 # backend/services/agent_engine.py
 
+
 def calculate_aios_score(events):
     """
     Simple scoring based on number of events
@@ -42,12 +43,19 @@ def build_user_insights(score, churn):
     }
 
 
-# 🚨 FORCE TEST MODE (THIS IS THE KEY PART)
 def decide_action(score, churn):
     """
-    FORCE email trigger to test revenue layer
+    REAL logic (no more forced emails)
+    Only send email when churn risk is high
     """
+
+    if churn > 0.7:
+        return {
+            "action": "send_email",
+            "reason": "high churn risk"
+        }
+
     return {
-        "action": "send_email",
-        "reason": "FORCED TEST FROM PHONE"
+        "action": "none",
+        "reason": "no action needed"
     }

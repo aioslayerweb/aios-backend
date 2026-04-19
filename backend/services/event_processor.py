@@ -1,88 +1,53 @@
 from backend.services.supabase_client import supabase
+from datetime import datetime
 
 
-# =========================
-# SAVE EVENT (optional helper)
-# =========================
-def save_event(user_id: str, event_name: str, user_email: str = None, event_data: dict = {}):
-    try:
-        data = {
-            "user_id": user_id,
-            "event_name": event_name,
-            "event_data": event_data,
-            "user_email": user_email
-        }
+# ----------------------------
+# SAVE EVENT
+# ----------------------------
+def process_event(user_id: str, event_name: str, event_data: dict = None, user_email: str = None):
+    if event_data is None:
+        event_data = {}
 
-        response = supabase.table("events").insert(data).execute()
-        return response.data
+    event = {
+        "user_id": user_id,
+        "event_name": event_name,
+        "event_data": event_data,
+        "user_email": user_email,
+        "created_at": datetime.utcnow().isoformat()
+    }
 
-    except Exception as e:
-        print("Error saving event:", str(e))
-        return None
+    response = supabase.table("events").insert(event).execute()
+
+    return response.data
 
 
-# =========================
-# GET USER EVENTS (THIS FIXES YOUR ERROR)
-# =========================
+# ----------------------------
+# GET USER EVENTS (FIXED)
+# ----------------------------
 def get_user_events(user_id: str):
-    try:
-        response = (
-            supabase
-            .table("events")
-            .select("*")
-            .eq("user_id", user_id)
-            .execute()
-        )
+    response = supabase.table("events") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .order("created_at", desc=True) \
+        .execute()
 
-        return response.data if response.data else []
-
-    except Exception as e:
-        print("Error fetching user events:", str(e))
-        return []
+    return response.data if response.data else []
 
 
-# =========================
-# PROCESS EVENT (AI LOGIC ENTRY)
-# =========================
-def process_event(user_id: str):
-    try:
-        events = get_user_events(user_id)
+# ----------------------------
+# SIMPLE USER METRICS
+# ----------------------------
+def get_user_metrics(user_id: str):
+    events = get_user_events(user_id)
 
-        if not events:
-            return {
-                "events_count": 0,
-                "insight": "No data yet",
-                "score": 0,
-                "churn_risk": 1.0
-            }
+    total_events = len(events)
 
-        events_count = len(events)
+    logins = len([e for e in events if e["event_name"] == "login"])
+    purchases = len([e for e in events if e["event_name"] == "purchase"])
 
-        # ===== SIMPLE MVP LOGIC =====
-        if events_count >= 10:
-            insight = "Power user — very low churn risk"
-            score = 90
-            churn_risk = 0.1
-        elif events_count >= 5:
-            insight = "Active user — low churn risk"
-            score = 60
-            churn_risk = 0.3
-        elif events_count >= 2:
-            insight = "New user — medium churn risk"
-            score = 40
-            churn_risk = 0.6
-        else:
-            insight = "At risk user — high churn risk"
-            score = 20
-            churn_risk = 0.9
-
-        return {
-            "events_count": events_count,
-            "insight": insight,
-            "score": score,
-            "churn_risk": churn_risk
-        }
-
-    except Exception as e:
-        print("Error processing event:", str(e))
-        return None
+    return {
+        "total_events": total_events,
+        "logins": logins,
+        "purchases": purchases
+    }

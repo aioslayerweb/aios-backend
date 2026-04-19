@@ -1,17 +1,8 @@
-# backend/services/agent_engine.py
-
-
 def calculate_aios_score(events):
-    """
-    Simple scoring based on number of events
-    """
     return len(events) * 10
 
 
 def predict_churn(events):
-    """
-    Basic churn prediction logic
-    """
     count = len(events)
 
     if count <= 1:
@@ -26,10 +17,18 @@ def predict_churn(events):
         return 0.15
 
 
-def build_user_insights(score, churn):
+def build_user_insights(score, churn, plan="free"):
     """
-    Generate human-readable insights
+    FREE vs PRO logic
     """
+
+    if plan == "free":
+        return {
+            "score": score,
+            "insight": "Upgrade to PRO to unlock AI insights"
+        }
+
+    # PRO users get real insights
     if churn > 0.7:
         insight = "User at high risk of churn"
     elif churn > 0.4:
@@ -43,11 +42,13 @@ def build_user_insights(score, churn):
     }
 
 
-def decide_action(score, churn):
+def decide_action(score, churn, plan="free"):
     """
-    REAL logic (no more forced emails)
-    Only send email when churn risk is high
+    Only PRO users get automation
     """
+
+    if plan != "pro":
+        return {"action": "none"}
 
     if churn > 0.7:
         return {
@@ -55,7 +56,4 @@ def decide_action(score, churn):
             "reason": "high churn risk"
         }
 
-    return {
-        "action": "none",
-        "reason": "no action needed"
-    }
+    return {"action": "none"}

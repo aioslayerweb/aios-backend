@@ -1,44 +1,38 @@
 from fastapi import APIRouter
+from pydantic import BaseModel
 from backend.services.supabase_client import supabase
 from backend.services.ai_worker import run_ai_async
 
 router = APIRouter()
 
 
+class Event(BaseModel):
+    user_id: str
+    user_email: str
+    event_name: str
+
+
 @router.post("/events")
-def create_event(payload: dict):
+def create_event(event: Event):
+    """
+    Create event and trigger AI processing
+    """
 
-    try:
-        user_id = payload.get("user_id")
-        event_name = payload.get("event_name")
-        event_data = payload.get("event_data", {})
-        user_email = payload.get("user_email")
+    # ✅ FIX: include user_email in insert
+    data = {
+        "user_id": event.user_id,
+        "event_name": event.event_name,
+        "user_email": event.user_email,
+        "event_data": {}
+    }
 
-        if not user_id or not event_name:
-            return {
-                "status": "error",
-                "message": "missing user_id or event_name"
-            }
+    result = supabase.table("events").insert(data).execute()
 
-        # 1. Store event
-        db_response = supabase.table("events").insert({
-            "user_id": user_id,
-            "event_name": event_name,
-            "event_data": event_data
-        }).execute()
+    # trigger async AI
+    run_ai_async(data)
 
-        # 2. FIRE AND FORGET AI (NO WAIT)
-        run_ai_async(user_id, user_email)
-
-        # 3. instant response
-        return {
-            "status": "event_saved",
-            "inserted": db_response.data,
-            "ai": "processing_async"
-        }
-
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
+    return {
+        "status": "event_saved",
+        "inserted": result.data,
+        "ai": "processing_async"
+    }

@@ -1,13 +1,22 @@
 from fastapi import FastAPI
-from backend.routes import events, insights, billing
+from backend.services.supabase_client import supabase
 
 app = FastAPI()
 
-app.include_router(events.router)
-app.include_router(insights.router, prefix="/api")
-app.include_router(billing.router)
-
-
 @app.get("/")
 def root():
-    return {"message": "AIOS backend running"}
+    return {"message": "AIOS backend is running"}
+
+@app.get("/test-db")
+def test_db():
+    try:
+        response = supabase.table("events").select("*").execute()
+        return {
+            "status": "success",
+            "data": response.data
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": str(e)
+        }

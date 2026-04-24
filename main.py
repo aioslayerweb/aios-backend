@@ -7,7 +7,6 @@ app = FastAPI()
 def root():
     return {"message": "AIOS backend is running"}
 
-# SIMPLE BROWSER TEST (NO POST TOOL NEEDED)
 @app.get("/create-test-event")
 def create_test_event():
     try:
@@ -17,14 +16,15 @@ def create_test_event():
                 "source": "mobile_browser",
                 "action": "auto_test"
             },
-            "user_id": "123"
+            # FIX: valid UUID format
+            "user_id": "550e8400-e29b-41d4-a716-446655440000"
         }
 
         response = supabase.table("events").insert(data).execute()
 
         return {
             "status": "success",
-            "message": "Test event created from browser",
+            "message": "Test event created",
             "data": response.data
         }
 

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.services.supabase_client import supabase
+from services.supabase_client import supabase
 
 app = FastAPI()
 

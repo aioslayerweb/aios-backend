@@ -1,49 +1,43 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import Dict, Any
 from services.supabase_client import supabase
 
 app = FastAPI()
 
-# --------------------
-# ROOT TEST
-# --------------------
 @app.get("/")
 def root():
     return {"message": "AIOS backend is running"}
 
-# --------------------
-# TEST DB READ
-# --------------------
-@app.get("/test-db")
-def test_db():
+# SIMPLE BROWSER TEST (NO POST TOOL NEEDED)
+@app.get("/create-test-event")
+def create_test_event():
     try:
-        response = supabase.table("events").select("*").execute()
+        data = {
+            "event_name": "browser_test",
+            "event_data": {
+                "source": "mobile_browser",
+                "action": "auto_test"
+            },
+            "user_id": "123"
+        }
+
+        response = supabase.table("events").insert(data).execute()
+
         return {
             "status": "success",
+            "message": "Test event created from browser",
             "data": response.data
         }
+
     except Exception as e:
         return {
             "status": "error",
             "message": str(e)
         }
 
-# --------------------
-# EVENT MODEL (IMPORTANT FIX)
-# --------------------
-class Event(BaseModel):
-    event_name: str
-    event_data: Dict[str, Any]
-    user_id: str | None = None
-
-# --------------------
-# CREATE EVENT (WRITE)
-# --------------------
-@app.post("/events")
-def create_event(event: Event):
+@app.get("/test-db")
+def test_db():
     try:
-        response = supabase.table("events").insert(event.dict()).execute()
+        response = supabase.table("events").select("*").execute()
         return {
             "status": "success",
             "data": response.data

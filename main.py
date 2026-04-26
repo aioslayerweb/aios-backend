@@ -24,7 +24,7 @@ class Event(BaseModel):
     user_id: Optional[str] = None
 
 # -----------------------------
-# CREATE EVENT
+# EVENTS
 # -----------------------------
 @app.post("/events")
 def create_event(event: Event):
@@ -34,9 +34,6 @@ def create_event(event: Event):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# -----------------------------
-# GET EVENTS
-# -----------------------------
 @app.get("/events")
 def get_events():
     try:
@@ -50,18 +47,14 @@ def get_events():
 # -----------------------------
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
-
-# -----------------------------
-# SAFE AI INSIGHT ENGINE
-# -----------------------------
 def get_ai_insight(event_breakdown: dict):
 
+    # 🔴 HARD CHECK (prevents fake outputs)
     if not MISTRAL_API_KEY:
-        return "AI not configured"
+        return "AI error: missing API key"
 
     prompt = f"""
-You are an AI analytics engine.
-Analyze this user behavior data:
+Analyze this user behavior:
 
 {event_breakdown}
 
@@ -87,30 +80,26 @@ Return 1–2 sentences only.
 
         data = response.json()
 
-        # -----------------------------
-        # SAFE RESPONSE HANDLING
-        # -----------------------------
-        if isinstance(data, dict):
+        # 🔴 STRICT ERROR HANDLING
+        if response.status_code != 200:
+            return f"AI error: {data}"
 
-            # OpenAI-style fallback
-            if "choices" in data:
-                return data["choices"][0]["message"]["content"]
+        # OpenAI-style
+        if "choices" in data:
+            return data["choices"][0]["message"]["content"]
 
-            # Mistral alternative formats
-            if "outputs" in data:
-                return data["outputs"][0].get("text", str(data))
+        # Mistral-style
+        if "outputs" in data:
+            return data["outputs"][0].get("text", "AI error: invalid output")
 
-            if "message" in data:
-                return data["message"]
-
-        return str(data)
+        return f"AI error: unexpected format {data}"
 
     except Exception as e:
         return f"AI error: {str(e)}"
 
 
 # -----------------------------
-# INSIGHTS ENDPOINT
+# INSIGHTS
 # -----------------------------
 @app.get("/insights/{user_id}")
 def get_insights(user_id: str):

@@ -13,16 +13,31 @@ def root():
     return {"message": "AIOS backend is running"}
 
 # --------------------
-# HEALTH CHECK
-# --------------------
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-
-# --------------------
 # EVENT MODEL
 # --------------------
 class Event(BaseModel):
     event_name: str
     event_data: Dict[str, Any]
     user_id: Optional[str] = None
+
+# --------------------
+# CREATE EVENT
+# --------------------
+@app.post("/events")
+def create_event(event: Event):
+    try:
+        response = supabase.table("events").insert(event.dict()).execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+# --------------------
+# GET EVENTS
+# --------------------
+@app.get("/events")
+def get_events():
+    try:
+        response = supabase.table("events").select("*").execute()
+        return {"status": "success", "data": response.data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}

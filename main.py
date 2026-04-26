@@ -2,27 +2,22 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from services.supabase_client import supabase
+import requests
+import os
 
 app = FastAPI()
 
-# --------------------
-# ROOT
-# --------------------
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
 @app.get("/")
 def root():
     return {"message": "AIOS backend is running"}
 
-# --------------------
-# EVENT MODEL
-# --------------------
 class Event(BaseModel):
     event_name: str
     event_data: Dict[str, Any]
     user_id: Optional[str] = None
 
-# --------------------
-# CREATE EVENT
-# --------------------
 @app.post("/events")
 def create_event(event: Event):
     try:
@@ -31,9 +26,6 @@ def create_event(event: Event):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# --------------------
-# GET EVENTS
-# --------------------
 @app.get("/events")
 def get_events():
     try:
@@ -42,9 +34,43 @@ def get_events():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-# --------------------
-# 🔥 INSIGHTS ENDPOINT (NEW)
-# --------------------
+# 🔥 AI FUNCTION
+def generate_ai_insight(events):
+    try:
+        headers = {
+            "Authorization": f"Bearer {MISTRAL_API_KEY}",
+            "Content-Type": "application/json"
+        }
+
+        summary = {}
+        for e in events:
+            name = e["event_name"]
+            summary[name] = summary.get(name, 0) + 1
+
+        prompt = f"""
+        Analyze this user behavior data and give a short insight:
+
+        {summary}
+
+        Focus on engagement level and user intent.
+        """
+
+        response = requests.post(
+            "https://api.mistral.ai/v1/chat/completions",
+            headers=headers,
+            json={
+                "model": "mistral-small",
+                "messages": [{"role": "user", "content": prompt}]
+            }
+        )
+
+        result = response.json()
+        return result["choices"][0]["message"]["content"]
+
+    except Exception as e:
+        return f"AI error: {str(e)}"
+
+# 🔥 AI INSIGHTS ENDPOINT
 @app.get("/insights/{user_id}")
 def get_insights(user_id: str):
     try:
@@ -54,38 +80,21 @@ def get_insights(user_id: str):
         if not events:
             return {
                 "status": "success",
-                "insights": "No data for this user",
-                "total_events": 0
+                "message": "No data for this user"
             }
 
-        # Count events
-        total_events = len(events)
-
-        # Count event types
         event_counts = {}
         for event in events:
             name = event["event_name"]
             event_counts[name] = event_counts.get(name, 0) + 1
 
-        # Find most common event
-        top_event = max(event_counts, key=event_counts.get)
-
-        # Simple insight logic
-        if total_events > 10:
-            activity_level = "highly active"
-        elif total_events > 5:
-            activity_level = "moderately active"
-        else:
-            activity_level = "low activity"
-
-        insight_text = f"User is {activity_level}. Most common action: {top_event}"
+        ai_insight = generate_ai_insight(events)
 
         return {
             "status": "success",
             "user_id": user_id,
-            "total_events": total_events,
             "event_breakdown": event_counts,
-            "insight": insight_text
+            "ai_insight": ai_insight
         }
 
     except Exception as e:

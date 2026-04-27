@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from supabase_client import supabase
-import os
-from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -11,29 +9,19 @@ def root():
     return {"message": "AIOS backend is running"}
 
 
-@app.get("/events")
-def get_events():
-    response = supabase.table("events").select("*").execute()
-    return {"status": "success", "data": response.data}
-
-
-# =========================
-# 🚨 ALERT ENGINE v1
-# =========================
 @app.get("/alerts")
 def alerts():
     response = supabase.table("events").select("*").execute()
     events = response.data
 
     if not events:
-        return {"status": "success", "alerts": []}
+        return {"status": "success", "total_alerts": 0, "alerts": []}
 
+    # =========================
+    # 📊 USER ACTIVITY MAP
+    # =========================
     user_activity = {}
-    recent_events = []
-
-    # 🕒 time threshold (last 24h logic simplified)
-    now = datetime.utcnow()
-    threshold = now - timedelta(hours=24)
+    pricing_views = {}
 
     for e in events:
         uid = e.get("user_id")
@@ -42,70 +30,70 @@ def alerts():
 
         user_activity[uid] = user_activity.get(uid, 0) + 1
 
-        # try parse timestamp safely
-        try:
-            created = e.get("created_at")
-            if created:
-                recent_events.append(e)
-        except:
-            pass
-
-    alerts_list = []
-
-    # =========================
-    # 🔥 ALERT 1: HIGH ACTIVITY SPIKE
-    # =========================
-    for uid, count in user_activity.items():
-        if count >= 25:
-            alerts_list.append({
-                "type": "activity_spike",
-                "severity": "high",
-                "user_id": uid,
-                "message": f"User {uid} has extremely high activity ({count} events)"
-            })
-
-    # =========================
-    # ⚠️ ALERT 2: LOW ENGAGEMENT USERS
-    # =========================
-    for uid, count in user_activity.items():
-        if count < 3:
-            alerts_list.append({
-                "type": "low_engagement",
-                "severity": "medium",
-                "user_id": uid,
-                "message": f"User {uid} is barely active ({count} events)"
-            })
-
-    # =========================
-    # 💰 ALERT 3: REVENUE OPPORTUNITY
-    # =========================
-    pricing_views = {}
-
-    for e in events:
         if e["event_name"] == "view_pricing":
-            uid = e.get("user_id")
             pricing_views[uid] = pricing_views.get(uid, 0) + 1
 
+    # =========================
+    # 🧠 FINAL ALERT MAP (DEDUPED)
+    # =========================
+    alerts_map = {}
+
+    # =========================
+    # 🚨 RULE 1: REVENUE (HIGHEST PRIORITY)
+    # =========================
     for uid, count in pricing_views.items():
         if count >= 2:
-            alerts_list.append({
+            alerts_map[uid] = {
                 "type": "revenue_opportunity",
                 "severity": "high",
                 "user_id": uid,
-                "message": f"User {uid} viewed pricing multiple times ({count}) → strong conversion intent"
-            })
+                "priority": 1,
+                "message": f"User {uid} shows strong purchase intent ({count} pricing views)"
+            }
 
     # =========================
-    # 📉 ALERT 4: CHURN WARNING
+    # ⚠️ RULE 2: CHURN RISK
     # =========================
     for uid, count in user_activity.items():
-        if count < 5:
-            alerts_list.append({
+        if uid in alerts_map:
+            continue  # already high-priority alert assigned
+
+        if count < 3:
+            alerts_map[uid] = {
                 "type": "churn_risk",
                 "severity": "high",
                 "user_id": uid,
-                "message": f"User {uid} is at risk of churn (low activity)"
-            })
+                "priority": 2,
+                "message": f"User {uid} is at high churn risk ({count} events)"
+            }
+
+    # =========================
+    # 📉 RULE 3: LOW ENGAGEMENT
+    # =========================
+    for uid, count in user_activity.items():
+        if uid in alerts_map:
+            continue  # skip if already assigned
+
+        if count < 6:
+            alerts_map[uid] = {
+                "type": "low_engagement",
+                "severity": "medium",
+                "user_id": uid,
+                "priority": 3,
+                "message": f"User {uid} has low engagement ({count} events)"
+            }
+
+    # =========================
+    # 📦 FINAL OUTPUT
+    # =========================
+    alerts_list = list(alerts_map.values())
+
+    # sort by priority (1 = highest)
+    alerts_list.sort(key=lambda x: x["priority"])
+
+    # remove internal field before returning
+    for a in alerts_list:
+        a.pop("priority", None)
 
     return {
         "status": "success",

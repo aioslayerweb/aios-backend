@@ -35,7 +35,7 @@ def get_insights(user_id: str):
             name = e["event_name"]
             breakdown[name] = breakdown.get(name, 0) + 1
 
-        # 🔥 GROQ AI CALL
+        # 🔥 GROQ AI CALL (UPDATED MODEL)
         try:
             prompt = f"""
             Analyze this user behavior:
@@ -52,7 +52,7 @@ def get_insights(user_id: str):
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": "llama3-70b-8192",
+                    "model": "llama3-8b-8192",
                     "messages": [
                         {"role": "user", "content": prompt}
                     ]
@@ -61,7 +61,6 @@ def get_insights(user_id: str):
 
             result = ai_response.json()
 
-            # Safety check to avoid crashes
             if "choices" in result:
                 ai_text = result["choices"][0]["message"]["content"]
             else:

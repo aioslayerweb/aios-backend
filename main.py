@@ -9,11 +9,18 @@ app = FastAPI()
 
 
 # =========================
-# 🏠 ROOT
+# 🏠 SYSTEM STATE
+# =========================
+AUTONOMOUS_MODE = True  # master switch (safe guard)
+AUTO_APPLY_THRESHOLD = 0.75  # confidence needed for auto-apply
+
+
+# =========================
+# 🧠 ROOT
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Autonomous Strategy Upgrader v9 running"}
+    return {"message": "AIOS Fully Autonomous Mode (Guarded v10)"}
 
 
 # =========================
@@ -26,72 +33,44 @@ def events():
 
 
 # =========================
-# 🧠 STRATEGY REGISTRY (VERSIONED)
+# 🧠 STRATEGY CORE
 # =========================
 STRATEGIES = {
-    "behavior_agent": {
-        "version": 1,
-        "weight_activity": 1.0
-    },
-    "revenue_agent": {
-        "version": 1,
-        "weight_conversion": 1.0
-    },
-    "risk_agent": {
-        "version": 1,
-        "weight_risk": 1.0
-    }
+    "behavior_agent": {"version": 1, "weight": 1.0},
+    "revenue_agent": {"version": 1, "weight": 1.0},
+    "risk_agent": {"version": 1, "weight": 1.0}
 }
 
 
-# =========================
-# 📦 STRATEGY UPGRADE STORE
-# =========================
-PENDING_UPGRADES = []
+METRICS = defaultdict(lambda: {"runs": 0, "success": 0})
 
 
 # =========================
-# 📊 PERFORMANCE MEMORY
-# =========================
-METRICS = defaultdict(lambda: {
-    "runs": 0,
-    "positive_signals": 0
-})
-
-
-# =========================
-# 🧠 AGENTS
+# 👤 AGENTS
 # =========================
 def behavior_agent(events):
-    strat = STRATEGIES["behavior_agent"]
-
-    score = len(events) * strat["weight_activity"]
+    score = len(events)
     state = "power_user" if score > 20 else "inactive" if score < 3 else "normal"
 
     METRICS["behavior_agent"]["runs"] += 1
     if state == "power_user":
-        METRICS["behavior_agent"]["positive_signals"] += 1
+        METRICS["behavior_agent"]["success"] += 1
 
     return {"score": score, "state": state}
 
 
 def revenue_agent(events):
-    strat = STRATEGIES["revenue_agent"]
-
     has_pricing = any(e["event_name"] == "view_pricing" for e in events)
-
-    score = (80 if has_pricing else 20) * strat["weight_conversion"]
+    score = 80 if has_pricing else 20
 
     METRICS["revenue_agent"]["runs"] += 1
     if has_pricing:
-        METRICS["revenue_agent"]["positive_signals"] += 1
+        METRICS["revenue_agent"]["success"] += 1
 
     return {"score": score, "intent": "high" if score > 60 else "low"}
 
 
 def risk_agent(events):
-    strat = STRATEGIES["risk_agent"]
-
     n = len(events)
 
     if n < 3:
@@ -101,109 +80,99 @@ def risk_agent(events):
     else:
         risk = 20
 
-    risk = risk * strat["weight_risk"]
-
     METRICS["risk_agent"]["runs"] += 1
     if risk > 70:
-        METRICS["risk_agent"]["positive_signals"] += 1
+        METRICS["risk_agent"]["success"] += 1
 
-    return {"risk": risk, "level": "high" if risk > 70 else "stable"}
-
-
-# =========================
-# 🧪 SIMULATION ENGINE (A/B TEST CORE)
-# =========================
-def simulate_strategy_change(agent_name, key, new_value, events):
-    original = STRATEGIES[agent_name][key]
-
-    # simulate old
-    STRATEGIES[agent_name][key] = original
-    baseline = run_single_agent_test(agent_name, events)
-
-    # simulate new
-    STRATEGIES[agent_name][key] = new_value
-    test = run_single_agent_test(agent_name, events)
-
-    # revert
-    STRATEGIES[agent_name][key] = original
-
-    return {
-        "baseline": baseline,
-        "test": test,
-        "improvement": test["score"] - baseline["score"]
-    }
-
-
-def run_single_agent_test(agent_name, events):
-    if agent_name == "behavior_agent":
-        return behavior_agent(events)
-    if agent_name == "revenue_agent":
-        return revenue_agent(events)
-    if agent_name == "risk_agent":
-        return risk_agent(events)
+    return {"risk": risk}
 
 
 # =========================
-# 🧠 STRATEGY UPGRADE ENGINE
+# 🧪 SIMULATION ENGINE
 # =========================
-def generate_upgrades(events):
-    upgrades = []
+def simulate_upgrade(agent, factor):
+    original = STRATEGIES[agent]["weight"]
+
+    STRATEGIES[agent]["weight"] = factor
+    result = run_agent_test(agent)
+
+    STRATEGIES[agent]["weight"] = original
+
+    return result
+
+
+def run_agent_test(agent):
+    dummy_events = [{"event_name": "login"}] * 10
+
+    if agent == "behavior_agent":
+        return behavior_agent(dummy_events)
+    if agent == "revenue_agent":
+        return revenue_agent(dummy_events)
+    if agent == "risk_agent":
+        return risk_agent(dummy_events)
+
+
+# =========================
+# 🧠 UPGRADE ENGINE
+# =========================
+def generate_upgrade_plan():
+    plans = []
 
     for agent, stats in METRICS.items():
         if stats["runs"] < 5:
             continue
 
-        success_rate = stats["positive_signals"] / stats["runs"]
+        success_rate = stats["success"] / stats["runs"]
 
-        # LOW PERFORMANCE → PROPOSE CHANGE
+        confidence = min(success_rate, 1.0)
+
+        # LOW PERFORMANCE → ADJUST UPWARD
         if success_rate < 0.3:
-            upgrades.append({
+            plans.append({
                 "id": str(uuid.uuid4()),
                 "agent": agent,
-                "type": "increase_sensitivity",
-                "status": "pending",
-                "created_at": datetime.utcnow().isoformat()
+                "action": "increase_sensitivity",
+                "confidence": confidence,
+                "recommended_weight": 1.2
             })
 
         # HIGH PERFORMANCE → STABILIZE
         elif success_rate > 0.7:
-            upgrades.append({
+            plans.append({
                 "id": str(uuid.uuid4()),
                 "agent": agent,
-                "type": "stabilize_strategy",
-                "status": "pending",
-                "created_at": datetime.utcnow().isoformat()
+                "action": "stabilize",
+                "confidence": confidence,
+                "recommended_weight": 0.95
             })
 
-    return upgrades
+    return plans
 
 
 # =========================
-# 🛡️ APPROVAL SYSTEM
+# 🛡️ AUTONOMOUS EXECUTION ENGINE
 # =========================
-def apply_upgrade(upgrade):
-    agent = upgrade["agent"]
+def apply_autonomous_upgrade(plan):
+    agent = plan["agent"]
 
-    if agent not in STRATEGIES:
-        return False
+    if not AUTONOMOUS_MODE:
+        return {"applied": False, "reason": "autonomous_mode_disabled"}
 
-    # SAFE RULES ONLY (NO AUTO CHAOS)
-    if upgrade["type"] == "increase_sensitivity":
-        for key in STRATEGIES[agent]:
-            if "weight" in key:
-                STRATEGIES[agent][key] *= 1.1
+    confidence = plan["confidence"]
 
-    if upgrade["type"] == "stabilize_strategy":
-        for key in STRATEGIES[agent]:
-            if "weight" in key:
-                STRATEGIES[agent][key] *= 0.95
+    # 🧠 SAFE AUTO-APPLY RULE
+    if confidence < AUTO_APPLY_THRESHOLD:
+        return {"applied": False, "reason": "low_confidence"}
 
+    # APPLY CHANGE SAFELY
+    STRATEGIES[agent]["weight"] = plan["recommended_weight"]
     STRATEGIES[agent]["version"] += 1
-    return True
+
+    return {"applied": True, "agent": agent, "new_version": STRATEGIES[agent]["version"]}
 
 
 # =========================
-# 📊 ORCHESTRATOR
+# 📊 SYSTEM RUN
 # =========================
 def run_system(events):
     return {
@@ -214,50 +183,47 @@ def run_system(events):
 
 
 # =========================
-# 📡 API: AGENTS
+# 📡 AGENT API
 # =========================
 @app.get("/agents/{user_id}")
 def agents(user_id: str):
     res = supabase.table("events").select("*").execute()
     events = [e for e in res.data if e["user_id"] == user_id]
 
-    upgrades = generate_upgrades(events)
+    analysis = run_system(events)
+    plans = generate_upgrade_plan()
+
+    applied = []
+
+    # 🤖 AUTONOMOUS LOOP
+    for p in plans:
+        result = apply_autonomous_upgrade(p)
+        applied.append(result)
 
     return {
         "status": "success",
-        "user_id": user_id,
-        "analysis": run_system(events),
-        "upgrade_suggestions": upgrades
+        "autonomous_mode": AUTONOMOUS_MODE,
+        "analysis": analysis,
+        "upgrade_plans": plans,
+        "auto_applied": applied
     }
 
 
 # =========================
-# 🧠 APPLY UPGRADE (CONTROLLED)
+# 📡 UPGRADE INSPECTOR
 # =========================
-@app.post("/upgrade/apply")
-def apply(upgrade: dict):
-    success = apply_upgrade(upgrade)
-
+@app.get("/autonomy/status")
+def status():
     return {
-        "status": "applied" if success else "failed",
-        "strategy_state": STRATEGIES
-    }
-
-
-# =========================
-# 📡 VIEW UPGRADES
-# =========================
-@app.get("/upgrade/suggestions")
-def upgrades():
-    return {
-        "status": "success",
-        "suggestions": PENDING_UPGRADES,
+        "autonomous_mode": AUTONOMOUS_MODE,
+        "threshold": AUTO_APPLY_THRESHOLD,
+        "strategies": STRATEGIES,
         "metrics": dict(METRICS)
     }
 
 
 # =========================
-# 🔌 WEBSOCKET REALTIME
+# 🔌 WEBSOCKET REAL-TIME LOOP
 # =========================
 active_connections = set()
 
@@ -291,16 +257,15 @@ async def ws(websocket: WebSocket):
             events = [e for e in res.data if e["user_id"] == event["user_id"]]
 
             analysis = run_system(events)
-            upgrades = generate_upgrades(events)
+            plans = generate_upgrade_plan()
+
+            applied = [apply_autonomous_upgrade(p) for p in plans]
 
             await broadcast({
-                "type": "analysis_update",
-                "data": analysis
-            })
-
-            await broadcast({
-                "type": "strategy_upgrades",
-                "data": upgrades
+                "type": "autonomous_update",
+                "analysis": analysis,
+                "plans": plans,
+                "applied": applied
             })
 
     except WebSocketDisconnect:

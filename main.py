@@ -12,26 +12,32 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Multi-Agent System v6 running"}
+    return {"message": "AIOS Agent Communication Protocol v7 running"}
 
 
 # =========================
-# 📊 EVENTS
+# 📡 AGENT MESSAGE BUS (CORE SYSTEM)
 # =========================
-@app.get("/events")
-def get_events():
-    response = supabase.table("events").select("*").execute()
-    return {"status": "success", "data": response.data}
+AGENT_BUS = []
+
+
+def send_to_bus(message: dict):
+    message["timestamp"] = datetime.utcnow().isoformat()
+    AGENT_BUS.append(message)
+
+
+def get_bus_messages():
+    return AGENT_BUS[-100:]  # last 100 messages only
 
 
 # =========================
-# 🧠 MEMORY LAYER (GLOBAL STATE)
+# 🧠 MEMORY LAYER
 # =========================
 def build_memory(events):
     memory = {
         "total_events": 0,
-        "event_types": defaultdict(int),
-        "users": defaultdict(list)
+        "users": defaultdict(list),
+        "event_types": defaultdict(int)
     }
 
     for e in events:
@@ -41,90 +47,126 @@ def build_memory(events):
         if uid:
             memory["users"][uid].append(e)
 
-        name = e.get("event_name", "unknown")
-        memory["event_types"][name] += 1
+        memory["event_types"][e.get("event_name", "unknown")] += 1
 
     return memory
 
 
 # =========================
-# 👤 USER BEHAVIOR AGENT
+# 🤖 AGENT BASE CLASS (LOGIC STANDARD)
 # =========================
-def behavior_agent(user_events):
-    score = len(user_events)
-
-    return {
-        "agent": "behavior_agent",
-        "activity_score": score,
-        "status": "active" if score > 5 else "low_activity"
-    }
+def agent_emit(agent_name, user_id, payload):
+    send_to_bus({
+        "agent": agent_name,
+        "user_id": user_id,
+        "payload": payload
+    })
 
 
 # =========================
-# 💰 REVENUE / CONVERSION AGENT
+# 👤 BEHAVIOR AGENT
 # =========================
-def revenue_agent(user_events):
-    has_pricing = any(e.get("event_name") == "view_pricing" for e in user_events)
+def behavior_agent(user_id, events):
+    activity = len(events)
 
-    score = 70 if has_pricing else 20
+    if activity > 20:
+        state = "power_user"
+    elif activity < 3:
+        state = "inactive"
+    else:
+        state = "normal"
 
-    return {
-        "agent": "revenue_agent",
+    agent_emit("behavior_agent", user_id, {
+        "activity_score": activity,
+        "state": state
+    })
+
+    return state
+
+
+# =========================
+# 💰 REVENUE AGENT
+# =========================
+def revenue_agent(user_id, events):
+    has_pricing = any(e.get("event_name") == "view_pricing" for e in events)
+
+    score = 80 if has_pricing else 25
+
+    agent_emit("revenue_agent", user_id, {
         "conversion_score": score,
-        "status": "high_intent" if score > 50 else "low_intent"
-    }
+        "intent": "high" if score > 60 else "low"
+    })
+
+    return score
 
 
 # =========================
-# ⚠️ RISK / CHURN AGENT
+# ⚠️ RISK AGENT
 # =========================
-def risk_agent(user_events):
-    if len(user_events) < 3:
-        risk = 85
-    elif len(user_events) < 10:
-        risk = 50
+def risk_agent(user_id, events):
+    if len(events) < 3:
+        risk = 90
+    elif len(events) < 10:
+        risk = 60
     else:
         risk = 20
 
-    return {
-        "agent": "risk_agent",
+    agent_emit("risk_agent", user_id, {
         "churn_risk": risk,
-        "status": "high_risk" if risk > 70 else "stable"
-    }
+        "level": "high" if risk > 70 else "stable"
+    })
+
+    return risk
 
 
 # =========================
-# 🎯 ORCHESTRATOR (MAIN BRAIN)
+# 🔁 ORCHESTRATOR (COMMUNICATION COORDINATOR)
 # =========================
-def orchestrator(user_id, user_events):
-    behavior = behavior_agent(user_events)
-    revenue = revenue_agent(user_events)
-    risk = risk_agent(user_events)
+def orchestrator(user_id, events):
+    behavior_state = behavior_agent(user_id, events)
+    revenue_score = revenue_agent(user_id, events)
+    risk_score = risk_agent(user_id, events)
 
-    # 🧠 DECISION LOGIC (multi-agent fusion)
-    if risk["churn_risk"] > 70:
-        global_action = "reengagement_campaign"
-    elif revenue["conversion_score"] > 60:
-        global_action = "sales_nurture_flow"
-    elif behavior["activity_score"] > 20:
-        global_action = "premium_upsell"
-    else:
-        global_action = "monitor"
+    # =========================
+    # 🧠 CROSS-AGENT COMMUNICATION RULES
+    # =========================
+
+    # Risk influences revenue strategy
+    if risk_score > 70:
+        send_to_bus({
+            "agent": "orchestrator",
+            "user_id": user_id,
+            "action": "trigger_reengagement_flow",
+            "reason": "high_churn_risk"
+        })
+
+    # Revenue intent influences behavior agent
+    if revenue_score > 60:
+        send_to_bus({
+            "agent": "orchestrator",
+            "user_id": user_id,
+            "action": "mark_as_monetizable_user",
+            "reason": "high_conversion_intent"
+        })
+
+    # Behavior influences system classification
+    if behavior_state == "power_user":
+        send_to_bus({
+            "agent": "orchestrator",
+            "user_id": user_id,
+            "action": "upgrade_candidate_flag",
+            "reason": "heavy_usage_detected"
+        })
 
     return {
-        "user_id": user_id,
-        "agents": {
-            "behavior": behavior,
-            "revenue": revenue,
-            "risk": risk
-        },
-        "global_decision": global_action,
-        "timestamp": datetime.utcnow().isoformat()
+        "behavior_state": behavior_state,
+        "revenue_score": revenue_score,
+        "risk_score": risk_score
     }
 
 
 # =========================
-# 📊 MULTI-AGENT API
+# 📊 API: RUN AGENTS
 # =========================
 @app.get("/agents/{user_id}")
 def run_agents(user_id: str):
@@ -140,12 +182,24 @@ def run_agents(user_id: str):
 
     return {
         "status": "success",
-        **result
+        "user_id": user_id,
+        "results": result
     }
 
 
 # =========================
-# 🔌 REAL-TIME SYSTEM
+# 📡 BUS INSPECTION API
+# =========================
+@app.get("/bus")
+def view_bus():
+    return {
+        "status": "success",
+        "messages": get_bus_messages()
+    }
+
+
+# =========================
+# 🔌 WEBSOCKET SYSTEM
 # =========================
 active_connections = set()
 
@@ -164,7 +218,7 @@ async def broadcast(message: dict):
 
 
 # =========================
-# ⚡ WEBSOCKET MULTI-AGENT LOOP
+# ⚡ REAL-TIME COMM PROTOCOL
 # =========================
 @app.websocket("/ws/events")
 async def ws_events(websocket: WebSocket):
@@ -193,7 +247,7 @@ async def ws_events(websocket: WebSocket):
             })
 
             # =========================
-            # 🧠 MULTI-AGENT EXECUTION
+            # 🧠 AGENT COMMUNICATION LOOP
             # =========================
             response = supabase.table("events").select("*").execute()
             events = response.data or []
@@ -204,10 +258,14 @@ async def ws_events(websocket: WebSocket):
             if user_events:
                 result = orchestrator(user_id, user_events)
 
-                # REAL-TIME AGENT OUTPUT
+                # SEND FULL AGENT STATE
                 await broadcast({
-                    "type": "multi_agent_update",
-                    "data": result
+                    "type": "agent_state_update",
+                    "data": {
+                        "user_id": user_id,
+                        "state": result,
+                        "bus_tail": get_bus_messages()[-10:]
+                    }
                 })
 
     except WebSocketDisconnect:

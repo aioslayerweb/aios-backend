@@ -9,18 +9,11 @@ app = FastAPI()
 
 
 # =========================
-# 🏠 SYSTEM STATE
-# =========================
-AUTONOMOUS_MODE = True  # master switch (safe guard)
-AUTO_APPLY_THRESHOLD = 0.75  # confidence needed for auto-apply
-
-
-# =========================
-# 🧠 ROOT
+# 🏠 ROOT
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Fully Autonomous Mode (Guarded v10)"}
+    return {"message": "AIOS Self-Optimizing Revenue Engine v1"}
 
 
 # =========================
@@ -33,197 +26,189 @@ def events():
 
 
 # =========================
-# 🧠 STRATEGY CORE
+# 🧠 REVENUE MEMORY
 # =========================
-STRATEGIES = {
-    "behavior_agent": {"version": 1, "weight": 1.0},
-    "revenue_agent": {"version": 1, "weight": 1.0},
-    "risk_agent": {"version": 1, "weight": 1.0}
-}
-
-
-METRICS = defaultdict(lambda: {"runs": 0, "success": 0})
+REVENUE_METRICS = defaultdict(lambda: {
+    "sessions": 0,
+    "pricing_views": 0,
+    "logins": 0,
+    "conversion_signals": 0
+})
 
 
 # =========================
-# 👤 AGENTS
+# 💰 REVENUE SIGNAL ENGINE
 # =========================
-def behavior_agent(events):
-    score = len(events)
-    state = "power_user" if score > 20 else "inactive" if score < 3 else "normal"
+def analyze_revenue(events):
+    score = 0
 
-    METRICS["behavior_agent"]["runs"] += 1
-    if state == "power_user":
-        METRICS["behavior_agent"]["success"] += 1
+    for e in events:
+        name = e.get("event_name")
 
-    return {"score": score, "state": state}
+        if name == "login":
+            score += 1
+        elif name == "view_pricing":
+            score += 5
+        elif name == "interaction":
+            score += 2
+
+    return score
 
 
-def revenue_agent(events):
+# =========================
+# 🧠 CONVERSION INTENT MODEL
+# =========================
+def detect_intent(events):
     has_pricing = any(e["event_name"] == "view_pricing" for e in events)
-    score = 80 if has_pricing else 20
+    activity = len(events)
 
-    METRICS["revenue_agent"]["runs"] += 1
+    if has_pricing and activity > 10:
+        return "high_intent"
+
     if has_pricing:
-        METRICS["revenue_agent"]["success"] += 1
+        return "medium_intent"
 
-    return {"score": score, "intent": "high" if score > 60 else "low"}
+    if activity > 15:
+        return "warm_intent"
+
+    return "cold_intent"
 
 
-def risk_agent(events):
-    n = len(events)
+# =========================
+# 🧪 REVENUE SIMULATOR
+# =========================
+def simulate_conversion_boost(events, boost_factor):
+    base = analyze_revenue(events)
+    return base * boost_factor
 
-    if n < 3:
-        risk = 90
-    elif n < 10:
-        risk = 60
+
+# =========================
+# 📈 OPTIMIZATION ENGINE
+# =========================
+def generate_revenue_optimizations(events):
+    intent = detect_intent(events)
+    base_score = analyze_revenue(events)
+
+    recommendations = []
+
+    # HIGH VALUE USERS
+    if intent == "high_intent":
+        recommendations.append({
+            "type": "upsell_trigger",
+            "action": "show_premium_offer",
+            "confidence": 0.85,
+            "expected_revenue_impact": "+25%"
+        })
+
+    # MEDIUM INTENT USERS
+    elif intent == "medium_intent":
+        recommendations.append({
+            "type": "conversion_nudge",
+            "action": "show_discount_banner",
+            "confidence": 0.70,
+            "expected_revenue_impact": "+12%"
+        })
+
+    # WARM USERS
+    elif intent == "warm_intent":
+        recommendations.append({
+            "type": "engagement_boost",
+            "action": "trigger_onboarding_flow",
+            "confidence": 0.65,
+            "expected_revenue_impact": "+8%"
+        })
+
+    # COLD USERS
     else:
-        risk = 20
+        recommendations.append({
+            "type": "activation_campaign",
+            "action": "email_reengagement",
+            "confidence": 0.60,
+            "expected_revenue_impact": "+5%"
+        })
 
-    METRICS["risk_agent"]["runs"] += 1
-    if risk > 70:
-        METRICS["risk_agent"]["success"] += 1
-
-    return {"risk": risk}
-
-
-# =========================
-# 🧪 SIMULATION ENGINE
-# =========================
-def simulate_upgrade(agent, factor):
-    original = STRATEGIES[agent]["weight"]
-
-    STRATEGIES[agent]["weight"] = factor
-    result = run_agent_test(agent)
-
-    STRATEGIES[agent]["weight"] = original
-
-    return result
-
-
-def run_agent_test(agent):
-    dummy_events = [{"event_name": "login"}] * 10
-
-    if agent == "behavior_agent":
-        return behavior_agent(dummy_events)
-    if agent == "revenue_agent":
-        return revenue_agent(dummy_events)
-    if agent == "risk_agent":
-        return risk_agent(dummy_events)
-
-
-# =========================
-# 🧠 UPGRADE ENGINE
-# =========================
-def generate_upgrade_plan():
-    plans = []
-
-    for agent, stats in METRICS.items():
-        if stats["runs"] < 5:
-            continue
-
-        success_rate = stats["success"] / stats["runs"]
-
-        confidence = min(success_rate, 1.0)
-
-        # LOW PERFORMANCE → ADJUST UPWARD
-        if success_rate < 0.3:
-            plans.append({
-                "id": str(uuid.uuid4()),
-                "agent": agent,
-                "action": "increase_sensitivity",
-                "confidence": confidence,
-                "recommended_weight": 1.2
-            })
-
-        # HIGH PERFORMANCE → STABILIZE
-        elif success_rate > 0.7:
-            plans.append({
-                "id": str(uuid.uuid4()),
-                "agent": agent,
-                "action": "stabilize",
-                "confidence": confidence,
-                "recommended_weight": 0.95
-            })
-
-    return plans
-
-
-# =========================
-# 🛡️ AUTONOMOUS EXECUTION ENGINE
-# =========================
-def apply_autonomous_upgrade(plan):
-    agent = plan["agent"]
-
-    if not AUTONOMOUS_MODE:
-        return {"applied": False, "reason": "autonomous_mode_disabled"}
-
-    confidence = plan["confidence"]
-
-    # 🧠 SAFE AUTO-APPLY RULE
-    if confidence < AUTO_APPLY_THRESHOLD:
-        return {"applied": False, "reason": "low_confidence"}
-
-    # APPLY CHANGE SAFELY
-    STRATEGIES[agent]["weight"] = plan["recommended_weight"]
-    STRATEGIES[agent]["version"] += 1
-
-    return {"applied": True, "agent": agent, "new_version": STRATEGIES[agent]["version"]}
-
-
-# =========================
-# 📊 SYSTEM RUN
-# =========================
-def run_system(events):
     return {
-        "behavior": behavior_agent(events),
-        "revenue": revenue_agent(events),
-        "risk": risk_agent(events)
+        "intent": intent,
+        "base_revenue_score": base_score,
+        "recommendations": recommendations
     }
 
 
 # =========================
-# 📡 AGENT API
+# 🛡️ SAFE AUTO-APPLY ENGINE
 # =========================
-@app.get("/agents/{user_id}")
-def agents(user_id: str):
-    res = supabase.table("events").select("*").execute()
-    events = [e for e in res.data if e["user_id"] == user_id]
+def apply_revenue_optimization(plan):
+    confidence = plan.get("confidence", 0)
 
-    analysis = run_system(events)
-    plans = generate_upgrade_plan()
+    # ONLY SAFE AUTOMATIONS
+    if confidence < 0.75:
+        return {
+            "applied": False,
+            "reason": "low_confidence_safety_lock"
+        }
+
+    return {
+        "applied": True,
+        "action": plan["action"],
+        "note": "safe_revenue_automation_executed"
+    }
+
+
+# =========================
+# 📊 CORE REVENUE ANALYZER
+# =========================
+def run_revenue_engine(user_id):
+    res = supabase.table("events").select("*").execute()
+    events = [e for e in res.data if e.get("user_id") == user_id]
+
+    if not events:
+        return {"status": "error", "message": "no_user_events"}
+
+    optimizations = generate_revenue_optimizations(events)
 
     applied = []
 
-    # 🤖 AUTONOMOUS LOOP
-    for p in plans:
-        result = apply_autonomous_upgrade(p)
-        applied.append(result)
+    for rec in optimizations["recommendations"]:
+        applied.append(apply_revenue_optimization(rec))
 
     return {
         "status": "success",
-        "autonomous_mode": AUTONOMOUS_MODE,
-        "analysis": analysis,
-        "upgrade_plans": plans,
+        "user_id": user_id,
+        "analysis": optimizations,
         "auto_applied": applied
     }
 
 
 # =========================
-# 📡 UPGRADE INSPECTOR
+# 📡 API: REVENUE INSIGHTS
 # =========================
-@app.get("/autonomy/status")
-def status():
+@app.get("/revenue/{user_id}")
+def revenue(user_id: str):
+    return run_revenue_engine(user_id)
+
+
+# =========================
+# 📊 GLOBAL REVENUE INSIGHTS
+# =========================
+@app.get("/revenue/global")
+def global_revenue():
+    res = supabase.table("events").select("*").execute()
+    events = res.data or []
+
+    total = len(events)
+    pricing_views = len([e for e in events if e["event_name"] == "view_pricing"])
+    logins = len([e for e in events if e["event_name"] == "login"])
+
     return {
-        "autonomous_mode": AUTONOMOUS_MODE,
-        "threshold": AUTO_APPLY_THRESHOLD,
-        "strategies": STRATEGIES,
-        "metrics": dict(METRICS)
+        "total_events": total,
+        "pricing_views": pricing_views,
+        "logins": logins,
+        "conversion_ratio": pricing_views / total if total else 0
     }
 
 
 # =========================
-# 🔌 WEBSOCKET REAL-TIME LOOP
+# 🔌 WEBSOCKET REAL-TIME REVENUE ENGINE
 # =========================
 active_connections = set()
 
@@ -241,8 +226,8 @@ async def broadcast(msg):
         active_connections.remove(d)
 
 
-@app.websocket("/ws/events")
-async def ws(websocket: WebSocket):
+@app.websocket("/ws/revenue")
+async def ws_revenue(websocket: WebSocket):
     await websocket.accept()
     active_connections.add(websocket)
 
@@ -253,19 +238,13 @@ async def ws(websocket: WebSocket):
 
             supabase.table("events").insert(event).execute()
 
-            res = supabase.table("events").select("*").execute()
-            events = [e for e in res.data if e["user_id"] == event["user_id"]]
+            user_id = event.get("user_id")
 
-            analysis = run_system(events)
-            plans = generate_upgrade_plan()
-
-            applied = [apply_autonomous_upgrade(p) for p in plans]
+            analysis = run_revenue_engine(user_id)
 
             await broadcast({
-                "type": "autonomous_update",
-                "analysis": analysis,
-                "plans": plans,
-                "applied": applied
+                "type": "revenue_update",
+                "data": analysis
             })
 
     except WebSocketDisconnect:

@@ -11,7 +11,7 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Prediction Engine v3 running"}
+    return {"message": "AIOS Decision Engine v4 running"}
 
 
 # =========================
@@ -24,13 +24,13 @@ def get_events():
 
 
 # =========================
-# 🧠 BUILD USER PROFILE
+# 🧠 PROFILE BUILDER
 # =========================
 def build_profile(events):
     profile = {
         "total_events": 0,
         "event_types": defaultdict(int),
-        "sessions": set()
+        "active_sessions": set()
     }
 
     for e in events:
@@ -40,18 +40,17 @@ def build_profile(events):
         profile["event_types"][name] += 1
 
         if e.get("user_id"):
-            profile["sessions"].add(e["user_id"])
+            profile["active_sessions"].add(e["user_id"])
 
     return profile
 
 
 # =========================
-# 🔮 CHURN PREDICTION MODEL (RULE-BASED MVP)
+# 🔮 PREDICTION LAYER (simplified reuse)
 # =========================
-def predict_churn(profile):
+def churn_score(profile):
     score = 0
 
-    # low activity = higher churn
     if profile["total_events"] < 3:
         score += 60
     elif profile["total_events"] < 10:
@@ -59,7 +58,6 @@ def predict_churn(profile):
     else:
         score += 10
 
-    # low feature diversity
     if len(profile["event_types"]) <= 1:
         score += 25
     elif len(profile["event_types"]) <= 2:
@@ -69,63 +67,59 @@ def predict_churn(profile):
 
 
 # =========================
-# 💰 CONVERSION PROBABILITY
+# 🎯 DECISION ENGINE (CORE OF V4)
 # =========================
-def predict_conversion(profile):
-    base = profile["total_events"] * 4
-    diversity = len(profile["event_types"]) * 8
+def generate_decision(profile, churn, user_id):
+    actions = []
 
-    score = base + diversity
+    # LOW ENGAGEMENT CASE
+    if churn > 70:
+        actions.append({
+            "type": "alert",
+            "priority": "high",
+            "action": "notify_admin",
+            "message": f"User {user_id} is high churn risk"
+        })
 
-    return min(score, 100)
+        actions.append({
+            "type": "engagement_campaign",
+            "action": "trigger_onboarding_sequence",
+            "message": "Send re-engagement flow"
+        })
 
+    # MEDIUM RISK
+    elif churn > 40:
+        actions.append({
+            "type": "warning",
+            "priority": "medium",
+            "action": "nudge_user",
+            "message": "Suggest feature usage onboarding"
+        })
 
-# =========================
-# 📈 RETENTION SCORE
-# =========================
-def predict_retention(churn_score):
-    return max(0, 100 - churn_score)
+    # HIGH VALUE USER DETECTED
+    elif profile["total_events"] > 20:
+        actions.append({
+            "type": "opportunity",
+            "priority": "high",
+            "action": "upsell_candidate",
+            "message": "User eligible for premium upsell"
+        })
 
+    else:
+        actions.append({
+            "type": "normal",
+            "action": "monitor",
+            "message": "No action required"
+        })
 
-# =========================
-# ⚠️ RISK CLASSIFIER
-# =========================
-def classify_risk(churn_score):
-    if churn_score > 70:
-        return "high_risk"
-    elif churn_score > 40:
-        return "medium_risk"
-    return "low_risk"
-
-
-# =========================
-# 🧠 AI REASONING LAYER (MVP EXPLANATION ENGINE)
-# =========================
-def generate_ai_reasoning(profile, churn, conversion, retention):
-    top_event = max(profile["event_types"], key=profile["event_types"].get, default="none")
-
-    return f"""
-AI Prediction Summary:
-
-- Total activity: {profile['total_events']} events
-- Most used feature: {top_event}
-
-Predictions:
-- Churn risk: {churn}/100
-- Conversion likelihood: {conversion}/100
-- Retention score: {retention}/100
-
-Interpretation:
-User behavior suggests {'low engagement patterns' if churn > 60 else 'stable usage patterns'}.
-Primary engagement driver is {top_event}.
-"""
+    return actions
 
 
 # =========================
-# 📊 PREDICTION API
+# 📊 DECISION API
 # =========================
-@app.get("/predict/{user_id}")
-def predict_user(user_id: str):
+@app.get("/decisions/{user_id}")
+def get_decisions(user_id: str):
     response = supabase.table("events").select("*").execute()
     events = response.data or []
 
@@ -135,29 +129,22 @@ def predict_user(user_id: str):
         return {"status": "error", "message": "User not found"}
 
     profile = build_profile(user_events)
+    churn = churn_score(profile)
 
-    churn = predict_churn(profile)
-    conversion = predict_conversion(profile)
-    retention = predict_retention(churn)
-    risk = classify_risk(churn)
-
-    ai_reasoning = generate_ai_reasoning(profile, churn, conversion, retention)
+    actions = generate_decision(profile, churn, user_id)
 
     return {
         "status": "success",
         "user_id": user_id,
         "churn_risk_score": churn,
-        "conversion_probability": conversion,
-        "retention_score": retention,
-        "risk_level": risk,
         "total_events": profile["total_events"],
         "event_breakdown": dict(profile["event_types"]),
-        "ai_reasoning": ai_reasoning
+        "recommended_actions": actions
     }
 
 
 # =========================
-# 🔌 REAL-TIME ENGINE
+# 🔌 REAL-TIME SYSTEM
 # =========================
 active_connections = set()
 
@@ -188,7 +175,7 @@ async def ws_events(websocket: WebSocket):
             data = await websocket.receive_text()
             event = json.loads(data)
 
-            # Save event
+            # SAVE EVENT
             supabase.table("events").insert(event).execute()
 
             # ACK
@@ -198,13 +185,15 @@ async def ws_events(websocket: WebSocket):
                 "user_id": event.get("user_id")
             }))
 
-            # Broadcast event
+            # BROADCAST EVENT
             await broadcast({
                 "type": "new_event",
                 "data": event
             })
 
-            # REAL-TIME PREDICTION UPDATE
+            # =========================
+            # 🧠 DECISION ENGINE RUN
+            # =========================
             response = supabase.table("events").select("*").execute()
             events = response.data or []
 
@@ -213,20 +202,17 @@ async def ws_events(websocket: WebSocket):
 
             if user_events:
                 profile = build_profile(user_events)
+                churn = churn_score(profile)
 
-                churn = predict_churn(profile)
-                conversion = predict_conversion(profile)
-                retention = predict_retention(churn)
-                risk = classify_risk(churn)
+                decisions = generate_decision(profile, churn, user_id)
 
+                # REAL-TIME DECISION BROADCAST
                 await broadcast({
-                    "type": "live_prediction_update",
+                    "type": "decision_update",
                     "data": {
                         "user_id": user_id,
                         "churn_risk_score": churn,
-                        "conversion_probability": conversion,
-                        "retention_score": retention,
-                        "risk_level": risk
+                        "recommended_actions": decisions
                     }
                 })
 

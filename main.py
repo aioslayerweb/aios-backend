@@ -1,11 +1,8 @@
 from fastapi import FastAPI
 from supabase_client import supabase
 import os
-import requests
 
 app = FastAPI()
-
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
 @app.get("/")
@@ -19,130 +16,169 @@ def get_events():
     return {"status": "success", "data": response.data}
 
 
-@app.get("/insights/{user_id}")
-def get_insights(user_id: str):
-    try:
-        response = supabase.table("events").select("*").eq("user_id", user_id).execute()
-        events = response.data
+# =========================
+# 🧠 GLOBAL DASHBOARD SUMMARY
+# =========================
+@app.get("/dashboard/summary")
+def dashboard_summary():
+    response = supabase.table("events").select("*").execute()
+    events = response.data
 
-        if not events:
-            return {"status": "success", "message": "No events found"}
+    total_events = len(events)
 
-        total_events = len(events)
+    user_set = set()
+    event_types = {}
 
-        # 📊 Event breakdown
-        breakdown = {}
-        for e in events:
-            name = e["event_name"]
-            breakdown[name] = breakdown.get(name, 0) + 1
+    for e in events:
+        user_set.add(e.get("user_id"))
 
-        # 🧠 ENGAGEMENT SCORE (0–100)
-        score = min(total_events * 5, 100)
+        name = e["event_name"]
+        event_types[name] = event_types.get(name, 0) + 1
 
-        # 👤 USER TYPE
-        if score >= 80:
-            user_type = "power_user"
-        elif score >= 50:
-            user_type = "active_user"
-        elif score >= 20:
-            user_type = "casual_user"
+    return {
+        "status": "success",
+        "total_events": total_events,
+        "total_users": len(user_set),
+        "event_distribution": event_types
+    }
+
+
+# =========================
+# 👤 USERS OVERVIEW
+# =========================
+@app.get("/dashboard/users")
+def dashboard_users():
+    response = supabase.table("events").select("*").execute()
+    events = response.data
+
+    users = {}
+
+    for e in events:
+        uid = e.get("user_id")
+
+        if not uid:
+            continue
+
+        if uid not in users:
+            users[uid] = {
+                "user_id": uid,
+                "events": 0,
+                "event_types": set()
+            }
+
+        users[uid]["events"] += 1
+        users[uid]["event_types"].add(e["event_name"])
+
+    # convert sets to lists for JSON
+    result = []
+    for u in users.values():
+        result.append({
+            "user_id": u["user_id"],
+            "events": u["events"],
+            "event_types": list(u["event_types"])
+        })
+
+    return {
+        "status": "success",
+        "users": result
+    }
+
+
+# =========================
+# 🔥 POWER USERS FILTER
+# =========================
+@app.get("/dashboard/power-users")
+def power_users():
+    response = supabase.table("events").select("*").execute()
+    events = response.data
+
+    user_counts = {}
+
+    for e in events:
+        uid = e.get("user_id")
+        if not uid:
+            continue
+
+        user_counts[uid] = user_counts.get(uid, 0) + 1
+
+    power_users = []
+
+    for uid, count in user_counts.items():
+        if count >= 15:
+            power_users.append({
+                "user_id": uid,
+                "event_count": count,
+                "segment": "power_user"
+            })
+
+    return {
+        "status": "success",
+        "power_users": power_users
+    }
+
+
+# =========================
+# 📉 CHURN RISK USERS
+# =========================
+@app.get("/dashboard/churn-risk")
+def churn_risk():
+    response = supabase.table("events").select("*").execute()
+    events = response.data
+
+    user_counts = {}
+
+    for e in events:
+        uid = e.get("user_id")
+        if not uid:
+            continue
+
+        user_counts[uid] = user_counts.get(uid, 0) + 1
+
+    churn_users = []
+
+    for uid, count in user_counts.items():
+        if count < 5:
+            churn_users.append({
+                "user_id": uid,
+                "event_count": count,
+                "risk": "high"
+            })
+        elif count < 10:
+            churn_users.append({
+                "user_id": uid,
+                "event_count": count,
+                "risk": "medium"
+            })
+
+    return {
+        "status": "success",
+        "churn_risk_users": churn_users
+    }
+
+
+# =========================
+# 📊 REVENUE SIGNAL SUMMARY
+# =========================
+@app.get("/dashboard/revenue")
+def revenue_summary():
+    response = supabase.table("events").select("*").execute()
+    events = response.data
+
+    revenue_signals = {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+    }
+
+    for e in events:
+        if e["event_name"] == "view_pricing":
+            revenue_signals["high"] += 1
+        elif e["event_name"] == "login":
+            revenue_signals["medium"] += 1
         else:
-            user_type = "inactive_user"
+            revenue_signals["low"] += 1
 
-        # ⚠️ FLAGS
-        flags = []
-
-        login_ratio = breakdown.get("login", 0) / total_events
-
-        if login_ratio > 0.7:
-            flags.append("login_heavy")
-
-        if len(breakdown) <= 2:
-            flags.append("low_feature_usage")
-
-        # 💰 REVENUE SIGNAL
-        if user_type == "power_user" and "view_pricing" in breakdown:
-            revenue_signal = "high"
-        elif user_type == "active_user":
-            revenue_signal = "medium"
-        else:
-            revenue_signal = "low"
-
-        # 📉 CHURN RISK
-        if score < 30:
-            churn_risk = "high"
-        elif score < 70:
-            churn_risk = "medium"
-        else:
-            churn_risk = "low"
-
-        # 🎯 NEXT BEST ACTION (RULE-BASED)
-        if "low_feature_usage" in flags:
-            next_action = "trigger onboarding for unused features"
-        elif churn_risk == "high":
-            next_action = "send re-engagement campaign"
-        elif revenue_signal == "high":
-            next_action = "offer premium upgrade prompt"
-        else:
-            next_action = "continue monitoring behavior"
-
-        # 🤖 AI INSIGHT (GROQ)
-        try:
-            prompt = f"""
-You are a product intelligence AI.
-
-Analyze this user:
-
-- Total events: {total_events}
-- Breakdown: {breakdown}
-- Score: {score}
-- User type: {user_type}
-- Revenue signal: {revenue_signal}
-- Churn risk: {churn_risk}
-- Flags: {flags}
-
-Return:
-1. Short behavioral insight
-2. One business recommendation
-"""
-
-            ai_response = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {GROQ_API_KEY}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "model": "llama-3.1-8b-instant",
-                    "messages": [
-                        {"role": "user", "content": prompt}
-                    ]
-                }
-            )
-
-            result = ai_response.json()
-
-            if "choices" in result:
-                ai_text = result["choices"][0]["message"]["content"]
-            else:
-                ai_text = f"AI error: {result}"
-
-        except Exception as e:
-            ai_text = f"AI error: {str(e)}"
-
-        return {
-            "status": "success",
-            "user_id": user_id,
-            "engagement_score": score,
-            "user_type": user_type,
-            "flags": flags,
-            "revenue_signal": revenue_signal,
-            "churn_risk": churn_risk,
-            "next_best_action": next_action,
-            "total_events": total_events,
-            "event_breakdown": breakdown,
-            "ai_insight": ai_text
-        }
-
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+    return {
+        "status": "success",
+        "revenue_signal_distribution": revenue_signals
+    }

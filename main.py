@@ -2,7 +2,6 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from supabase_client import supabase
 import json
 from collections import defaultdict
-from datetime import datetime
 
 app = FastAPI()
 
@@ -12,7 +11,7 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Behavior Analytics Engine v2 running"}
+    return {"message": "AIOS Prediction Engine v3 running"}
 
 
 # =========================
@@ -25,135 +24,160 @@ def get_events():
 
 
 # =========================
-# 🧠 USER BEHAVIOR MODEL
+# 🧠 BUILD USER PROFILE
 # =========================
-def build_user_profiles(events):
-    profiles = defaultdict(lambda: {
+def build_profile(events):
+    profile = {
         "total_events": 0,
         "event_types": defaultdict(int),
-        "last_seen": None
-    })
+        "sessions": set()
+    }
 
     for e in events:
-        uid = e.get("user_id")
-        if not uid:
-            continue
+        profile["total_events"] += 1
 
-        profiles[uid]["total_events"] += 1
+        name = e.get("event_name", "unknown")
+        profile["event_types"][name] += 1
 
-        event_name = e.get("event_name", "unknown")
-        profiles[uid]["event_types"][event_name] += 1
+        if e.get("user_id"):
+            profile["sessions"].add(e["user_id"])
 
-        profiles[uid]["last_seen"] = e.get("created_at")
-
-    return profiles
+    return profile
 
 
 # =========================
-# 📈 ENGAGEMENT SCORING ENGINE
+# 🔮 CHURN PREDICTION MODEL (RULE-BASED MVP)
 # =========================
-def calculate_engagement(profile):
-    base = profile["total_events"]
+def predict_churn(profile):
+    score = 0
 
-    diversity = len(profile["event_types"])
-
-    score = (base * 5) + (diversity * 10)
-
-    if score > 80:
-        user_type = "power_user"
-    elif score > 30:
-        user_type = "active_user"
-    else:
-        user_type = "low_activity"
-
-    return score, user_type
-
-
-# =========================
-# ⚠️ CHURN SIGNAL DETECTOR
-# =========================
-def detect_risks(profile):
-    flags = []
-
+    # low activity = higher churn
     if profile["total_events"] < 3:
-        flags.append("low_engagement")
+        score += 60
+    elif profile["total_events"] < 10:
+        score += 30
+    else:
+        score += 10
 
+    # low feature diversity
     if len(profile["event_types"]) <= 1:
-        flags.append("low_feature_usage")
+        score += 25
+    elif len(profile["event_types"]) <= 2:
+        score += 10
 
-    return flags
+    return min(score, 100)
 
 
 # =========================
-# 🧠 AI INSIGHT GENERATOR (RULE-BASED MVP)
+# 💰 CONVERSION PROBABILITY
 # =========================
-def generate_insight(profile, score, user_type, flags):
+def predict_conversion(profile):
+    base = profile["total_events"] * 4
+    diversity = len(profile["event_types"]) * 8
+
+    score = base + diversity
+
+    return min(score, 100)
+
+
+# =========================
+# 📈 RETENTION SCORE
+# =========================
+def predict_retention(churn_score):
+    return max(0, 100 - churn_score)
+
+
+# =========================
+# ⚠️ RISK CLASSIFIER
+# =========================
+def classify_risk(churn_score):
+    if churn_score > 70:
+        return "high_risk"
+    elif churn_score > 40:
+        return "medium_risk"
+    return "low_risk"
+
+
+# =========================
+# 🧠 AI REASONING LAYER (MVP EXPLANATION ENGINE)
+# =========================
+def generate_ai_reasoning(profile, churn, conversion, retention):
     top_event = max(profile["event_types"], key=profile["event_types"].get, default="none")
 
     return f"""
-User Analysis Summary:
+AI Prediction Summary:
 
-- User type: {user_type}
-- Engagement score: {score}
-- Total events: {profile['total_events']}
-- Primary activity: {top_event}
-- Risk flags: {', '.join(flags) if flags else 'none'}
+- Total activity: {profile['total_events']} events
+- Most used feature: {top_event}
 
-Insight:
-This user shows {user_type.replace('_', ' ')} behavior with focus on {top_event}.
+Predictions:
+- Churn risk: {churn}/100
+- Conversion likelihood: {conversion}/100
+- Retention score: {retention}/100
+
+Interpretation:
+User behavior suggests {'low engagement patterns' if churn > 60 else 'stable usage patterns'}.
+Primary engagement driver is {top_event}.
 """
 
 
 # =========================
-# 📊 INSIGHTS ENDPOINT
+# 📊 PREDICTION API
 # =========================
-@app.get("/insights/{user_id}")
-def get_insights(user_id: str):
+@app.get("/predict/{user_id}")
+def predict_user(user_id: str):
     response = supabase.table("events").select("*").execute()
     events = response.data or []
 
     user_events = [e for e in events if e.get("user_id") == user_id]
 
-    profile = build_user_profiles(user_events).get(user_id)
-
-    if not profile:
+    if not user_events:
         return {"status": "error", "message": "User not found"}
 
-    score, user_type = calculate_engagement(profile)
-    flags = detect_risks(profile)
-    insight = generate_insight(profile, score, user_type, flags)
+    profile = build_profile(user_events)
+
+    churn = predict_churn(profile)
+    conversion = predict_conversion(profile)
+    retention = predict_retention(churn)
+    risk = classify_risk(churn)
+
+    ai_reasoning = generate_ai_reasoning(profile, churn, conversion, retention)
 
     return {
         "status": "success",
         "user_id": user_id,
-        "engagement_score": score,
-        "user_type": user_type,
-        "flags": flags,
+        "churn_risk_score": churn,
+        "conversion_probability": conversion,
+        "retention_score": retention,
+        "risk_level": risk,
         "total_events": profile["total_events"],
         "event_breakdown": dict(profile["event_types"]),
-        "ai_insight": insight
+        "ai_reasoning": ai_reasoning
     }
 
 
 # =========================
-# 🔌 REAL-TIME EVENT STREAM
+# 🔌 REAL-TIME ENGINE
 # =========================
 active_connections = set()
 
 
 async def broadcast(message: dict):
-    disconnected = set()
+    dead = set()
 
     for conn in active_connections:
         try:
             await conn.send_text(json.dumps(message))
         except:
-            disconnected.add(conn)
+            dead.add(conn)
 
-    for d in disconnected:
+    for d in dead:
         active_connections.discard(d)
 
 
+# =========================
+# ⚡ WEBSOCKET EVENTS
+# =========================
 @app.websocket("/ws/events")
 async def ws_events(websocket: WebSocket):
     await websocket.accept()
@@ -180,26 +204,29 @@ async def ws_events(websocket: WebSocket):
                 "data": event
             })
 
-            # Recompute insights live
+            # REAL-TIME PREDICTION UPDATE
             response = supabase.table("events").select("*").execute()
             events = response.data or []
 
             user_id = event.get("user_id")
             user_events = [e for e in events if e.get("user_id") == user_id]
 
-            profile = build_user_profiles(user_events).get(user_id)
+            if user_events:
+                profile = build_profile(user_events)
 
-            if profile:
-                score, user_type = calculate_engagement(profile)
-                flags = detect_risks(profile)
+                churn = predict_churn(profile)
+                conversion = predict_conversion(profile)
+                retention = predict_retention(churn)
+                risk = classify_risk(churn)
 
                 await broadcast({
-                    "type": "live_user_update",
+                    "type": "live_prediction_update",
                     "data": {
                         "user_id": user_id,
-                        "score": score,
-                        "user_type": user_type,
-                        "flags": flags
+                        "churn_risk_score": churn,
+                        "conversion_probability": conversion,
+                        "retention_score": retention,
+                        "risk_level": risk
                     }
                 })
 

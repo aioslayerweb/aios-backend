@@ -1,134 +1,79 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from supabase_client import supabase
 from collections import defaultdict
+import json
 
 app = FastAPI()
 
 
 # =========================
-# 🏠 HEALTH CHECK
+# 🏠 ROOT
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS backend is running"}
+    return {"message": "AIOS backend is running (Realtime enabled)"}
 
 
 # =========================
-# 📊 DASHBOARD OVERVIEW (MAIN KPI SCREEN)
+# 🧠 IN-MEMORY CONNECTIONS
 # =========================
-@app.get("/dashboard/overview")
-def dashboard_overview():
-    response = supabase.table("events").select("*").execute()
-    events = response.data or []
-
-    total_events = len(events)
-    unique_users = len(set(e["user_id"] for e in events if e.get("user_id")))
-
-    event_types = defaultdict(int)
-    for e in events:
-        event_types[e["event_name"]] += 1
-
-    top_event = max(event_types.items(), key=lambda x: x[1])[0] if event_types else None
-
-    return {
-        "status": "success",
-        "kpis": {
-            "total_events": total_events,
-            "unique_users": unique_users,
-            "top_event": top_event
-        },
-        "event_breakdown": dict(event_types)
-    }
+active_connections = []
 
 
 # =========================
-# 👤 USER ANALYTICS (FRONTEND PROFILE PAGE)
+# 🔌 WEBSOCKET MANAGER
 # =========================
-@app.get("/dashboard/user/{user_id}")
-def user_dashboard(user_id: str):
-    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
-    events = response.data or []
+async def broadcast(message: dict):
+    disconnected = []
+    for connection in active_connections:
+        try:
+            await connection.send_text(json.dumps(message))
+        except:
+            disconnected.append(connection)
 
-    if not events:
-        return {
-            "status": "success",
-            "user_id": user_id,
-            "message": "No activity found"
-        }
-
-    event_counts = defaultdict(int)
-
-    for e in events:
-        event_counts[e["event_name"]] += 1
-
-    total_events = len(events)
-
-    engagement_score = min(100, total_events * 5)
-
-    return {
-        "status": "success",
-        "user_id": user_id,
-        "engagement_score": engagement_score,
-        "total_events": total_events,
-        "event_breakdown": dict(event_counts),
-        "last_activity": events[-1]["created_at"]
-    }
+    for d in disconnected:
+        active_connections.remove(d)
 
 
 # =========================
-# 📈 EVENT ANALYTICS (TREND SCREEN)
+# 🔌 REAL-TIME EVENTS STREAM
 # =========================
-@app.get("/dashboard/events")
-def event_dashboard():
-    response = supabase.table("events").select("*").execute()
-    events = response.data or []
+@app.websocket("/ws/events")
+async def ws_events(websocket: WebSocket):
+    await websocket.accept()
+    active_connections.append(websocket)
 
-    trend = defaultdict(int)
-    for e in events:
-        trend[e["event_name"]] += 1
+    try:
+        while True:
+            data = await websocket.receive_text()
 
-    sorted_trend = sorted(trend.items(), key=lambda x: x[1], reverse=True)
+            event = json.loads(data)
 
-    return {
-        "status": "success",
-        "total_events": len(events),
-        "event_trends": [
-            {"event": k, "count": v} for k, v in sorted_trend
-        ]
-    }
+            # Save to DB
+            supabase.table("events").insert(event).execute()
+
+            # Broadcast live event
+            await broadcast({
+                "type": "new_event",
+                "data": event
+            })
+
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
 
 
 # =========================
-# 🔔 ALERTS FEED (FRONTEND READY)
+# 🔔 ALERT ENGINE (REAL-TIME)
 # =========================
-@app.get("/dashboard/alerts")
-def dashboard_alerts():
-    response = supabase.table("events").select("*").execute()
-    events = response.data or []
-
+def generate_alerts(events):
     user_activity = defaultdict(int)
-    pricing_views = defaultdict(int)
 
     for e in events:
         uid = e.get("user_id")
-        if not uid:
-            continue
-
-        user_activity[uid] += 1
-
-        if e["event_name"] == "view_pricing":
-            pricing_views[uid] += 1
+        if uid:
+            user_activity[uid] += 1
 
     alerts = []
-
-    for uid, count in pricing_views.items():
-        if count >= 2:
-            alerts.append({
-                "type": "revenue_opportunity",
-                "severity": "high",
-                "user_id": uid,
-                "message": "High purchase intent detected"
-            })
 
     for uid, count in user_activity.items():
         if count < 3:
@@ -136,49 +81,59 @@ def dashboard_alerts():
                 "type": "churn_risk",
                 "severity": "high",
                 "user_id": uid,
-                "message": "User at risk of churn"
+                "message": "User at high churn risk"
             })
 
-    return {
-        "status": "success",
-        "total_alerts": len(alerts),
-        "alerts": alerts
-    }
+    return alerts
 
 
 # =========================
-# 🧠 AI INSIGHTS (NORMALIZED OUTPUT)
+# 🔌 REAL-TIME ALERT STREAM
 # =========================
-@app.get("/dashboard/insights/{user_id}")
-def dashboard_insights(user_id: str):
-    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+@app.websocket("/ws/alerts")
+async def ws_alerts(websocket: WebSocket):
+    await websocket.accept()
+    active_connections.append(websocket)
+
+    try:
+        while True:
+            response = supabase.table("events").select("*").execute()
+            events = response.data or []
+
+            alerts = generate_alerts(events)
+
+            await websocket.send_text(json.dumps({
+                "type": "alerts_update",
+                "alerts": alerts
+            }))
+
+            # simple interval simulation
+            import asyncio
+            await asyncio.sleep(5)
+
+    except WebSocketDisconnect:
+        active_connections.remove(websocket)
+
+
+# =========================
+# 📊 REST FALLBACK (DASHBOARD SUPPORT)
+# =========================
+@app.get("/dashboard/overview")
+def dashboard_overview():
+    response = supabase.table("events").select("*").execute()
     events = response.data or []
 
-    if not events:
-        return {
-            "status": "success",
-            "user_id": user_id,
-            "insight": "No data available"
-        }
-
     total = len(events)
-    logins = len([e for e in events if e["event_name"] == "login"])
-
-    engagement_score = min(100, total * 5)
-
-    if engagement_score > 80:
-        user_type = "power_user"
-    elif engagement_score > 40:
-        user_type = "active_user"
-    else:
-        user_type = "low_activity"
+    users = len(set(e["user_id"] for e in events if e.get("user_id")))
 
     return {
         "status": "success",
-        "user_id": user_id,
-        "engagement_score": engagement_score,
-        "user_type": user_type,
         "total_events": total,
-        "login_count": logins,
-        "insight": f"{user_type} with {total} total events"
+        "unique_users": users
     }
+
+
+@app.get("/events")
+def get_events():
+    response = supabase.table("events").select("*").execute()
+    return {"status": "success", "data": response.data}

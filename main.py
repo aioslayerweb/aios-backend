@@ -3,6 +3,7 @@ from supabase_client import supabase
 import json
 from collections import defaultdict
 from datetime import datetime
+import uuid
 
 app = FastAPI()
 
@@ -12,263 +13,295 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Self-Improving Agents v8 running"}
+    return {"message": "AIOS Autonomous Strategy Upgrader v9 running"}
 
 
 # =========================
 # 📊 EVENTS
 # =========================
 @app.get("/events")
-def get_events():
-    response = supabase.table("events").select("*").execute()
-    return {"status": "success", "data": response.data}
+def events():
+    res = supabase.table("events").select("*").execute()
+    return {"status": "success", "data": res.data}
 
 
 # =========================
-# 🧠 AGENT STRATEGY STORE (VERSIONED)
+# 🧠 STRATEGY REGISTRY (VERSIONED)
 # =========================
-AGENT_STRATEGIES = {
-    "behavior_agent": {"version": 1, "weight_activity": 1.0},
-    "revenue_agent": {"version": 1, "weight_conversion": 1.0},
-    "risk_agent": {"version": 1, "weight_risk": 1.0}
+STRATEGIES = {
+    "behavior_agent": {
+        "version": 1,
+        "weight_activity": 1.0
+    },
+    "revenue_agent": {
+        "version": 1,
+        "weight_conversion": 1.0
+    },
+    "risk_agent": {
+        "version": 1,
+        "weight_risk": 1.0
+    }
 }
 
 
 # =========================
-# 📊 PERFORMANCE TRACKING
+# 📦 STRATEGY UPGRADE STORE
 # =========================
-AGENT_PERFORMANCE = defaultdict(lambda: {
+PENDING_UPGRADES = []
+
+
+# =========================
+# 📊 PERFORMANCE MEMORY
+# =========================
+METRICS = defaultdict(lambda: {
     "runs": 0,
-    "success_signals": 0
+    "positive_signals": 0
 })
 
 
 # =========================
-# 🧠 MEMORY LAYER
+# 🧠 AGENTS
 # =========================
-def build_memory(events):
-    memory = {
-        "total_events": 0,
-        "users": defaultdict(list)
-    }
+def behavior_agent(events):
+    strat = STRATEGIES["behavior_agent"]
 
-    for e in events:
-        memory["total_events"] += 1
-        uid = e.get("user_id")
-        if uid:
-            memory["users"][uid].append(e)
-
-    return memory
-
-
-# =========================
-# 👤 BEHAVIOR AGENT (VERSIONED STRATEGY)
-# =========================
-def behavior_agent(user_id, events):
-    strategy = AGENT_STRATEGIES["behavior_agent"]
-
-    score = len(events) * strategy["weight_activity"]
-
+    score = len(events) * strat["weight_activity"]
     state = "power_user" if score > 20 else "inactive" if score < 3 else "normal"
 
-    AGENT_PERFORMANCE["behavior_agent"]["runs"] += 1
+    METRICS["behavior_agent"]["runs"] += 1
     if state == "power_user":
-        AGENT_PERFORMANCE["behavior_agent"]["success_signals"] += 1
+        METRICS["behavior_agent"]["positive_signals"] += 1
 
-    return {
-        "agent": "behavior_agent",
-        "score": score,
-        "state": state,
-        "strategy_version": strategy["version"]
-    }
+    return {"score": score, "state": state}
 
 
-# =========================
-# 💰 REVENUE AGENT
-# =========================
-def revenue_agent(user_id, events):
-    strategy = AGENT_STRATEGIES["revenue_agent"]
+def revenue_agent(events):
+    strat = STRATEGIES["revenue_agent"]
 
-    has_pricing = any(e.get("event_name") == "view_pricing" for e in events)
+    has_pricing = any(e["event_name"] == "view_pricing" for e in events)
 
-    score = (80 if has_pricing else 20) * strategy["weight_conversion"]
+    score = (80 if has_pricing else 20) * strat["weight_conversion"]
 
-    AGENT_PERFORMANCE["revenue_agent"]["runs"] += 1
+    METRICS["revenue_agent"]["runs"] += 1
     if has_pricing:
-        AGENT_PERFORMANCE["revenue_agent"]["success_signals"] += 1
+        METRICS["revenue_agent"]["positive_signals"] += 1
 
-    return {
-        "agent": "revenue_agent",
-        "score": score,
-        "intent": "high" if score > 60 else "low",
-        "strategy_version": strategy["version"]
-    }
+    return {"score": score, "intent": "high" if score > 60 else "low"}
 
 
-# =========================
-# ⚠️ RISK AGENT
-# =========================
-def risk_agent(user_id, events):
-    strategy = AGENT_STRATEGIES["risk_agent"]
+def risk_agent(events):
+    strat = STRATEGIES["risk_agent"]
 
-    base = len(events)
+    n = len(events)
 
-    if base < 3:
+    if n < 3:
         risk = 90
-    elif base < 10:
+    elif n < 10:
         risk = 60
     else:
         risk = 20
 
-    risk = risk * strategy["weight_risk"]
+    risk = risk * strat["weight_risk"]
 
-    AGENT_PERFORMANCE["risk_agent"]["runs"] += 1
+    METRICS["risk_agent"]["runs"] += 1
     if risk > 70:
-        AGENT_PERFORMANCE["risk_agent"]["success_signals"] += 1
+        METRICS["risk_agent"]["positive_signals"] += 1
+
+    return {"risk": risk, "level": "high" if risk > 70 else "stable"}
+
+
+# =========================
+# 🧪 SIMULATION ENGINE (A/B TEST CORE)
+# =========================
+def simulate_strategy_change(agent_name, key, new_value, events):
+    original = STRATEGIES[agent_name][key]
+
+    # simulate old
+    STRATEGIES[agent_name][key] = original
+    baseline = run_single_agent_test(agent_name, events)
+
+    # simulate new
+    STRATEGIES[agent_name][key] = new_value
+    test = run_single_agent_test(agent_name, events)
+
+    # revert
+    STRATEGIES[agent_name][key] = original
 
     return {
-        "agent": "risk_agent",
-        "score": risk,
-        "level": "high" if risk > 70 else "stable",
-        "strategy_version": strategy["version"]
+        "baseline": baseline,
+        "test": test,
+        "improvement": test["score"] - baseline["score"]
     }
 
 
-# =========================
-# 🔁 SELF-IMPROVEMENT ENGINE
-# =========================
-def self_improve_agents():
-    suggestions = []
+def run_single_agent_test(agent_name, events):
+    if agent_name == "behavior_agent":
+        return behavior_agent(events)
+    if agent_name == "revenue_agent":
+        return revenue_agent(events)
+    if agent_name == "risk_agent":
+        return risk_agent(events)
 
-    for agent, stats in AGENT_PERFORMANCE.items():
+
+# =========================
+# 🧠 STRATEGY UPGRADE ENGINE
+# =========================
+def generate_upgrades(events):
+    upgrades = []
+
+    for agent, stats in METRICS.items():
         if stats["runs"] < 5:
             continue
 
-        success_rate = stats["success_signals"] / stats["runs"]
+        success_rate = stats["positive_signals"] / stats["runs"]
 
-        # LOW PERFORMANCE DETECTED
+        # LOW PERFORMANCE → PROPOSE CHANGE
         if success_rate < 0.3:
-            suggestions.append({
+            upgrades.append({
+                "id": str(uuid.uuid4()),
                 "agent": agent,
-                "action": "adjust_weight",
-                "reason": "low_success_rate",
-                "current_rate": success_rate,
-                "suggested_change": "increase sensitivity"
+                "type": "increase_sensitivity",
+                "status": "pending",
+                "created_at": datetime.utcnow().isoformat()
             })
 
-        # HIGH PERFORMANCE DETECTED
+        # HIGH PERFORMANCE → STABILIZE
         elif success_rate > 0.7:
-            suggestions.append({
+            upgrades.append({
+                "id": str(uuid.uuid4()),
                 "agent": agent,
-                "action": "stabilize_model",
-                "reason": "high_performance",
-                "current_rate": success_rate,
-                "suggested_change": "lock strategy version"
+                "type": "stabilize_strategy",
+                "status": "pending",
+                "created_at": datetime.utcnow().isoformat()
             })
 
-    return suggestions
+    return upgrades
 
 
 # =========================
-# 🎯 ORCHESTRATOR
+# 🛡️ APPROVAL SYSTEM
 # =========================
-def orchestrator(user_id, events):
-    behavior = behavior_agent(user_id, events)
-    revenue = revenue_agent(user_id, events)
-    risk = risk_agent(user_id, events)
+def apply_upgrade(upgrade):
+    agent = upgrade["agent"]
 
+    if agent not in STRATEGIES:
+        return False
+
+    # SAFE RULES ONLY (NO AUTO CHAOS)
+    if upgrade["type"] == "increase_sensitivity":
+        for key in STRATEGIES[agent]:
+            if "weight" in key:
+                STRATEGIES[agent][key] *= 1.1
+
+    if upgrade["type"] == "stabilize_strategy":
+        for key in STRATEGIES[agent]:
+            if "weight" in key:
+                STRATEGIES[agent][key] *= 0.95
+
+    STRATEGIES[agent]["version"] += 1
+    return True
+
+
+# =========================
+# 📊 ORCHESTRATOR
+# =========================
+def run_system(events):
     return {
-        "behavior": behavior,
-        "revenue": revenue,
-        "risk": risk
+        "behavior": behavior_agent(events),
+        "revenue": revenue_agent(events),
+        "risk": risk_agent(events)
     }
 
 
 # =========================
-# 📊 API: AGENTS
+# 📡 API: AGENTS
 # =========================
 @app.get("/agents/{user_id}")
-def run_agents(user_id: str):
-    response = supabase.table("events").select("*").execute()
-    events = response.data or []
+def agents(user_id: str):
+    res = supabase.table("events").select("*").execute()
+    events = [e for e in res.data if e["user_id"] == user_id]
 
-    user_events = [e for e in events if e.get("user_id") == user_id]
-
-    if not user_events:
-        return {"status": "error", "message": "User not found"}
+    upgrades = generate_upgrades(events)
 
     return {
         "status": "success",
         "user_id": user_id,
-        "result": orchestrator(user_id, user_events),
-        "improvement_suggestions": self_improve_agents()
+        "analysis": run_system(events),
+        "upgrade_suggestions": upgrades
     }
 
 
 # =========================
-# 📡 SELF-IMPROVEMENT API
+# 🧠 APPLY UPGRADE (CONTROLLED)
 # =========================
-@app.get("/agents/improvements")
-def improvements():
+@app.post("/upgrade/apply")
+def apply(upgrade: dict):
+    success = apply_upgrade(upgrade)
+
+    return {
+        "status": "applied" if success else "failed",
+        "strategy_state": STRATEGIES
+    }
+
+
+# =========================
+# 📡 VIEW UPGRADES
+# =========================
+@app.get("/upgrade/suggestions")
+def upgrades():
     return {
         "status": "success",
-        "suggestions": self_improve_agents(),
-        "agent_performance": dict(AGENT_PERFORMANCE)
+        "suggestions": PENDING_UPGRADES,
+        "metrics": dict(METRICS)
     }
 
 
 # =========================
-# 🔌 WEBSOCKET SYSTEM
+# 🔌 WEBSOCKET REALTIME
 # =========================
 active_connections = set()
 
 
-async def broadcast(message: dict):
+async def broadcast(msg):
     dead = set()
 
-    for conn in active_connections:
+    for c in active_connections:
         try:
-            await conn.send_text(json.dumps(message))
+            await c.send_text(json.dumps(msg))
         except:
-            dead.add(conn)
+            dead.add(c)
 
     for d in dead:
-        active_connections.discard(d)
+        active_connections.remove(d)
 
 
-# =========================
-# ⚡ REAL-TIME LOOP
-# =========================
 @app.websocket("/ws/events")
-async def ws_events(websocket: WebSocket):
+async def ws(websocket: WebSocket):
     await websocket.accept()
     active_connections.add(websocket)
 
     try:
         while True:
-            data = await websocket.receive_text()
-            event = json.loads(data)
+            raw = await websocket.receive_text()
+            event = json.loads(raw)
 
             supabase.table("events").insert(event).execute()
 
-            await websocket.send_text(json.dumps({
-                "status": "received",
-                "event_name": event.get("event_name"),
-                "user_id": event.get("user_id")
-            }))
+            res = supabase.table("events").select("*").execute()
+            events = [e for e in res.data if e["user_id"] == event["user_id"]]
+
+            analysis = run_system(events)
+            upgrades = generate_upgrades(events)
 
             await broadcast({
-                "type": "event_received",
-                "data": event
+                "type": "analysis_update",
+                "data": analysis
             })
 
-            # RUN SELF-IMPROVEMENT LOOP
-            improvements = self_improve_agents()
-
             await broadcast({
-                "type": "self_improvement_update",
-                "data": improvements
+                "type": "strategy_upgrades",
+                "data": upgrades
             })
 
     except WebSocketDisconnect:
-        active_connections.discard(websocket)
+        active_connections.remove(websocket)

@@ -1,133 +1,184 @@
 from fastapi import FastAPI
 from supabase_client import supabase
-from datetime import datetime
+from collections import defaultdict
 
 app = FastAPI()
 
 
+# =========================
+# 🏠 HEALTH CHECK
+# =========================
 @app.get("/")
 def root():
     return {"message": "AIOS backend is running"}
 
 
 # =========================
-# 📊 ALERTS ENGINE (CLEAN v1.1)
+# 📊 DASHBOARD OVERVIEW (MAIN KPI SCREEN)
 # =========================
-@app.get("/alerts")
-def alerts():
+@app.get("/dashboard/overview")
+def dashboard_overview():
     response = supabase.table("events").select("*").execute()
-    events = response.data
+    events = response.data or []
+
+    total_events = len(events)
+    unique_users = len(set(e["user_id"] for e in events if e.get("user_id")))
+
+    event_types = defaultdict(int)
+    for e in events:
+        event_types[e["event_name"]] += 1
+
+    top_event = max(event_types.items(), key=lambda x: x[1])[0] if event_types else None
+
+    return {
+        "status": "success",
+        "kpis": {
+            "total_events": total_events,
+            "unique_users": unique_users,
+            "top_event": top_event
+        },
+        "event_breakdown": dict(event_types)
+    }
+
+
+# =========================
+# 👤 USER ANALYTICS (FRONTEND PROFILE PAGE)
+# =========================
+@app.get("/dashboard/user/{user_id}")
+def user_dashboard(user_id: str):
+    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+    events = response.data or []
 
     if not events:
-        return {"status": "success", "total_alerts": 0, "alerts": []}
+        return {
+            "status": "success",
+            "user_id": user_id,
+            "message": "No activity found"
+        }
 
-    user_activity = {}
-    pricing_views = {}
+    event_counts = defaultdict(int)
+
+    for e in events:
+        event_counts[e["event_name"]] += 1
+
+    total_events = len(events)
+
+    engagement_score = min(100, total_events * 5)
+
+    return {
+        "status": "success",
+        "user_id": user_id,
+        "engagement_score": engagement_score,
+        "total_events": total_events,
+        "event_breakdown": dict(event_counts),
+        "last_activity": events[-1]["created_at"]
+    }
+
+
+# =========================
+# 📈 EVENT ANALYTICS (TREND SCREEN)
+# =========================
+@app.get("/dashboard/events")
+def event_dashboard():
+    response = supabase.table("events").select("*").execute()
+    events = response.data or []
+
+    trend = defaultdict(int)
+    for e in events:
+        trend[e["event_name"]] += 1
+
+    sorted_trend = sorted(trend.items(), key=lambda x: x[1], reverse=True)
+
+    return {
+        "status": "success",
+        "total_events": len(events),
+        "event_trends": [
+            {"event": k, "count": v} for k, v in sorted_trend
+        ]
+    }
+
+
+# =========================
+# 🔔 ALERTS FEED (FRONTEND READY)
+# =========================
+@app.get("/dashboard/alerts")
+def dashboard_alerts():
+    response = supabase.table("events").select("*").execute()
+    events = response.data or []
+
+    user_activity = defaultdict(int)
+    pricing_views = defaultdict(int)
 
     for e in events:
         uid = e.get("user_id")
         if not uid:
             continue
 
-        user_activity[uid] = user_activity.get(uid, 0) + 1
+        user_activity[uid] += 1
 
         if e["event_name"] == "view_pricing":
-            pricing_views[uid] = pricing_views.get(uid, 0) + 1
+            pricing_views[uid] += 1
 
-    alerts_map = {}
+    alerts = []
 
-    # Revenue intent (highest priority)
     for uid, count in pricing_views.items():
         if count >= 2:
-            alerts_map[uid] = {
+            alerts.append({
                 "type": "revenue_opportunity",
                 "severity": "high",
                 "user_id": uid,
-                "message": f"Strong purchase intent detected ({count} pricing views)"
-            }
+                "message": "High purchase intent detected"
+            })
 
-    # Churn risk
     for uid, count in user_activity.items():
-        if uid in alerts_map:
-            continue
-
         if count < 3:
-            alerts_map[uid] = {
+            alerts.append({
                 "type": "churn_risk",
                 "severity": "high",
                 "user_id": uid,
-                "message": f"High churn risk detected ({count} events)"
-            }
-
-    # Low engagement
-    for uid, count in user_activity.items():
-        if uid in alerts_map:
-            continue
-
-        if count < 6:
-            alerts_map[uid] = {
-                "type": "low_engagement",
-                "severity": "medium",
-                "user_id": uid,
-                "message": f"Low engagement detected ({count} events)"
-            }
-
-    alerts_list = list(alerts_map.values())
+                "message": "User at risk of churn"
+            })
 
     return {
         "status": "success",
-        "total_alerts": len(alerts_list),
-        "alerts": alerts_list
+        "total_alerts": len(alerts),
+        "alerts": alerts
     }
 
 
 # =========================
-# 🔔 NOTIFICATION ENGINE v1
+# 🧠 AI INSIGHTS (NORMALIZED OUTPUT)
 # =========================
-@app.get("/notifications")
-def notifications():
-    alerts_response = alerts()
-    alerts_list = alerts_response["alerts"]
+@app.get("/dashboard/insights/{user_id}")
+def dashboard_insights(user_id: str):
+    response = supabase.table("events").select("*").eq("user_id", user_id).execute()
+    events = response.data or []
 
-    notifications = []
-
-    for alert in alerts_list:
-        notif = {
-            "id": f"notif_{alert['user_id']}_{datetime.utcnow().timestamp()}",
-            "user_id": alert["user_id"],
-            "type": alert["type"],
-            "severity": alert["severity"],
-            "title": build_title(alert),
-            "message": alert["message"],
-            "created_at": datetime.utcnow().isoformat(),
-            "channel": "api"  # future: email, slack, push
+    if not events:
+        return {
+            "status": "success",
+            "user_id": user_id,
+            "insight": "No data available"
         }
-        notifications.append(notif)
+
+    total = len(events)
+    logins = len([e for e in events if e["event_name"] == "login"])
+
+    engagement_score = min(100, total * 5)
+
+    if engagement_score > 80:
+        user_type = "power_user"
+    elif engagement_score > 40:
+        user_type = "active_user"
+    else:
+        user_type = "low_activity"
 
     return {
         "status": "success",
-        "total_notifications": len(notifications),
-        "notifications": notifications
+        "user_id": user_id,
+        "engagement_score": engagement_score,
+        "user_type": user_type,
+        "total_events": total,
+        "login_count": logins,
+        "insight": f"{user_type} with {total} total events"
     }
-
-
-# =========================
-# 🧠 NOTIFICATION TITLE ENGINE
-# =========================
-def build_title(alert):
-    if alert["type"] == "revenue_opportunity":
-        return "🔥 High Purchase Intent Detected"
-    elif alert["type"] == "churn_risk":
-        return "⚠️ User at Risk of Churn"
-    elif alert["type"] == "low_engagement":
-        return "📉 Low User Engagement"
-    return "AIOS Alert"
-
-
-# =========================
-# 📦 EVENTS (existing DB endpoint)
-# =========================
-@app.get("/events")
-def events():
-    response = supabase.table("events").select("*").execute()
-    return {"status": "success", "data": response.data}

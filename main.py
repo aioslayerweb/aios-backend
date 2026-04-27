@@ -2,6 +2,7 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from supabase_client import supabase
 import json
 from collections import defaultdict
+from datetime import datetime
 
 app = FastAPI()
 
@@ -11,11 +12,11 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Real-Time Engine v1.2 running"}
+    return {"message": "AIOS Behavior Analytics Engine v2 running"}
 
 
 # =========================
-# 📊 EVENTS REST API
+# 📊 EVENTS
 # =========================
 @app.get("/events")
 def get_events():
@@ -24,55 +25,135 @@ def get_events():
 
 
 # =========================
-# 🔔 ALERT ENGINE
+# 🧠 USER BEHAVIOR MODEL
 # =========================
-def generate_alerts(events):
-    user_activity = defaultdict(int)
+def build_user_profiles(events):
+    profiles = defaultdict(lambda: {
+        "total_events": 0,
+        "event_types": defaultdict(int),
+        "last_seen": None
+    })
 
     for e in events:
         uid = e.get("user_id")
-        if uid:
-            user_activity[uid] += 1
+        if not uid:
+            continue
 
-    alerts = []
+        profiles[uid]["total_events"] += 1
 
-    for uid, count in user_activity.items():
-        if count < 3:
-            alerts.append({
-                "type": "low_engagement",
-                "severity": "medium",
-                "user_id": uid,
-                "message": f"User {uid} is barely active ({count} events)"
-            })
+        event_name = e.get("event_name", "unknown")
+        profiles[uid]["event_types"][event_name] += 1
 
-    return alerts
+        profiles[uid]["last_seen"] = e.get("created_at")
+
+    return profiles
 
 
 # =========================
-# 🌐 GLOBAL CONNECTIONS (IMPORTANT UPGRADE)
+# 📈 ENGAGEMENT SCORING ENGINE
+# =========================
+def calculate_engagement(profile):
+    base = profile["total_events"]
+
+    diversity = len(profile["event_types"])
+
+    score = (base * 5) + (diversity * 10)
+
+    if score > 80:
+        user_type = "power_user"
+    elif score > 30:
+        user_type = "active_user"
+    else:
+        user_type = "low_activity"
+
+    return score, user_type
+
+
+# =========================
+# ⚠️ CHURN SIGNAL DETECTOR
+# =========================
+def detect_risks(profile):
+    flags = []
+
+    if profile["total_events"] < 3:
+        flags.append("low_engagement")
+
+    if len(profile["event_types"]) <= 1:
+        flags.append("low_feature_usage")
+
+    return flags
+
+
+# =========================
+# 🧠 AI INSIGHT GENERATOR (RULE-BASED MVP)
+# =========================
+def generate_insight(profile, score, user_type, flags):
+    top_event = max(profile["event_types"], key=profile["event_types"].get, default="none")
+
+    return f"""
+User Analysis Summary:
+
+- User type: {user_type}
+- Engagement score: {score}
+- Total events: {profile['total_events']}
+- Primary activity: {top_event}
+- Risk flags: {', '.join(flags) if flags else 'none'}
+
+Insight:
+This user shows {user_type.replace('_', ' ')} behavior with focus on {top_event}.
+"""
+
+
+# =========================
+# 📊 INSIGHTS ENDPOINT
+# =========================
+@app.get("/insights/{user_id}")
+def get_insights(user_id: str):
+    response = supabase.table("events").select("*").execute()
+    events = response.data or []
+
+    user_events = [e for e in events if e.get("user_id") == user_id]
+
+    profile = build_user_profiles(user_events).get(user_id)
+
+    if not profile:
+        return {"status": "error", "message": "User not found"}
+
+    score, user_type = calculate_engagement(profile)
+    flags = detect_risks(profile)
+    insight = generate_insight(profile, score, user_type, flags)
+
+    return {
+        "status": "success",
+        "user_id": user_id,
+        "engagement_score": score,
+        "user_type": user_type,
+        "flags": flags,
+        "total_events": profile["total_events"],
+        "event_breakdown": dict(profile["event_types"]),
+        "ai_insight": insight
+    }
+
+
+# =========================
+# 🔌 REAL-TIME EVENT STREAM
 # =========================
 active_connections = set()
 
 
-# =========================
-# 📡 BROADCAST ENGINE
-# =========================
 async def broadcast(message: dict):
     disconnected = set()
 
-    for connection in active_connections:
+    for conn in active_connections:
         try:
-            await connection.send_text(json.dumps(message))
+            await conn.send_text(json.dumps(message))
         except:
-            disconnected.add(connection)
+            disconnected.add(conn)
 
-    for conn in disconnected:
-        active_connections.discard(conn)
+    for d in disconnected:
+        active_connections.discard(d)
 
 
-# =========================
-# 🔌 WS: EVENTS (REAL-TIME FANOUT)
-# =========================
 @app.websocket("/ws/events")
 async def ws_events(websocket: WebSocket):
     await websocket.accept()
@@ -81,77 +162,46 @@ async def ws_events(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
+            event = json.loads(data)
 
-            try:
-                event = json.loads(data)
-            except:
-                await websocket.send_text(json.dumps({
-                    "status": "error",
-                    "message": "Invalid JSON"
-                }))
-                continue
-
-            # =========================
-            # 💾 SAVE EVENT
-            # =========================
+            # Save event
             supabase.table("events").insert(event).execute()
 
-            # =========================
-            # 🔥 ACK (SENDER ONLY)
-            # =========================
+            # ACK
             await websocket.send_text(json.dumps({
                 "status": "received",
                 "event_name": event.get("event_name"),
                 "user_id": event.get("user_id")
             }))
 
-            # =========================
-            # 📡 BROADCAST (ALL CLIENTS)
-            # =========================
+            # Broadcast event
             await broadcast({
                 "type": "new_event",
                 "data": event
             })
 
-            # =========================
-            # 🔔 LIVE ALERT GENERATION
-            # =========================
+            # Recompute insights live
             response = supabase.table("events").select("*").execute()
             events = response.data or []
 
-            alerts = generate_alerts(events)
+            user_id = event.get("user_id")
+            user_events = [e for e in events if e.get("user_id") == user_id]
 
-            await broadcast({
-                "type": "alerts_update",
-                "alerts": alerts
-            })
+            profile = build_user_profiles(user_events).get(user_id)
 
-    except WebSocketDisconnect:
-        active_connections.discard(websocket)
+            if profile:
+                score, user_type = calculate_engagement(profile)
+                flags = detect_risks(profile)
 
-
-# =========================
-# 🔌 WS: ALERT STREAM (OPTIONAL LIVE FEED)
-# =========================
-@app.websocket("/ws/alerts")
-async def ws_alerts(websocket: WebSocket):
-    await websocket.accept()
-    active_connections.add(websocket)
-
-    try:
-        while True:
-            response = supabase.table("events").select("*").execute()
-            events = response.data or []
-
-            alerts = generate_alerts(events)
-
-            await websocket.send_text(json.dumps({
-                "type": "alerts_update",
-                "alerts": alerts
-            }))
-
-            import asyncio
-            await asyncio.sleep(5)
+                await broadcast({
+                    "type": "live_user_update",
+                    "data": {
+                        "user_id": user_id,
+                        "score": score,
+                        "user_type": user_type,
+                        "flags": flags
+                    }
+                })
 
     except WebSocketDisconnect:
         active_connections.discard(websocket)

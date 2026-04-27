@@ -12,7 +12,7 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Autonomous Agent v5 running"}
+    return {"message": "AIOS Multi-Agent System v6 running"}
 
 
 # =========================
@@ -25,114 +25,109 @@ def get_events():
 
 
 # =========================
-# 🧠 PROFILE BUILDER
+# 🧠 MEMORY LAYER (GLOBAL STATE)
 # =========================
-def build_profile(events):
-    profile = {
+def build_memory(events):
+    memory = {
         "total_events": 0,
         "event_types": defaultdict(int),
-        "last_seen": None
+        "users": defaultdict(list)
     }
 
     for e in events:
-        profile["total_events"] += 1
+        memory["total_events"] += 1
+
+        uid = e.get("user_id")
+        if uid:
+            memory["users"][uid].append(e)
 
         name = e.get("event_name", "unknown")
-        profile["event_types"][name] += 1
+        memory["event_types"][name] += 1
 
-        profile["last_seen"] = e.get("created_at")
-
-    return profile
+    return memory
 
 
 # =========================
-# 🧠 INTENT INFERENCE ENGINE
+# 👤 USER BEHAVIOR AGENT
 # =========================
-def infer_intent(profile):
-    events = profile["event_types"]
+def behavior_agent(user_events):
+    score = len(user_events)
 
-    if events.get("login", 0) > 10:
-        return "habitual_user"
-
-    if events.get("view_pricing", 0) > 0:
-        return "purchase_intent"
-
-    if profile["total_events"] < 3:
-        return "at_risk_user"
-
-    if profile["total_events"] > 20:
-        return "power_user"
-
-    return "normal_user"
+    return {
+        "agent": "behavior_agent",
+        "activity_score": score,
+        "status": "active" if score > 5 else "low_activity"
+    }
 
 
 # =========================
-# 🤖 AUTONOMOUS DECISION ENGINE
+# 💰 REVENUE / CONVERSION AGENT
 # =========================
-def autonomous_decisions(user_id, profile, intent):
-    actions = []
+def revenue_agent(user_events):
+    has_pricing = any(e.get("event_name") == "view_pricing" for e in user_events)
 
-    # 🚨 HIGH RISK USERS
-    if intent == "at_risk_user":
-        actions.append({
-            "type": "alert",
-            "action": "notify_system",
-            "priority": "high",
-            "message": f"User {user_id} is at risk of churn"
-        })
+    score = 70 if has_pricing else 20
 
-        actions.append({
-            "type": "workflow",
-            "action": "send_reengagement_email",
-            "safe": True
-        })
+    return {
+        "agent": "revenue_agent",
+        "conversion_score": score,
+        "status": "high_intent" if score > 50 else "low_intent"
+    }
 
-    # 💰 PURCHASE INTENT
-    elif intent == "purchase_intent":
-        actions.append({
-            "type": "workflow",
-            "action": "trigger_sales_sequence",
-            "safe": True
-        })
 
-    # 🧠 POWER USER
-    elif intent == "power_user":
-        actions.append({
-            "type": "opportunity",
-            "action": "upgrade_offer",
-            "safe": True
-        })
-
-    # 📊 NORMAL USER
+# =========================
+# ⚠️ RISK / CHURN AGENT
+# =========================
+def risk_agent(user_events):
+    if len(user_events) < 3:
+        risk = 85
+    elif len(user_events) < 10:
+        risk = 50
     else:
-        actions.append({
-            "type": "monitor",
-            "action": "track_behavior",
-            "safe": True
-        })
+        risk = 20
 
-    return actions
-
-
-# =========================
-# 🛡️ SAFETY LAYER (IMPORTANT)
-# =========================
-def safety_filter(actions):
-    safe_actions = []
-
-    for a in actions:
-        # Only allow SAFE workflows in v5
-        if a.get("safe", True):
-            safe_actions.append(a)
-
-    return safe_actions
+    return {
+        "agent": "risk_agent",
+        "churn_risk": risk,
+        "status": "high_risk" if risk > 70 else "stable"
+    }
 
 
 # =========================
-# 📊 AUTONOMOUS API
+# 🎯 ORCHESTRATOR (MAIN BRAIN)
 # =========================
-@app.get("/agent/{user_id}")
-def agent(user_id: str):
+def orchestrator(user_id, user_events):
+    behavior = behavior_agent(user_events)
+    revenue = revenue_agent(user_events)
+    risk = risk_agent(user_events)
+
+    # 🧠 DECISION LOGIC (multi-agent fusion)
+    if risk["churn_risk"] > 70:
+        global_action = "reengagement_campaign"
+    elif revenue["conversion_score"] > 60:
+        global_action = "sales_nurture_flow"
+    elif behavior["activity_score"] > 20:
+        global_action = "premium_upsell"
+    else:
+        global_action = "monitor"
+
+    return {
+        "user_id": user_id,
+        "agents": {
+            "behavior": behavior,
+            "revenue": revenue,
+            "risk": risk
+        },
+        "global_decision": global_action,
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+
+# =========================
+# 📊 MULTI-AGENT API
+# =========================
+@app.get("/agents/{user_id}")
+def run_agents(user_id: str):
     response = supabase.table("events").select("*").execute()
     events = response.data or []
 
@@ -141,25 +136,16 @@ def agent(user_id: str):
     if not user_events:
         return {"status": "error", "message": "User not found"}
 
-    profile = build_profile(user_events)
-    intent = infer_intent(profile)
-
-    raw_actions = autonomous_decisions(user_id, profile, intent)
-    safe_actions = safety_filter(raw_actions)
+    result = orchestrator(user_id, user_events)
 
     return {
         "status": "success",
-        "user_id": user_id,
-        "intent": intent,
-        "total_events": profile["total_events"],
-        "event_breakdown": dict(profile["event_types"]),
-        "autonomous_actions": safe_actions,
-        "timestamp": datetime.utcnow().isoformat()
+        **result
     }
 
 
 # =========================
-# 🔌 REAL-TIME ENGINE
+# 🔌 REAL-TIME SYSTEM
 # =========================
 active_connections = set()
 
@@ -178,7 +164,7 @@ async def broadcast(message: dict):
 
 
 # =========================
-# ⚡ WEBSOCKET AGENT LOOP
+# ⚡ WEBSOCKET MULTI-AGENT LOOP
 # =========================
 @app.websocket("/ws/events")
 async def ws_events(websocket: WebSocket):
@@ -207,7 +193,7 @@ async def ws_events(websocket: WebSocket):
             })
 
             # =========================
-            # 🤖 AUTONOMOUS LOOP
+            # 🧠 MULTI-AGENT EXECUTION
             # =========================
             response = supabase.table("events").select("*").execute()
             events = response.data or []
@@ -216,20 +202,12 @@ async def ws_events(websocket: WebSocket):
             user_events = [e for e in events if e.get("user_id") == user_id]
 
             if user_events:
-                profile = build_profile(user_events)
-                intent = infer_intent(profile)
+                result = orchestrator(user_id, user_events)
 
-                actions = autonomous_decisions(user_id, profile, intent)
-                safe_actions = safety_filter(actions)
-
-                # REAL-TIME AUTONOMOUS OUTPUT
+                # REAL-TIME AGENT OUTPUT
                 await broadcast({
-                    "type": "autonomous_decision",
-                    "data": {
-                        "user_id": user_id,
-                        "intent": intent,
-                        "actions": safe_actions
-                    }
+                    "type": "multi_agent_update",
+                    "data": result
                 })
 
     except WebSocketDisconnect:

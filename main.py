@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.services.supabase_client import supabase
+from supabase_client import supabase
 import os
 import requests
 
@@ -7,14 +7,17 @@ app = FastAPI()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
+
 @app.get("/")
 def root():
     return {"message": "AIOS backend is running"}
+
 
 @app.get("/events")
 def get_events():
     response = supabase.table("events").select("*").execute()
     return {"status": "success", "data": response.data}
+
 
 @app.get("/insights/{user_id}")
 def get_insights(user_id: str):
@@ -57,7 +60,12 @@ def get_insights(user_id: str):
             )
 
             result = ai_response.json()
-            ai_text = result["choices"][0]["message"]["content"]
+
+            # Safety check to avoid crashes
+            if "choices" in result:
+                ai_text = result["choices"][0]["message"]["content"]
+            else:
+                ai_text = f"AI error: {result}"
 
         except Exception as e:
             ai_text = f"AI error: {str(e)}"

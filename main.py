@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from supabase_client import supabase
 import os
+from datetime import datetime, timedelta
 
 app = FastAPI()
 
@@ -17,168 +18,97 @@ def get_events():
 
 
 # =========================
-# 🧠 GLOBAL DASHBOARD SUMMARY
+# 🚨 ALERT ENGINE v1
 # =========================
-@app.get("/dashboard/summary")
-def dashboard_summary():
+@app.get("/alerts")
+def alerts():
     response = supabase.table("events").select("*").execute()
     events = response.data
 
-    total_events = len(events)
+    if not events:
+        return {"status": "success", "alerts": []}
 
-    user_set = set()
-    event_types = {}
+    user_activity = {}
+    recent_events = []
 
-    for e in events:
-        user_set.add(e.get("user_id"))
-
-        name = e["event_name"]
-        event_types[name] = event_types.get(name, 0) + 1
-
-    return {
-        "status": "success",
-        "total_events": total_events,
-        "total_users": len(user_set),
-        "event_distribution": event_types
-    }
-
-
-# =========================
-# 👤 USERS OVERVIEW
-# =========================
-@app.get("/dashboard/users")
-def dashboard_users():
-    response = supabase.table("events").select("*").execute()
-    events = response.data
-
-    users = {}
-
-    for e in events:
-        uid = e.get("user_id")
-
-        if not uid:
-            continue
-
-        if uid not in users:
-            users[uid] = {
-                "user_id": uid,
-                "events": 0,
-                "event_types": set()
-            }
-
-        users[uid]["events"] += 1
-        users[uid]["event_types"].add(e["event_name"])
-
-    # convert sets to lists for JSON
-    result = []
-    for u in users.values():
-        result.append({
-            "user_id": u["user_id"],
-            "events": u["events"],
-            "event_types": list(u["event_types"])
-        })
-
-    return {
-        "status": "success",
-        "users": result
-    }
-
-
-# =========================
-# 🔥 POWER USERS FILTER
-# =========================
-@app.get("/dashboard/power-users")
-def power_users():
-    response = supabase.table("events").select("*").execute()
-    events = response.data
-
-    user_counts = {}
+    # 🕒 time threshold (last 24h logic simplified)
+    now = datetime.utcnow()
+    threshold = now - timedelta(hours=24)
 
     for e in events:
         uid = e.get("user_id")
         if not uid:
             continue
 
-        user_counts[uid] = user_counts.get(uid, 0) + 1
+        user_activity[uid] = user_activity.get(uid, 0) + 1
 
-    power_users = []
+        # try parse timestamp safely
+        try:
+            created = e.get("created_at")
+            if created:
+                recent_events.append(e)
+        except:
+            pass
 
-    for uid, count in user_counts.items():
-        if count >= 15:
-            power_users.append({
+    alerts_list = []
+
+    # =========================
+    # 🔥 ALERT 1: HIGH ACTIVITY SPIKE
+    # =========================
+    for uid, count in user_activity.items():
+        if count >= 25:
+            alerts_list.append({
+                "type": "activity_spike",
+                "severity": "high",
                 "user_id": uid,
-                "event_count": count,
-                "segment": "power_user"
+                "message": f"User {uid} has extremely high activity ({count} events)"
             })
 
-    return {
-        "status": "success",
-        "power_users": power_users
-    }
-
-
-# =========================
-# 📉 CHURN RISK USERS
-# =========================
-@app.get("/dashboard/churn-risk")
-def churn_risk():
-    response = supabase.table("events").select("*").execute()
-    events = response.data
-
-    user_counts = {}
-
-    for e in events:
-        uid = e.get("user_id")
-        if not uid:
-            continue
-
-        user_counts[uid] = user_counts.get(uid, 0) + 1
-
-    churn_users = []
-
-    for uid, count in user_counts.items():
-        if count < 5:
-            churn_users.append({
+    # =========================
+    # ⚠️ ALERT 2: LOW ENGAGEMENT USERS
+    # =========================
+    for uid, count in user_activity.items():
+        if count < 3:
+            alerts_list.append({
+                "type": "low_engagement",
+                "severity": "medium",
                 "user_id": uid,
-                "event_count": count,
-                "risk": "high"
-            })
-        elif count < 10:
-            churn_users.append({
-                "user_id": uid,
-                "event_count": count,
-                "risk": "medium"
+                "message": f"User {uid} is barely active ({count} events)"
             })
 
-    return {
-        "status": "success",
-        "churn_risk_users": churn_users
-    }
-
-
-# =========================
-# 📊 REVENUE SIGNAL SUMMARY
-# =========================
-@app.get("/dashboard/revenue")
-def revenue_summary():
-    response = supabase.table("events").select("*").execute()
-    events = response.data
-
-    revenue_signals = {
-        "high": 0,
-        "medium": 0,
-        "low": 0
-    }
+    # =========================
+    # 💰 ALERT 3: REVENUE OPPORTUNITY
+    # =========================
+    pricing_views = {}
 
     for e in events:
         if e["event_name"] == "view_pricing":
-            revenue_signals["high"] += 1
-        elif e["event_name"] == "login":
-            revenue_signals["medium"] += 1
-        else:
-            revenue_signals["low"] += 1
+            uid = e.get("user_id")
+            pricing_views[uid] = pricing_views.get(uid, 0) + 1
+
+    for uid, count in pricing_views.items():
+        if count >= 2:
+            alerts_list.append({
+                "type": "revenue_opportunity",
+                "severity": "high",
+                "user_id": uid,
+                "message": f"User {uid} viewed pricing multiple times ({count}) → strong conversion intent"
+            })
+
+    # =========================
+    # 📉 ALERT 4: CHURN WARNING
+    # =========================
+    for uid, count in user_activity.items():
+        if count < 5:
+            alerts_list.append({
+                "type": "churn_risk",
+                "severity": "high",
+                "user_id": uid,
+                "message": f"User {uid} is at risk of churn (low activity)"
+            })
 
     return {
         "status": "success",
-        "revenue_signal_distribution": revenue_signals
+        "total_alerts": len(alerts_list),
+        "alerts": alerts_list
     }

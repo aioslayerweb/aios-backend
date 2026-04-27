@@ -5,16 +5,17 @@ from collections import defaultdict
 
 app = FastAPI()
 
+
 # =========================
 # 🏠 ROOT
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS backend is running (Realtime enabled)"}
+    return {"message": "AIOS Real-Time Engine v1.2 running"}
 
 
 # =========================
-# 📊 EVENTS REST (fallback API)
+# 📊 EVENTS REST API
 # =========================
 @app.get("/events")
 def get_events():
@@ -23,7 +24,7 @@ def get_events():
 
 
 # =========================
-# 🧠 SIMPLE ALERT ENGINE
+# 🔔 ALERT ENGINE
 # =========================
 def generate_alerts(events):
     user_activity = defaultdict(int)
@@ -48,28 +49,34 @@ def generate_alerts(events):
 
 
 # =========================
-# 🔔 ALERTS API (REST)
+# 🌐 GLOBAL CONNECTIONS (IMPORTANT UPGRADE)
 # =========================
-@app.get("/alerts")
-def get_alerts():
-    response = supabase.table("events").select("*").execute()
-    events = response.data or []
-
-    alerts = generate_alerts(events)
-
-    return {
-        "status": "success",
-        "total_alerts": len(alerts),
-        "alerts": alerts
-    }
+active_connections = set()
 
 
 # =========================
-# 🔌 WEBSOCKET: EVENTS STREAM
+# 📡 BROADCAST ENGINE
+# =========================
+async def broadcast(message: dict):
+    disconnected = set()
+
+    for connection in active_connections:
+        try:
+            await connection.send_text(json.dumps(message))
+        except:
+            disconnected.add(connection)
+
+    for conn in disconnected:
+        active_connections.discard(conn)
+
+
+# =========================
+# 🔌 WS: EVENTS (REAL-TIME FANOUT)
 # =========================
 @app.websocket("/ws/events")
 async def ws_events(websocket: WebSocket):
     await websocket.accept()
+    active_connections.add(websocket)
 
     try:
         while True:
@@ -90,7 +97,7 @@ async def ws_events(websocket: WebSocket):
             supabase.table("events").insert(event).execute()
 
             # =========================
-            # 🔥 ACK RESPONSE (FIX YOU NEEDED)
+            # 🔥 ACK (SENDER ONLY)
             # =========================
             await websocket.send_text(json.dumps({
                 "status": "received",
@@ -98,16 +105,38 @@ async def ws_events(websocket: WebSocket):
                 "user_id": event.get("user_id")
             }))
 
+            # =========================
+            # 📡 BROADCAST (ALL CLIENTS)
+            # =========================
+            await broadcast({
+                "type": "new_event",
+                "data": event
+            })
+
+            # =========================
+            # 🔔 LIVE ALERT GENERATION
+            # =========================
+            response = supabase.table("events").select("*").execute()
+            events = response.data or []
+
+            alerts = generate_alerts(events)
+
+            await broadcast({
+                "type": "alerts_update",
+                "alerts": alerts
+            })
+
     except WebSocketDisconnect:
-        pass
+        active_connections.discard(websocket)
 
 
 # =========================
-# 🔌 WEBSOCKET: LIVE ALERTS STREAM
+# 🔌 WS: ALERT STREAM (OPTIONAL LIVE FEED)
 # =========================
 @app.websocket("/ws/alerts")
 async def ws_alerts(websocket: WebSocket):
     await websocket.accept()
+    active_connections.add(websocket)
 
     try:
         while True:
@@ -125,4 +154,4 @@ async def ws_alerts(websocket: WebSocket):
             await asyncio.sleep(5)
 
     except WebSocketDisconnect:
-        pass
+        active_connections.discard(websocket)

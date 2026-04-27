@@ -35,14 +35,41 @@ def get_insights(user_id: str):
             name = e["event_name"]
             breakdown[name] = breakdown.get(name, 0) + 1
 
-        # 🔥 GROQ AI CALL (UPDATED MODEL AGAIN)
+        # 🧠 RULE-BASED SCORING
+        score = min(total_events * 5, 100)
+
+        # 👤 USER TYPE CLASSIFICATION
+        if score >= 80:
+            user_type = "power_user"
+        elif score >= 50:
+            user_type = "active_user"
+        elif score >= 20:
+            user_type = "casual_user"
+        else:
+            user_type = "inactive_user"
+
+        # ⚠️ FLAGS
+        flags = []
+
+        if "login" in breakdown and breakdown["login"] > (total_events * 0.7):
+            flags.append("login_heavy")
+
+        if len(breakdown) <= 2:
+            flags.append("low_feature_usage")
+
+        # 🔥 GROQ AI CALL
         try:
             prompt = f"""
-            Analyze this user behavior:
+            Analyze this user:
+
             Total events: {total_events}
             Breakdown: {breakdown}
+            User type: {user_type}
+            Flags: {flags}
 
-            Give a short insight about the user.
+            Give:
+            1. A short insight
+            2. One actionable recommendation
             """
 
             ai_response = requests.post(
@@ -72,6 +99,9 @@ def get_insights(user_id: str):
         return {
             "status": "success",
             "user_id": user_id,
+            "engagement_score": score,
+            "user_type": user_type,
+            "flags": flags,
             "total_events": total_events,
             "event_breakdown": breakdown,
             "ai_insight": ai_text

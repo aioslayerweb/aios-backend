@@ -3,7 +3,6 @@ from supabase_client import supabase
 import json
 from collections import defaultdict
 from datetime import datetime
-import uuid
 
 app = FastAPI()
 
@@ -13,221 +12,189 @@ app = FastAPI()
 # =========================
 @app.get("/")
 def root():
-    return {"message": "AIOS Self-Optimizing Revenue Engine v1"}
+    return {"message": "AIOS Customer Lifetime Value Engine v2"}
 
 
 # =========================
 # 📊 EVENTS
 # =========================
-@app.get("/events")
-def events():
+def get_all_events():
     res = supabase.table("events").select("*").execute()
-    return {"status": "success", "data": res.data}
+    return res.data or []
 
 
 # =========================
-# 🧠 REVENUE MEMORY
+# 🧠 FEATURE EXTRACTION
 # =========================
-REVENUE_METRICS = defaultdict(lambda: {
-    "sessions": 0,
-    "pricing_views": 0,
-    "logins": 0,
-    "conversion_signals": 0
-})
+def extract_user_features(events):
+    total_events = len(events)
+    logins = len([e for e in events if e["event_name"] == "login"])
+    pricing_views = len([e for e in events if e["event_name"] == "view_pricing"])
+    interactions = len([e for e in events if e["event_name"] == "interaction"])
+
+    last_seen = None
+    if events:
+        last_seen = max(e["created_at"] for e in events)
+
+    return {
+        "total_events": total_events,
+        "logins": logins,
+        "pricing_views": pricing_views,
+        "interactions": interactions,
+        "last_seen": last_seen
+    }
 
 
 # =========================
-# 💰 REVENUE SIGNAL ENGINE
+# 💎 CLV SCORING MODEL
 # =========================
-def analyze_revenue(events):
+def calculate_clv(features):
     score = 0
 
-    for e in events:
-        name = e.get("event_name")
+    # engagement weight
+    score += features["total_events"] * 2
 
-        if name == "login":
-            score += 1
-        elif name == "view_pricing":
-            score += 5
-        elif name == "interaction":
-            score += 2
+    # intent weight
+    score += features["pricing_views"] * 10
+
+    # activity weight
+    score += features["interactions"] * 3
 
     return score
 
 
 # =========================
-# 🧠 CONVERSION INTENT MODEL
+# 🧠 RETENTION ESTIMATION
 # =========================
-def detect_intent(events):
-    has_pricing = any(e["event_name"] == "view_pricing" for e in events)
-    activity = len(events)
-
-    if has_pricing and activity > 10:
-        return "high_intent"
-
-    if has_pricing:
-        return "medium_intent"
-
-    if activity > 15:
-        return "warm_intent"
-
-    return "cold_intent"
+def estimate_retention(features):
+    if features["total_events"] > 20:
+        return "high_retention"
+    elif features["total_events"] > 5:
+        return "medium_retention"
+    return "low_retention"
 
 
 # =========================
-# 🧪 REVENUE SIMULATOR
+# 💰 CLV SEGMENTATION
 # =========================
-def simulate_conversion_boost(events, boost_factor):
-    base = analyze_revenue(events)
-    return base * boost_factor
-
-
-# =========================
-# 📈 OPTIMIZATION ENGINE
-# =========================
-def generate_revenue_optimizations(events):
-    intent = detect_intent(events)
-    base_score = analyze_revenue(events)
-
-    recommendations = []
-
-    # HIGH VALUE USERS
-    if intent == "high_intent":
-        recommendations.append({
-            "type": "upsell_trigger",
-            "action": "show_premium_offer",
-            "confidence": 0.85,
-            "expected_revenue_impact": "+25%"
-        })
-
-    # MEDIUM INTENT USERS
-    elif intent == "medium_intent":
-        recommendations.append({
-            "type": "conversion_nudge",
-            "action": "show_discount_banner",
-            "confidence": 0.70,
-            "expected_revenue_impact": "+12%"
-        })
-
-    # WARM USERS
-    elif intent == "warm_intent":
-        recommendations.append({
-            "type": "engagement_boost",
-            "action": "trigger_onboarding_flow",
-            "confidence": 0.65,
-            "expected_revenue_impact": "+8%"
-        })
-
-    # COLD USERS
-    else:
-        recommendations.append({
-            "type": "activation_campaign",
-            "action": "email_reengagement",
-            "confidence": 0.60,
-            "expected_revenue_impact": "+5%"
-        })
-
-    return {
-        "intent": intent,
-        "base_revenue_score": base_score,
-        "recommendations": recommendations
-    }
+def segment_user(clv_score):
+    if clv_score > 150:
+        return "whale"
+    elif clv_score > 80:
+        return "high_value"
+    elif clv_score > 30:
+        return "mid_value"
+    return "low_value"
 
 
 # =========================
-# 🛡️ SAFE AUTO-APPLY ENGINE
+# 🎯 STRATEGY ENGINE
 # =========================
-def apply_revenue_optimization(plan):
-    confidence = plan.get("confidence", 0)
-
-    # ONLY SAFE AUTOMATIONS
-    if confidence < 0.75:
+def generate_clv_strategy(segment, retention):
+    if segment == "whale":
         return {
-            "applied": False,
-            "reason": "low_confidence_safety_lock"
+            "strategy": "vip_treatment",
+            "actions": ["early_access", "premium_support", "exclusive_offers"]
+        }
+
+    if segment == "high_value":
+        return {
+            "strategy": "upsell",
+            "actions": ["premium_upgrade", "bundle_offer"]
+        }
+
+    if segment == "mid_value":
+        return {
+            "strategy": "nurture",
+            "actions": ["feature_education", "email_sequences"]
         }
 
     return {
-        "applied": True,
-        "action": plan["action"],
-        "note": "safe_revenue_automation_executed"
+        "strategy": "activation",
+        "actions": ["onboarding_flow", "discount_offer"]
     }
 
 
 # =========================
-# 📊 CORE REVENUE ANALYZER
+# 📊 CLV ENGINE
 # =========================
-def run_revenue_engine(user_id):
-    res = supabase.table("events").select("*").execute()
-    events = [e for e in res.data if e.get("user_id") == user_id]
+def run_clv_engine(user_id):
+    events = get_all_events()
+    user_events = [e for e in events if e.get("user_id") == user_id]
 
-    if not events:
-        return {"status": "error", "message": "no_user_events"}
+    if not user_events:
+        return {"status": "error", "message": "user_not_found"}
 
-    optimizations = generate_revenue_optimizations(events)
-
-    applied = []
-
-    for rec in optimizations["recommendations"]:
-        applied.append(apply_revenue_optimization(rec))
+    features = extract_user_features(user_events)
+    clv_score = calculate_clv(features)
+    segment = segment_user(clv_score)
+    retention = estimate_retention(features)
+    strategy = generate_clv_strategy(segment, retention)
 
     return {
         "status": "success",
         "user_id": user_id,
-        "analysis": optimizations,
-        "auto_applied": applied
+        "clv_score": clv_score,
+        "segment": segment,
+        "retention": retention,
+        "features": features,
+        "strategy": strategy
     }
 
 
 # =========================
-# 📡 API: REVENUE INSIGHTS
+# 📡 API: USER CLV
 # =========================
-@app.get("/revenue/{user_id}")
-def revenue(user_id: str):
-    return run_revenue_engine(user_id)
+@app.get("/clv/{user_id}")
+def clv(user_id: str):
+    return run_clv_engine(user_id)
 
 
 # =========================
-# 📊 GLOBAL REVENUE INSIGHTS
+# 📊 GLOBAL CLV DASHBOARD
 # =========================
-@app.get("/revenue/global")
-def global_revenue():
-    res = supabase.table("events").select("*").execute()
-    events = res.data or []
+@app.get("/clv/global")
+def global_clv():
+    events = get_all_events()
 
-    total = len(events)
-    pricing_views = len([e for e in events if e["event_name"] == "view_pricing"])
-    logins = len([e for e in events if e["event_name"] == "login"])
+    users = defaultdict(list)
+    for e in events:
+        if e.get("user_id"):
+            users[e["user_id"]].append(e)
+
+    segments = defaultdict(int)
+
+    for uid, evs in users.items():
+        features = extract_user_features(evs)
+        score = calculate_clv(features)
+        segment = segment_user(score)
+        segments[segment] += 1
 
     return {
-        "total_events": total,
-        "pricing_views": pricing_views,
-        "logins": logins,
-        "conversion_ratio": pricing_views / total if total else 0
+        "total_users": len(users),
+        "segment_distribution": dict(segments)
     }
 
 
 # =========================
-# 🔌 WEBSOCKET REAL-TIME REVENUE ENGINE
+# 🔌 WEBSOCKET REAL-TIME CLV
 # =========================
 active_connections = set()
 
 
 async def broadcast(msg):
     dead = set()
-
     for c in active_connections:
         try:
             await c.send_text(json.dumps(msg))
         except:
             dead.add(c)
-
     for d in dead:
         active_connections.remove(d)
 
 
-@app.websocket("/ws/revenue")
-async def ws_revenue(websocket: WebSocket):
+@app.websocket("/ws/clv")
+async def ws_clv(websocket: WebSocket):
     await websocket.accept()
     active_connections.add(websocket)
 
@@ -240,12 +207,13 @@ async def ws_revenue(websocket: WebSocket):
 
             user_id = event.get("user_id")
 
-            analysis = run_revenue_engine(user_id)
+            if user_id:
+                result = run_clv_engine(user_id)
 
-            await broadcast({
-                "type": "revenue_update",
-                "data": analysis
-            })
+                await broadcast({
+                    "type": "clv_update",
+                    "data": result
+                })
 
     except WebSocketDisconnect:
         active_connections.remove(websocket)

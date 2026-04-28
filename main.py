@@ -42,9 +42,12 @@ def clv_score(f):
 
 
 def segment(score):
-    if score > 150: return "whale"
-    if score > 80: return "high_value"
-    if score > 30: return "mid_value"
+    if score > 150:
+        return "whale"
+    if score > 80:
+        return "high_value"
+    if score > 30:
+        return "mid_value"
     return "low_value"
 
 
@@ -73,10 +76,17 @@ def behavior_state(f):
 
 
 # =========================
-# 🎯 GROWTH DECISION ENGINE (CORE)
+# 🎯 GROWTH DECISION ENGINE
 # =========================
-def decide_action(segment, intent, behavior):
-    # PRIORITY LOGIC (IMPORTANT)
+def decide_action(segment_value, intent, behavior):
     
-    # 1. HIGH VALUE + HIGH INTENT → monetize
-    if segment in ["wh
+    # 1. HIGH VALUE + HIGH INTENT
+    if segment_value in ["whale", "high_value"] and intent == "high":
+        return {
+            "action": "show_premium_upgrade",
+            "priority": "high",
+            "reason": "high_value_high_intent"
+        }
+
+    # 2. HIGH VALUE BUT LOW INTENT
+    if segment_value in ["wh

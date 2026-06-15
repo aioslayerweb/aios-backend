@@ -1,2 +1,53 @@
+# Node
 node_modules/
+npm-debug.log*
+
+# Environment
 .env
+.env.local
+.env.production
+.env.development
+
+# Next.js
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+.coverage
+
+# Build
+dist/
+build/
+
+# Render
+.render/
+
+# Misc
+*.tmp
+*.swp
+node_modules

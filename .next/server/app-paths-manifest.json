@@ -1,4 +1,9 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/activity/page": "app/activity/page.js",
+  "/agents/page": "app/agents/page.js",
+  "/insights/page": "app/insights/page.js",
   "/page": "app/page.js",
-  "/activity/page": "app/activity/page.js"
+  "/sales/page": "app/sales/page.js",
+  "/settings/page": "app/settings/page.js"
 }

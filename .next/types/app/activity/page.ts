@@ -1,4 +1,4 @@
-// File: /home/project/app/activity/page.tsx
+// File: /workspaces/aios-backend/app/activity/page.tsx
 import * as entry from '../../../../app/activity/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

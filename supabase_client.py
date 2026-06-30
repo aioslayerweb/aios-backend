@@ -1,20 +1,51 @@
-from dotenv import load_dotenv
 import os
-from supabase import create_client, Client
+import logging
+from dotenv import load_dotenv
+from supabase import Client, create_client
 
-# Load .env file
+# ==========================================
+# AIOS Configuration
+# ==========================================
+
 load_dotenv()
 
+logger = logging.getLogger("aios.supabase")
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-if not SUPABASE_URL:
-    raise Exception("Missing SUPABASE_URL")
 
-if not SUPABASE_KEY:
-    raise Exception("Missing SUPABASE_SERVICE_ROLE_KEY")
+def _validate_environment() -> None:
+    """
+    Ensure all required environment variables exist before
+    starting the backend.
+    """
 
-supabase: Client = create_client(
-    SUPABASE_URL,
-    SUPABASE_KEY
-)
+    missing = []
+
+    if not SUPABASE_URL:
+        missing.append("SUPABASE_URL")
+
+    if not SUPABASE_SERVICE_ROLE_KEY:
+        missing.append("SUPABASE_SERVICE_ROLE_KEY")
+
+    if missing:
+        raise RuntimeError(
+            f"Missing required environment variables: {', '.join(missing)}"
+        )
+
+
+_validate_environment()
+
+
+try:
+    supabase: Client = create_client(
+        SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY,
+    )
+
+    logger.info("Supabase client initialized successfully.")
+
+except Exception as exc:
+    logger.exception("Failed to initialize Supabase client.")
+    raise RuntimeError("Unable to connect to Supabase.") from exc

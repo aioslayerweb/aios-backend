@@ -17,6 +17,12 @@ from services.business_memory import (
     get_decision_memory,
 )
 
+from services.customer_engine import (
+    get_all_customers,
+    get_customer,
+    get_customer_health,
+)
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -51,7 +57,6 @@ def get_user_events(user_id: str):
         .eq("user_id", user_id)
         .execute()
     )
-
     return res.data or []
 
 # ==========================================
@@ -88,7 +93,6 @@ def ready():
 
 @app.get("/debug/users")
 def users():
-
     res = supabase.table("events").select("user_id").execute()
 
     if not res.data:
@@ -108,11 +112,8 @@ def users():
 
 @app.get("/api/v1/executive/overview")
 def executive_overview():
-
     res = supabase.table("events").select("*").execute()
-
     events = res.data or []
-
     return build_executive_overview(events)
 
 # ==========================================
@@ -132,6 +133,42 @@ def customer_memory():
 @app.get("/api/v1/memory/decisions")
 def decision_memory():
     return get_decision_memory()
+
+# ==========================================
+# Customer Intelligence
+# ==========================================
+
+@app.get("/api/v1/customers")
+def customers():
+    return {
+        "customers": get_all_customers()
+    }
+
+
+@app.get("/api/v1/customers/{customer_id}")
+def customer(customer_id: str):
+
+    data = get_customer(customer_id)
+
+    if data is None:
+        return {
+            "error": "Customer not found"
+        }
+
+    return data
+
+
+@app.get("/api/v1/customers/{customer_id}/health")
+def customer_health(customer_id: str):
+
+    data = get_customer_health(customer_id)
+
+    if data is None:
+        return {
+            "error": "Customer not found"
+        }
+
+    return data
 
 # ==========================================
 # Signals
@@ -194,11 +231,8 @@ async def websocket_endpoint(websocket: WebSocket):
     active_connections.add(websocket)
 
     try:
-
         while True:
-
             raw = await websocket.receive_text()
-
             payload = json.loads(raw)
 
             await websocket.send_text(
@@ -211,7 +245,6 @@ async def websocket_endpoint(websocket: WebSocket):
             )
 
     except WebSocketDisconnect:
-
         active_connections.remove(websocket)
 
 # ==========================================
@@ -235,6 +268,7 @@ def dashboard():
                 <li><a href="/api/v1/memory/company">Company Memory</a></li>
                 <li><a href="/api/v1/memory/customers">Customer Memory</a></li>
                 <li><a href="/api/v1/memory/decisions">Decision Memory</a></li>
+                <li><a href="/api/v1/customers">Customers API</a></li>
             </ul>
         </body>
     </html>

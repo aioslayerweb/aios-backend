@@ -1,300 +1,212 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from supabase_client import supabase
+from datetime import datetime
 import json
-from collections import defaultdict
 
-app = FastAPI()
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 
+from config.settings import settings
+from supabase_client import supabase
+from services.executive_engine import build_executive_overview
+from services.signals import extract_signals
 
-# =========================
-# CONSTANTS (ANTI-BREAK FIX)
-# =========================
-HIGH_VALUE_SEGMENTS = ["whale", "high_value"]
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+)
 
-SAFE_ACTIONS = [
-    "onboarding_flow",
-    "feature_education",
-    "email_nurture_sequence"
-]
+# ==========================================
+# Middleware
+# ==========================================
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Restrict in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# =========================
-# ROOT
-# =========================
-@app.get("/")
-def root():
-    return {"message": "AIOS Growth Autopilot v3 running (stable)"}
+# ==========================================
+# State
+# ==========================================
 
+active_connections = set()
 
-# =========================
-# DATA
-# =========================
-def get_all_events():
-    res = supabase.table("events").select("*").execute()
-    return res.data or []
+# ==========================================
+# Helper
+# ==========================================
 
-
-# =========================
-# FEATURES
-# =========================
-def extract_features(events):
-    return {
-        "total_events": len(events),
-        "logins": len([e for e in events if e["event_name"] == "login"]),
-        "pricing_views": len([e for e in events if e["event_name"] == "view_pricing"]),
-        "interactions": len([e for e in events if e["event_name"] == "interaction"])
-    }
-
-
-# =========================
-# CLV
-# =========================
-def clv_score(f):
-    return f["total_events"] * 2 + f["pricing_views"] * 10 + f["interactions"] * 3
-
-
-def segment(score):
-    if score > 150:
-        return "whale"
-    if score > 80:
-        return "high_value"
-    if score > 30:
-        return "mid_value"
-    return "low_value"
-
-
-# =========================
-# REVENUE INTENT
-# =========================
-def revenue_intent(f):
-    if f["pricing_views"] > 0 and f["total_events"] > 10:
-        return "high"
-    if f["pricing_views"] > 0:
-        return "medium"
-    if f["total_events"] > 15:
-        return "warm"
-    return "cold"
-
-
-# =========================
-# BEHAVIOR
-# =========================
-def behavior_state(f):
-    if f["total_events"] > 20:
-        return "power_user"
-    if f["total_events"] < 3:
-        return "inactive"
-    return "normal"
-
-
-# =========================
-# DECISION ENGINE
-# =========================
-def decide_action(seg, intent, behavior):
-
-    if seg in HIGH_VALUE_SEGMENTS and intent == "high":
-        return {
-            "action": "show_premium_upgrade",
-            "priority": "high",
-            "reason": "high_value_high_intent"
-        }
-
-    if seg in HIGH_VALUE_SEGMENTS and intent != "high":
-        return {
-            "action": "feature_education",
-            "priority": "high",
-            "reason": "valuable_user_low_conversion"
-        }
-
-    if seg == "mid_value":
-        return {
-            "action": "email_nurture_sequence",
-            "priority": "medium",
-            "reason": "mid_value_growth"
-        }
-
-    if behavior == "inactive":
-        return {
-            "action": "reengagement_campaign",
-            "priority": "high",
-            "reason": "inactive_user"
-        }
-
-    return {
-        "action": "onboarding_flow",
-        "priority": "low",
-        "reason": "default_path"
-    }
-
-
-# =========================
-# SAFE EXECUTION
-# =========================
-def execute_action(decision):
-    if decision["action"] in SAFE_ACTIONS:
-        return {
-            "executed": True,
-            "mode": "auto",
-            "action": decision["action"]
-        }
-
-    return {
-        "executed": False,
-        "mode": "manual_required",
-        "action": decision["action"]
-    }
-
-
-# =========================
-# AUTOPILOT CORE
-# =========================
-def run_autopilot(user_id):
-    events = get_all_events()
-    user_events = [e for e in events if e.get("user_id") == user_id]
-
-    if not user_events:
-        return {"status": "error", "message": "user_not_found"}
-
-    f = extract_features(user_events)
-
-    score = clv_score(f)
-    seg = segment(score)
-    intent = revenue_intent(f)
-    behavior = behavior_state(f)
-
-    decision = decide_action(seg, intent, behavior)
-    execution = execute_action(decision)
-
-    return {
-        "status": "success",
-        "user_id": user_id,
-        "clv_score": score,
-        "segment": seg,
-        "intent": intent,
-        "behavior": behavior,
-        "decision": decision,
-        "execution": execution
-    }
-
-
-# =========================
-# TIMELINE API
-# =========================
-@app.get("/timeline/{user_id}")
-def get_timeline(user_id: str):
-
+def get_user_events(user_id: str):
     res = (
-        supabase
-        .table("customer_timeline")
+        supabase.table("events")
         .select("*")
         .eq("user_id", user_id)
-        .order("created_at")
         .execute()
     )
 
-    timeline = res.data or []
+    return res.data or []
+
+# ==========================================
+# System
+# ==========================================
+
+@app.get("/")
+def root():
+    return {
+        "name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "environment": settings.ENVIRONMENT,
+        "status": "running"
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat()
+    }
+
+
+@app.get("/ready")
+def ready():
+    return {
+        "ready": True
+    }
+
+# ==========================================
+# Debug
+# ==========================================
+
+@app.get("/debug/users")
+def users():
+    res = supabase.table("events").select("user_id").execute()
+
+    if not res.data:
+        return []
+
+    return list(
+        set(
+            e.get("user_id")
+            for e in res.data
+            if e.get("user_id")
+        )
+    )
+
+# ==========================================
+# Executive Intelligence
+# ==========================================
+
+@app.get("/api/v1/executive/overview")
+def executive_overview():
+
+    res = supabase.table("events").select("*").execute()
+
+    events = res.data or []
+
+    return build_executive_overview(events)
+
+# ==========================================
+# Signals
+# ==========================================
+
+@app.get("/signals/{user_id}")
+def signals(user_id: str):
+
+    events = get_user_events(user_id)
+
+    return extract_signals(events)
+
+# ==========================================
+# Insights
+# ==========================================
+
+@app.get("/insights/{user_id}")
+def insights(user_id: str):
+
+    events = get_user_events(user_id)
 
     return {
         "user_id": user_id,
-        "timeline": [
+        "event_count": len(events),
+        "insights": [
             {
-                "time": event["created_at"],
-                "event": event["event_name"],
-                "data": event.get("event_data", {})
+                "title": "Supabase Connected",
+                "description": f"{len(events)} events loaded",
+                "type": "system"
             }
-            for event in timeline
         ]
     }
 
+# ==========================================
+# Autopilot
+# ==========================================
 
-# =========================
-# API
-# =========================
 @app.get("/autopilot/{user_id}")
 def autopilot(user_id: str):
-    return run_autopilot(user_id)
 
-
-@app.get("/autopilot/global")
-def global_autopilot():
-    events = get_all_events()
-
-    users = defaultdict(list)
-    for e in events:
-        if e.get("user_id"):
-            users[e["user_id"]].append(e)
-
-    summary = {
-        "whale": 0,
-        "high_value": 0,
-        "mid_value": 0,
-        "low_value": 0
-    }
-
-    for uid, evs in users.items():
-        f = extract_features(evs)
-        s = clv_score(f)
-        seg = segment(s)
-        summary[seg] += 1
+    events = get_user_events(user_id)
 
     return {
-        "total_users": len(users),
-        "segments": summary
+        "user_id": user_id,
+        "event_count": len(events),
+        "score": 42,
+        "segment": "mid_value",
+        "status": "supabase_mode"
     }
 
+# ==========================================
+# WebSocket
+# ==========================================
 
-# =========================
-# WEBSOCKET
-# =========================
-active_connections = set()
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
 
-
-async def broadcast(msg):
-    dead = set()
-
-    for c in active_connections:
-        try:
-            await c.send_text(json.dumps(msg))
-        except:
-            dead.add(c)
-
-    for d in dead:
-        active_connections.remove(d)
-
-
-@app.websocket("/ws/autopilot")
-async def ws_autopilot(websocket: WebSocket):
     await websocket.accept()
+
     active_connections.add(websocket)
 
     try:
+
         while True:
+
             raw = await websocket.receive_text()
-            event = json.loads(raw)
 
-            # Store raw event
-            supabase.table("events").insert(event).execute()
+            payload = json.loads(raw)
 
-            # AIOS Memory Layer
-            timeline_event = {
-                "user_id": event.get("user_id"),
-                "event_name": event.get("event_name"),
-                "event_data": event.get("event_data", {})
-            }
-
-            supabase.table("customer_timeline").insert(
-                timeline_event
-            ).execute()
-
-            user_id = event.get("user_id")
-
-            if user_id:
-                result = run_autopilot(user_id)
-
-                await broadcast({
-                    "type": "autopilot_update",
-                    "data": result
-                })
+            await websocket.send_text(
+                json.dumps(
+                    {
+                        "type": "ack",
+                        "received": payload
+                    }
+                )
+            )
 
     except WebSocketDisconnect:
+
         active_connections.remove(websocket)
+
+# ==========================================
+# Dashboard
+# ==========================================
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def dashboard():
+
+    return """
+    <html>
+        <body style="font-family:Arial;background:#0f172a;color:white;padding:40px">
+            <h1>AIOS Executive Dashboard API</h1>
+
+            <p>Backend Status: ✅ Running</p>
+
+            <ul>
+                <li><a href="/health">Health</a></li>
+                <li><a href="/ready">Ready</a></li>
+                <li><a href="/api/v1/executive/overview">Executive Overview</a></li>
+            </ul>
+        </body>
+    </html>
+    """

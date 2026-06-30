@@ -23,6 +23,8 @@ from services.customer_engine import (
     get_customer_health,
 )
 
+from services.customer_ai import build_customer_insights
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
@@ -83,28 +85,7 @@ def health():
 
 @app.get("/ready")
 def ready():
-    return {
-        "ready": True
-    }
-
-# ==========================================
-# Debug
-# ==========================================
-
-@app.get("/debug/users")
-def users():
-    res = supabase.table("events").select("user_id").execute()
-
-    if not res.data:
-        return []
-
-    return list(
-        set(
-            e.get("user_id")
-            for e in res.data
-            if e.get("user_id")
-        )
-    )
+    return {"ready": True}
 
 # ==========================================
 # Executive Intelligence
@@ -135,39 +116,35 @@ def decision_memory():
     return get_decision_memory()
 
 # ==========================================
-# Customer Intelligence
+# Customers
 # ==========================================
 
 @app.get("/api/v1/customers")
 def customers():
-    return {
-        "customers": get_all_customers()
-    }
+    return {"customers": get_all_customers()}
 
 
 @app.get("/api/v1/customers/{customer_id}")
 def customer(customer_id: str):
-
     data = get_customer(customer_id)
-
-    if data is None:
-        return {
-            "error": "Customer not found"
-        }
-
+    if not data:
+        return {"error": "Customer not found"}
     return data
 
 
 @app.get("/api/v1/customers/{customer_id}/health")
 def customer_health(customer_id: str):
-
     data = get_customer_health(customer_id)
+    if not data:
+        return {"error": "Customer not found"}
+    return data
 
-    if data is None:
-        return {
-            "error": "Customer not found"
-        }
 
+@app.get("/api/v1/customers/{customer_id}/insights")
+def customer_insights(customer_id: str):
+    data = build_customer_insights(customer_id)
+    if not data:
+        return {"error": "Customer not found"}
     return data
 
 # ==========================================
@@ -176,9 +153,7 @@ def customer_health(customer_id: str):
 
 @app.get("/signals/{user_id}")
 def signals(user_id: str):
-
     events = get_user_events(user_id)
-
     return extract_signals(events)
 
 # ==========================================
@@ -187,9 +162,7 @@ def signals(user_id: str):
 
 @app.get("/insights/{user_id}")
 def insights(user_id: str):
-
     events = get_user_events(user_id)
-
     return {
         "user_id": user_id,
         "event_count": len(events),
@@ -208,9 +181,7 @@ def insights(user_id: str):
 
 @app.get("/autopilot/{user_id}")
 def autopilot(user_id: str):
-
     events = get_user_events(user_id)
-
     return {
         "user_id": user_id,
         "event_count": len(events),
@@ -225,9 +196,7 @@ def autopilot(user_id: str):
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-
     await websocket.accept()
-
     active_connections.add(websocket)
 
     try:
@@ -236,12 +205,7 @@ async def websocket_endpoint(websocket: WebSocket):
             payload = json.loads(raw)
 
             await websocket.send_text(
-                json.dumps(
-                    {
-                        "type": "ack",
-                        "received": payload
-                    }
-                )
+                json.dumps({"type": "ack", "received": payload})
             )
 
     except WebSocketDisconnect:
@@ -253,14 +217,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @app.get("/dashboard", response_class=HTMLResponse)
 def dashboard():
-
     return """
     <html>
         <body style="font-family:Arial;background:#0f172a;color:white;padding:40px">
             <h1>AIOS Executive Dashboard API</h1>
-
             <p>Backend Status: ✅ Running</p>
-
             <ul>
                 <li><a href="/health">Health</a></li>
                 <li><a href="/ready">Ready</a></li>
@@ -268,7 +229,7 @@ def dashboard():
                 <li><a href="/api/v1/memory/company">Company Memory</a></li>
                 <li><a href="/api/v1/memory/customers">Customer Memory</a></li>
                 <li><a href="/api/v1/memory/decisions">Decision Memory</a></li>
-                <li><a href="/api/v1/customers">Customers API</a></li>
+                <li><a href="/api/v1/customers">Customers</a></li>
             </ul>
         </body>
     </html>

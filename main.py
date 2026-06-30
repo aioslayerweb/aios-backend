@@ -24,6 +24,7 @@ from services.customer_engine import (
 )
 
 from services.customer_ai import build_customer_insights
+from services.churn_model import calculate_churn_probability
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -146,6 +147,11 @@ def customer_insights(customer_id: str):
     if not data:
         return {"error": "Customer not found"}
     return data
+
+
+@app.get("/api/v1/customers/{customer_id}/churn")
+def customer_churn(customer_id: str):
+    return calculate_churn_probability(customer_id)
 
 # ==========================================
 # Signals

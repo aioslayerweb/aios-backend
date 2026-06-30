@@ -1,14 +1,21 @@
 from datetime import datetime
 import json
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
 from config.settings import settings
 from supabase_client import supabase
-from services.executive_engine import build_executive_overview
+
 from services.signals import extract_signals
+from services.executive_engine import build_executive_overview
+
+from services.business_memory import (
+    get_company_memory,
+    get_customer_memory,
+    get_decision_memory,
+)
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -21,7 +28,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,7 +41,7 @@ app.add_middleware(
 active_connections = set()
 
 # ==========================================
-# Helper
+# Helpers
 # ==========================================
 
 def get_user_events(user_id: str):
@@ -81,6 +88,7 @@ def ready():
 
 @app.get("/debug/users")
 def users():
+
     res = supabase.table("events").select("user_id").execute()
 
     if not res.data:
@@ -106,6 +114,24 @@ def executive_overview():
     events = res.data or []
 
     return build_executive_overview(events)
+
+# ==========================================
+# Business Memory
+# ==========================================
+
+@app.get("/api/v1/memory/company")
+def company_memory():
+    return get_company_memory()
+
+
+@app.get("/api/v1/memory/customers")
+def customer_memory():
+    return get_customer_memory()
+
+
+@app.get("/api/v1/memory/decisions")
+def decision_memory():
+    return get_decision_memory()
 
 # ==========================================
 # Signals
@@ -206,6 +232,9 @@ def dashboard():
                 <li><a href="/health">Health</a></li>
                 <li><a href="/ready">Ready</a></li>
                 <li><a href="/api/v1/executive/overview">Executive Overview</a></li>
+                <li><a href="/api/v1/memory/company">Company Memory</a></li>
+                <li><a href="/api/v1/memory/customers">Customer Memory</a></li>
+                <li><a href="/api/v1/memory/decisions">Decision Memory</a></li>
             </ul>
         </body>
     </html>

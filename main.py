@@ -178,6 +178,36 @@ def run_autopilot(user_id):
 
 
 # =========================
+# TIMELINE API
+# =========================
+@app.get("/timeline/{user_id}")
+def get_timeline(user_id: str):
+
+    res = (
+        supabase
+        .table("customer_timeline")
+        .select("*")
+        .eq("user_id", user_id)
+        .order("created_at")
+        .execute()
+    )
+
+    timeline = res.data or []
+
+    return {
+        "user_id": user_id,
+        "timeline": [
+            {
+                "time": event["created_at"],
+                "event": event["event_name"],
+                "data": event.get("event_data", {})
+            }
+            for event in timeline
+        ]
+    }
+
+
+# =========================
 # API
 # =========================
 @app.get("/autopilot/{user_id}")
@@ -221,11 +251,13 @@ active_connections = set()
 
 async def broadcast(msg):
     dead = set()
+
     for c in active_connections:
         try:
             await c.send_text(json.dumps(msg))
         except:
             dead.add(c)
+
     for d in dead:
         active_connections.remove(d)
 
@@ -240,7 +272,19 @@ async def ws_autopilot(websocket: WebSocket):
             raw = await websocket.receive_text()
             event = json.loads(raw)
 
+            # Store raw event
             supabase.table("events").insert(event).execute()
+
+            # AIOS Memory Layer
+            timeline_event = {
+                "user_id": event.get("user_id"),
+                "event_name": event.get("event_name"),
+                "event_data": event.get("event_data", {})
+            }
+
+            supabase.table("customer_timeline").insert(
+                timeline_event
+            ).execute()
 
             user_id = event.get("user_id")
 

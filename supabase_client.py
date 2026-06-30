@@ -1,10 +1,20 @@
+from dotenv import load_dotenv
 import os
 from supabase import create_client, Client
+
+# Load .env file
+load_dotenv()
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise Exception("Missing Supabase environment variables")
+if not SUPABASE_URL:
+    raise Exception("Missing SUPABASE_URL")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+if not SUPABASE_KEY:
+    raise Exception("Missing SUPABASE_SERVICE_ROLE_KEY")
+
+supabase: Client = create_client(
+    SUPABASE_URL,
+    SUPABASE_KEY
+)

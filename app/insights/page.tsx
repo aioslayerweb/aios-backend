@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { CircleAlert as AlertCircle, TrendingUp, Bell } from "lucide-react";
+import {
+  CircleAlert as AlertCircle,
+  TrendingUp,
+  Bell,
+  type LucideIcon,
+} from "lucide-react";
 import InsightCard from "@/components/insights/InsightCard";
 
 type FilterType = "all" | "risks" | "opportunities" | "alerts";
@@ -33,6 +38,11 @@ export default function InsightsPage() {
 
   useEffect(() => {
     async function fetchInsights() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+
       const { data } = await supabase
         .from("insights")
         .select("*")
@@ -73,10 +83,10 @@ export default function InsightsPage() {
   }
 
   const filteredInsights = getFilteredInsights();
-  const typeIcons: Record<string, React.ComponentType<any>> = {
-    Risk: AlertCircle,
-    Opportunity: TrendingUp,
-    Alert: Bell,
+  const typeIcons: Record<InsightData["type"], LucideIcon> = {
+    Risk: AlertCircle as LucideIcon,
+    Opportunity: TrendingUp as LucideIcon,
+    Alert: Bell as LucideIcon,
   };
 
   return (
@@ -145,7 +155,7 @@ export default function InsightsPage() {
             <InsightCard
               key={insight.id}
               insight={insight}
-              icon={typeIcons[insight.type] || AlertCircle}
+              icon={typeIcons[insight.type]}
               onAction={(action) => handleAction(action, insight.title)}
             />
           ))

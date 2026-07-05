@@ -61,6 +61,12 @@ export default function DashboardContent() {
 
   useEffect(() => {
     async function fetchData() {
+      if (!supabase) {
+        setLoadingKpis(false);
+        setLoadingInsights(false);
+        return;
+      }
+
       const { data: kpiData } = await supabase
         .from("kpi_metrics")
         .select("*")

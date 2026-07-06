@@ -2,7 +2,6 @@
 
 import { type ReactNode, useMemo, useState } from "react"
 import {
-  Bell,
   Bot,
   Brain,
   Building2,
@@ -27,7 +26,7 @@ import {
   useAIStatus,
   useBreakpoint,
   useCommandPalette,
-  useNotifications,
+  useNotificationCenter,
   useSidebar,
   useWorkspace,
 } from "@/hooks"
@@ -36,6 +35,7 @@ import { useKeyboardShortcuts } from "@/utils/keyboard"
 import { drawerVariants, pageVariants, panelVariants, slideUpVariants } from "@/theme"
 import { Avatar, Breadcrumb, Button, Dropdown, LoadingSpinner, StatusIndicator } from "@/components/ui"
 import { CommandPalette } from "@/components/command-palette"
+import { NotificationBell, NotificationDrawer, NotificationToastHost } from "@/components/notifications"
 
 const iconByKey = {
   home: Home,
@@ -103,7 +103,7 @@ function ShellTopBar() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [mobileAiPanelOpen, setMobileAiPanelOpen] = useState(false)
   const { open } = useCommandPalette()
-  const { notifications } = useNotifications()
+  const { unreadCount, drawerOpen, toggleDrawer, setDrawerOpen } = useNotificationCenter()
   const { aiStatus, memoryStatus, isConnected, isRunning } = useAIStatus()
 
   const currentWorkspaceTitle = useMemo(() => titleFromPath(pathname), [pathname])
@@ -164,18 +164,7 @@ function ShellTopBar() {
           <div className="ml-auto flex items-center gap-2">
             <Dropdown label="Quick Actions" items={quickActions} icon={<Lightbulb className="h-4 w-4" />} className="hidden md:block" />
 
-            <button
-              type="button"
-              className="relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-surface-muted"
-              aria-label="View notifications"
-            >
-              <Bell className="h-4 w-4" />
-              {notifications.length > 0 ? (
-                <span className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-primary px-1 text-[10px] text-text-inverse">
-                  {notifications.length}
-                </span>
-              ) : null}
-            </button>
+            <NotificationBell unreadCount={unreadCount} onClick={toggleDrawer} />
 
             <div className="hidden items-center gap-1 md:flex">
               <StatusIndicator tone={isRunning ? "warning" : "success"} label={`AI ${aiStatus}`} />
@@ -206,6 +195,7 @@ function ShellTopBar() {
 
       <ShellMobileSidebarDrawer open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
       <ShellAdaptiveAiPanel open={mobileAiPanelOpen} onClose={() => setMobileAiPanelOpen(false)} />
+      <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   )
 }
@@ -475,42 +465,6 @@ function GlobalLoadingOverlay() {
   )
 }
 
-function NotificationsHost() {
-  const { notifications, remove } = useNotifications()
-
-  return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-[var(--z-notification)] flex w-full max-w-sm flex-col gap-2" aria-live="polite">
-      <AnimatePresence>
-        {notifications.map((item) => (
-          <motion.div
-            key={item.id}
-            variants={slideUpVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="pointer-events-auto rounded-md border border-border bg-surface-canvas p-3 shadow-md"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-text-primary">{item.title}</p>
-                {item.description ? <p className="mt-1 text-xs text-text-secondary">{item.description}</p> : null}
-              </div>
-              <button
-                type="button"
-                onClick={() => remove(item.id)}
-                className="text-xs text-text-muted hover:text-text-primary"
-                aria-label={`Dismiss ${item.title} notification`}
-              >
-                Dismiss
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  )
-}
-
 type ApplicationLayoutProps = {
   children: ReactNode
 }
@@ -547,7 +501,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
       </div>
 
       <CommandPalette />
-      <NotificationsHost />
+      <NotificationToastHost />
       <GlobalLoadingOverlay />
     </div>
   )

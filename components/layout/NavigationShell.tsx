@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bot, Building2, Briefcase, Database, BrainCircuit, Sparkles, ShieldCheck } from "lucide-react";
+import { Bot, Building2, Database, BrainCircuit, Sparkles, ShieldCheck } from "lucide-react";
 import { moduleCatalog } from "@/modules";
 
 const navItems = [

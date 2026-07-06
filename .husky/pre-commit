@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧠 AIOS PRE-COMMIT GATE ACTIVATED"
+
+echo "--------------------------------------"
+echo "Step 1: Running Lint + Type + Build Validation"
+echo "--------------------------------------"
+
+npm run validate
+
+VALIDATE_EXIT_CODE=$?
+
+if [ $VALIDATE_EXIT_CODE -ne 0 ]; then
+  echo "❌ AIOS BLOCK: Validation failed"
+  echo "Commit rejected by AIOS Pre-Commit Guard"
+  exit 1
+fi
+
+echo "--------------------------------------"
+echo "Step 2: AIOS Integrity Check Passed"
+echo "--------------------------------------"
+
+echo "✔ Lint: OK"
+echo "✔ Typecheck: OK"
+echo "✔ Build: OK"
+
+echo "🟢 AIOS STATUS: COMMIT APPROVED"
+
+exit 0

@@ -5,7 +5,7 @@ import { interpretIntent } from "@/ai/interpreter";
 import { planWorkflow } from "@/ai/planner";
 import { optimizeWorkflow } from "@/ai/optimizer";
 import { executeWorkflow } from "@/workflows/engine/runtime";
-import { createTrace, appendStage, appendExecutionStep, finalizeTrace, type WorkflowTrace } from "@/workflows/engine/trace";
+import { createTrace, appendStage, finalizeTrace, type WorkflowTrace } from "@/workflows/engine/trace";
 
 export type WorkflowStatus = "draft" | "running" | "paused" | "completed" | "failed";
 

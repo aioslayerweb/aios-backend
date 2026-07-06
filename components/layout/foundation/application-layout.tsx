@@ -11,8 +11,6 @@ import {
   LineChart,
   ListChecks,
   Menu,
-  PanelRightClose,
-  PanelRightOpen,
   Search,
   Settings,
   Sparkles,
@@ -24,6 +22,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   useAIStatus,
+  useAIAssistant,
   useBreakpoint,
   useCommandPalette,
   useNotificationCenter,
@@ -32,9 +31,10 @@ import {
 } from "@/hooks"
 import { workspaceItems, cn } from "@/utils"
 import { useKeyboardShortcuts } from "@/utils/keyboard"
-import { drawerVariants, pageVariants, panelVariants, slideUpVariants } from "@/theme"
+import { drawerVariants, pageVariants } from "@/theme"
 import { Avatar, Breadcrumb, Button, Dropdown, LoadingSpinner, StatusIndicator } from "@/components/ui"
 import { CommandPalette } from "@/components/command-palette"
+import { AIAssistantPanel } from "@/components/ai-assistant"
 import { NotificationBell, NotificationDrawer, NotificationToastHost } from "@/components/notifications"
 
 const iconByKey = {
@@ -101,7 +101,7 @@ function ShellTopBar() {
   const pathname = usePathname()
   const { isMobile, isTablet } = useBreakpoint()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [mobileAiPanelOpen, setMobileAiPanelOpen] = useState(false)
+  const { setOpen: setAIPanelOpen } = useAIAssistant()
   const { open } = useCommandPalette()
   const { unreadCount, drawerOpen, toggleDrawer, setDrawerOpen } = useNotificationCenter()
   const { aiStatus, memoryStatus, isConnected, isRunning } = useAIStatus()
@@ -174,7 +174,7 @@ function ShellTopBar() {
 
             <button
               type="button"
-              onClick={() => setMobileAiPanelOpen(true)}
+              onClick={() => setAIPanelOpen(true)}
               className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-surface-muted xl:hidden"
               aria-label="Open AI assistant panel"
             >
@@ -194,7 +194,6 @@ function ShellTopBar() {
       </header>
 
       <ShellMobileSidebarDrawer open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
-      <ShellAdaptiveAiPanel open={mobileAiPanelOpen} onClose={() => setMobileAiPanelOpen(false)} />
       <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   )
@@ -300,117 +299,6 @@ function ShellMobileSidebarDrawer({
   )
 }
 
-function AiPanelSections() {
-  return (
-    <div className="space-y-3 p-4">
-      <h2 className="text-sm font-semibold text-brand-navy">AI Assistant</h2>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">Current Context</h3>
-        <p className="mt-1 text-sm text-text-secondary">Active workspace context and business signal summary placeholder.</p>
-      </section>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">AI Suggestions</h3>
-        <p className="mt-1 text-sm text-text-secondary">Recommended actions and confidence scores placeholder.</p>
-      </section>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">Running Agents</h3>
-        <p className="mt-1 text-sm text-text-secondary">Agent execution stream placeholder.</p>
-      </section>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">Recent Memory</h3>
-        <p className="mt-1 text-sm text-text-secondary">Latest memory writes and summaries placeholder.</p>
-      </section>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">Execution Status</h3>
-        <p className="mt-1 text-sm text-text-secondary">Workflow execution progress placeholder.</p>
-      </section>
-      <section className="aios-card p-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-text-muted">Future AI Conversation</h3>
-        <p className="mt-1 text-sm text-text-secondary">Conversational assistant panel placeholder.</p>
-      </section>
-    </div>
-  )
-}
-
-function ShellRightPanel() {
-  const [collapsed, setCollapsed] = useState(false)
-
-  return (
-    <motion.aside
-      layout
-      variants={panelVariants}
-      initial="initial"
-      animate="animate"
-      className={cn("hidden border-l border-border bg-surface-canvas xl:flex xl:flex-col", collapsed ? "xl:w-16" : "xl:w-96")}
-      aria-label="AI assistant panel"
-    >
-      <div className="flex h-14 items-center justify-between border-b border-border px-3">
-        <span className={cn("text-sm font-semibold text-brand-navy", collapsed && "sr-only")}>AI Panel</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setCollapsed((previous) => !previous)}
-          aria-label={collapsed ? "Expand AI panel" : "Collapse AI panel"}
-        >
-          {collapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
-        </Button>
-      </div>
-
-      {collapsed ? <div className="p-3 text-xs text-text-muted">AI</div> : <AiPanelSections />}
-    </motion.aside>
-  )
-}
-
-function ShellAdaptiveAiPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { isMobile } = useBreakpoint()
-
-  return (
-    <AnimatePresence>
-      {open ? (
-        <div className="fixed inset-0 z-[var(--z-drawer)] bg-slate-900/40 xl:hidden" onClick={onClose}>
-          {isMobile ? (
-            <motion.section
-              variants={slideUpVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="absolute bottom-0 left-0 right-0 max-h-[78vh] overflow-y-auto rounded-t-2xl border border-border bg-surface-canvas"
-              onClick={(event) => event.stopPropagation()}
-              aria-label="Mobile AI assistant bottom sheet"
-            >
-              <div className="flex h-12 items-center justify-between border-b border-border px-4">
-                <span className="text-sm font-semibold text-brand-navy">AI Assistant</span>
-                <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close AI panel">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <AiPanelSections />
-            </motion.section>
-          ) : (
-            <motion.aside
-              variants={drawerVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="ml-auto h-full w-96 max-w-[88vw] border-l border-border bg-surface-canvas"
-              onClick={(event) => event.stopPropagation()}
-              aria-label="Tablet AI assistant slide-over panel"
-            >
-              <div className="flex h-14 items-center justify-between border-b border-border px-4">
-                <span className="text-sm font-semibold text-brand-navy">AI Assistant</span>
-                <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close AI panel">
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <AiPanelSections />
-            </motion.aside>
-          )}
-        </div>
-      ) : null}
-    </AnimatePresence>
-  )
-}
-
 function ShellStatusBar() {
   const { aiStatus, memoryStatus, isConnected, isRunning } = useAIStatus()
 
@@ -471,6 +359,8 @@ type ApplicationLayoutProps = {
 
 export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const { open, close } = useCommandPalette()
+  const { open: aiPanelOpen, setOpen: setAIPanelOpen } = useAIAssistant()
+  const { isMobile } = useBreakpoint()
 
   useKeyboardShortcuts({
     "mod+k": open,
@@ -497,8 +387,14 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
           <ShellStatusBar />
         </div>
 
-        <ShellRightPanel />
+        <AIAssistantPanel mode="desktop" open={true} />
       </div>
+
+      <AIAssistantPanel
+        mode={isMobile ? "mobile" : "tablet"}
+        open={aiPanelOpen}
+        onClose={() => setAIPanelOpen(false)}
+      />
 
       <CommandPalette />
       <NotificationToastHost />

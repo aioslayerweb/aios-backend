@@ -1,3 +1,4 @@
+export * from "./ai-assistant-context"
 export * from "./command-palette-context"
 export * from "./memory-context"
 export * from "./notification-context"

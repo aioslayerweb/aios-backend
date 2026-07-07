@@ -82,6 +82,16 @@ export const defaultCommandItems: CommandItem[] = [
     keywords: ["insights", "analysis", "metrics"],
   },
   {
+    id: "nav-activity-feed",
+    title: "Open Universal Activity Feed",
+    description: "Navigate to operational activity timeline",
+    group: "navigation",
+    type: "navigation",
+    href: "/activity",
+    shortcut: "G T",
+    keywords: ["activity", "timeline", "history", "events", "feed"],
+  },
+  {
     id: "nav-reports",
     title: "Open Reports",
     description: "Navigate to Reports workspace",

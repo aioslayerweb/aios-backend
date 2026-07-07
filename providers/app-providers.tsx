@@ -8,6 +8,8 @@ import { SupabaseProvider } from "@/contexts/supabase-context"
 import { AIAssistantProvider } from "@/contexts/ai-assistant-context"
 import { NotificationProvider } from "@/contexts/notification-context"
 import { CommandPaletteProvider } from "@/contexts/command-palette-context"
+import { RuntimeStatusProvider } from "@/contexts/runtime-status-context"
+import { ActivityFeedProvider } from "@/contexts/activity-feed-context"
 import { WorkspaceProvider } from "@/contexts/workspace-context"
 import { SidebarProvider } from "@/contexts/sidebar-context"
 
@@ -21,7 +23,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
               <SidebarProvider>
                 <AIAssistantProvider>
                   <NotificationProvider>
-                    <CommandPaletteProvider>{children}</CommandPaletteProvider>
+                    <CommandPaletteProvider>
+                      <RuntimeStatusProvider>
+                        <ActivityFeedProvider>{children}</ActivityFeedProvider>
+                      </RuntimeStatusProvider>
+                    </CommandPaletteProvider>
                   </NotificationProvider>
                 </AIAssistantProvider>
               </SidebarProvider>

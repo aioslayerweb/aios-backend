@@ -36,6 +36,7 @@ import { Avatar, Breadcrumb, Button, Dropdown, LoadingSpinner, StatusIndicator }
 import { CommandPalette } from "@/components/command-palette"
 import { AIAssistantPanel } from "@/components/ai-assistant"
 import { NotificationBell, NotificationDrawer, NotificationToastHost } from "@/components/notifications"
+import { RuntimeStatusBar } from "@/components/runtime-status"
 
 const iconByKey = {
   home: Home,
@@ -300,32 +301,7 @@ function ShellMobileSidebarDrawer({
 }
 
 function ShellStatusBar() {
-  const { aiStatus, memoryStatus, isConnected, isRunning } = useAIStatus()
-
-  const statusItems: Array<{
-    label: string
-    value: string
-    tone: "success" | "warning" | "error" | "info" | "neutral"
-  }> = [
-    { label: "AI Runtime", value: aiStatus, tone: isRunning ? "warning" : "success" },
-    { label: "Memory", value: memoryStatus, tone: memoryStatus === "synced" ? "success" : "warning" },
-    { label: "Supabase", value: isConnected ? "online" : "offline", tone: isConnected ? "success" : "error" },
-    { label: "API", value: "healthy", tone: "success" },
-    { label: "Sync", value: memoryStatus === "syncing" ? "active" : "idle", tone: memoryStatus === "syncing" ? "warning" : "neutral" },
-    { label: "Background Tasks", value: isRunning ? "running" : "idle", tone: isRunning ? "warning" : "neutral" },
-  ]
-
-  return (
-    <footer className="border-t border-border bg-surface-canvas px-4 py-2 text-xs md:px-6 lg:px-8" aria-label="System status bar">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        {statusItems.map((item) => (
-          <span key={item.label} className="inline-flex items-center gap-2 text-text-muted">
-            <StatusIndicator tone={item.tone} label={`${item.label}: ${item.value}`} />
-          </span>
-        ))}
-      </div>
-    </footer>
-  )
+  return <RuntimeStatusBar />
 }
 
 function GlobalLoadingOverlay() {

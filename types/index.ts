@@ -1,5 +1,7 @@
 export * from "./ai-assistant"
+export * from "./activity-feed"
 export * from "./command-palette"
 export * from "./navigation"
 export * from "./notifications"
+export * from "./runtime-status"
 export * from "./ui"

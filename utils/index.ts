@@ -1,4 +1,5 @@
 export * from "./a11y"
+export * from "./activity-feed"
 export * from "./animation"
 export * from "./cn"
 export * from "./date"

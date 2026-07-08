@@ -11,11 +11,15 @@ import {
   LineChart,
   ListChecks,
   Menu,
+  Workflow,
   Search,
   Settings,
   Sparkles,
   WalletCards,
   X,
+  Network,
+  BrainCircuit,
+  ShieldCheck,
 } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
@@ -46,6 +50,12 @@ const iconByKey = {
   knowledge: Brain,
   memory: Database,
   agents: Bot,
+  governance: ShieldCheck,
+  decisions: BrainCircuit,
+  prompt: Sparkles,
+  workflow: Workflow,
+  orchestrator: Network,
+  planning: BrainCircuit,
   insights: LineChart,
   reports: ListChecks,
   settings: Settings,

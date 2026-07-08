@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bot, Building2, Database, BrainCircuit, Sparkles, ShieldCheck } from "lucide-react";
+import { Bot, Building2, Database, BrainCircuit, Sparkles, ShieldCheck, Network } from "lucide-react";
 import { moduleCatalog } from "@/modules";
 
 const navItems = [
@@ -7,6 +7,8 @@ const navItems = [
   { label: "Insights", href: "/app/insights", icon: Sparkles },
   { label: "Executive", href: "/app/executive", icon: Building2 },
   { label: "Knowledge", href: "/app/knowledge", icon: Database },
+  { label: "Orchestrator", href: "/app/orchestrator", icon: Network },
+  { label: "Planning", href: "/app/planning", icon: BrainCircuit },
 ];
 
 export default function NavigationShell() {

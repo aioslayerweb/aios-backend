@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { ChevronUp, LoaderCircle } from "lucide-react"
-import { useRuntimeModules, useRuntimeStatus, useSystemHealth } from "@/hooks"
+import { useRuntime, useRuntimeModules, useRuntimeStatus, useSystemHealth } from "@/hooks"
 import { formatRuntimeElapsed } from "@/utils/runtime-status"
 import { RuntimePanel } from "./runtime-panel"
 import { RuntimeStatusIndicator } from "./runtime-status-indicator"
@@ -12,6 +12,7 @@ export function RuntimeStatusBar() {
   const { modules, expanded, setExpanded, lastUpdated, websocketState } = useRuntimeStatus()
   const { overallHealth } = useSystemHealth()
   const { activeModules } = useRuntimeModules()
+  const { runningAgents, pendingTasks } = useRuntime()
 
   const compactModules = modules.slice(0, 5)
 
@@ -48,6 +49,9 @@ export function RuntimeStatusBar() {
 
           <span className="rounded-md border border-border px-2 py-1 text-xs text-text-secondary">
             {activeModules.length} active modules
+          </span>
+          <span className="rounded-md border border-border px-2 py-1 text-xs text-text-secondary">
+            {runningAgents} agents · {pendingTasks} pending
           </span>
         </div>
       </footer>

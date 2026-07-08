@@ -28,6 +28,10 @@ export type AgentStatus = {
   status: "idle" | "running" | "complete" | "failed"
   progress: number
   step: string
+  confidence?: number
+  reasoningStage?: string
+  etaSeconds?: number
+  recentActions?: string[]
 }
 
 export type MemoryEntry = {
@@ -41,7 +45,7 @@ export type MemoryEntry = {
 export type ExecutionEvent = {
   id: string
   label: string
-  status: "queued" | "running" | "complete" | "failed"
+  status: "queued" | "running" | "waiting" | "retrying" | "complete" | "failed"
   timestamp: number
 }
 

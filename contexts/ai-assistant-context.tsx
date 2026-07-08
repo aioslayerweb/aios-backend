@@ -38,6 +38,11 @@ type AIAssistantContextValue = AIAssistantState & {
   memoryEntries: MemoryEntry[]
   executionTimeline: ExecutionEvent[]
   quickActions: AIQuickAction[]
+  setAgentStatuses: (updater: AgentStatus[] | ((previous: AgentStatus[]) => AgentStatus[])) => void
+  setMemoryEntries: (updater: MemoryEntry[] | ((previous: MemoryEntry[]) => MemoryEntry[])) => void
+  setExecutionTimeline: (
+    updater: ExecutionEvent[] | ((previous: ExecutionEvent[]) => ExecutionEvent[])
+  ) => void
   setOpen: (open: boolean) => void
   setCollapsed: (collapsed: boolean) => void
   setWidth: (width: number) => void
@@ -56,6 +61,9 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
   const [selectedTab, setSelectedTab] = useState<AIAssistantTab>("context")
   const [mobileExpanded, setMobileExpanded] = useState(false)
   const [conversationDraft, setConversationDraft] = useState("")
+  const [agentStatuses, setAgentStatuses] = useState<AgentStatus[]>(mockAgentStatuses)
+  const [memoryEntries, setMemoryEntries] = useState<MemoryEntry[]>(mockMemoryEntries)
+  const [executionTimeline, setExecutionTimeline] = useState<ExecutionEvent[]>(mockExecutionEvents)
 
   const setWidth = useCallback((nextWidth: number) => {
     setWidthState(clampPanelWidth(nextWidth))
@@ -77,10 +85,13 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
       conversationDraft,
       currentContext: mockCurrentContext,
       suggestions: mockSuggestions,
-      agentStatuses: mockAgentStatuses,
-      memoryEntries: mockMemoryEntries,
-      executionTimeline: mockExecutionEvents,
+      agentStatuses,
+      memoryEntries,
+      executionTimeline,
       quickActions: aiQuickActions,
+      setAgentStatuses,
+      setMemoryEntries,
+      setExecutionTimeline,
       setOpen,
       setCollapsed,
       setWidth,
@@ -90,8 +101,11 @@ export function AIAssistantProvider({ children }: { children: ReactNode }) {
       setConversationDraft,
     }),
     [
+      agentStatuses,
       collapsed,
       conversationDraft,
+      executionTimeline,
+      memoryEntries,
       mobileExpanded,
       open,
       selectedTab,

@@ -11,6 +11,8 @@ function toneClass(status: ExecutionEvent["status"]): string {
       return "bg-semantic-success"
     case "running":
       return "bg-semantic-warning"
+    case "retrying":
+      return "bg-semantic-warning"
     case "failed":
       return "bg-semantic-error"
     default:

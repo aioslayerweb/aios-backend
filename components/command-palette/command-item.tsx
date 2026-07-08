@@ -1,6 +1,6 @@
 import { Pin } from "lucide-react"
 import type { CommandItem as PaletteCommandItem } from "@/types"
-import { cn } from "@/utils"
+import { cn, getHighlightParts } from "@/utils"
 import { CommandShortcut } from "./command-shortcut"
 
 type CommandItemProps = {
@@ -9,9 +9,13 @@ type CommandItemProps = {
   onSelect: () => void
   onPin: () => void
   index: number
+  query?: string
 }
 
-export function CommandItem({ item, active, onSelect, onPin, index }: CommandItemProps) {
+export function CommandItem({ item, active, onSelect, onPin, index, query = "" }: CommandItemProps) {
+  const titleParts = getHighlightParts(item.title, query)
+  const descriptionParts = getHighlightParts(item.description, query)
+
   return (
     <div
       id={`command-item-${index}`}
@@ -30,8 +34,28 @@ export function CommandItem({ item, active, onSelect, onPin, index }: CommandIte
         className="min-w-0 flex-1 text-left"
         aria-label={`${item.title} command`}
       >
-        <p className="truncate text-sm font-medium">{item.title}</p>
-        <p className="truncate text-xs text-text-secondary">{item.description}</p>
+        <p className="truncate text-sm font-medium">
+          {titleParts.map((part, partIndex) =>
+            part.match ? (
+              <mark key={`${item.id}-title-${partIndex}`} className="rounded bg-brand-subtle px-0.5 text-brand-navy">
+                {part.text}
+              </mark>
+            ) : (
+              <span key={`${item.id}-title-${partIndex}`}>{part.text}</span>
+            )
+          )}
+        </p>
+        <p className="truncate text-xs text-text-secondary">
+          {descriptionParts.map((part, partIndex) =>
+            part.match ? (
+              <mark key={`${item.id}-desc-${partIndex}`} className="rounded bg-brand-subtle px-0.5 text-brand-navy">
+                {part.text}
+              </mark>
+            ) : (
+              <span key={`${item.id}-desc-${partIndex}`}>{part.text}</span>
+            )
+          )}
+        </p>
       </button>
 
       <div className="flex items-center gap-2">

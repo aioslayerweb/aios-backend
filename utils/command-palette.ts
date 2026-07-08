@@ -67,9 +67,43 @@ export const defaultCommandItems: CommandItem[] = [
     description: "Navigate to Agents workspace",
     group: "navigation",
     type: "navigation",
-    href: "/agents",
+    href: "/app/agents",
     shortcut: "G A",
     keywords: ["agents", "automation", "workflows"],
+    execute: { kind: "navigate", target: "/app/agents" },
+  },
+  {
+    id: "nav-workflows",
+    title: "Open Workflow Builder",
+    description: "Navigate to Workflow Builder orchestration workspace",
+    group: "navigation",
+    type: "navigation",
+    href: "/app/workflows",
+    shortcut: "G W",
+    keywords: ["workflow", "builder", "orchestration", "automation"],
+    execute: { kind: "navigate", target: "/app/workflows" },
+  },
+  {
+    id: "nav-orchestrator",
+    title: "Open Multi-Agent Orchestrator",
+    description: "Navigate to the multi-agent orchestration workspace",
+    group: "navigation",
+    type: "navigation",
+    href: "/app/orchestrator",
+    shortcut: "G O",
+    keywords: ["orchestrator", "agents", "network", "runtime"],
+    execute: { kind: "navigate", target: "/app/orchestrator" },
+  },
+  {
+    id: "nav-planning",
+    title: "Open Autonomous Planning Engine",
+    description: "Navigate to the strategic planning workspace",
+    group: "navigation",
+    type: "navigation",
+    href: "/app/planning",
+    shortcut: "G L",
+    keywords: ["planning", "strategy", "roadmap", "priority"],
+    execute: { kind: "navigate", target: "/app/planning" },
   },
   {
     id: "nav-insights",
@@ -110,6 +144,271 @@ export const defaultCommandItems: CommandItem[] = [
     href: "/settings",
     shortcut: "G ,",
     keywords: ["settings", "preferences", "config"],
+    execute: { kind: "navigate", target: "/settings" },
+  },
+  {
+    id: "runtime-restart",
+    title: "Restart Runtime",
+    description: "Simulate runtime restart and module refresh",
+    group: "runtime",
+    type: "runtime",
+    shortcut: "⌘ 1",
+    keywords: ["runtime", "restart", "modules", "refresh"],
+    execute: { kind: "runtime", target: "restart" },
+  },
+  {
+    id: "runtime-pause",
+    title: "Pause Runtime",
+    description: "Pause non-critical runtime processing",
+    group: "runtime",
+    type: "runtime",
+    shortcut: "⌘ 2",
+    keywords: ["runtime", "pause", "queue"],
+    execute: { kind: "runtime", target: "pause" },
+  },
+  {
+    id: "runtime-resume",
+    title: "Resume Runtime",
+    description: "Resume runtime processing and synchronization",
+    group: "runtime",
+    type: "runtime",
+    shortcut: "⌘ 3",
+    keywords: ["runtime", "resume", "queue"],
+    execute: { kind: "runtime", target: "resume" },
+  },
+  {
+    id: "runtime-replay",
+    title: "Replay Events",
+    description: "Open activity replay perspective",
+    group: "runtime",
+    type: "execution",
+    keywords: ["events", "replay", "timeline", "runtime"],
+    execute: { kind: "execution", target: "replay-events" },
+  },
+  {
+    id: "runtime-inspect-queue",
+    title: "Inspect Queue",
+    description: "Open runtime queue and execution state",
+    group: "executions",
+    type: "execution",
+    keywords: ["queue", "inspect", "execution", "tasks"],
+    execute: { kind: "execution", target: "inspect-queue" },
+  },
+  {
+    id: "memory-search",
+    title: "Search Memory",
+    description: "Find memory entries, sessions, and context snapshots",
+    group: "memory",
+    type: "memory",
+    keywords: ["memory", "search", "session", "history"],
+    execute: { kind: "memory", target: "search" },
+  },
+  {
+    id: "memory-recent",
+    title: "Recent Memory",
+    description: "Review recent memory updates",
+    group: "memory",
+    type: "memory",
+    keywords: ["memory", "recent", "updates"],
+    execute: { kind: "memory", target: "recent" },
+  },
+  {
+    id: "memory-pinned",
+    title: "Pinned Memory",
+    description: "Review pinned long-term memory objects",
+    group: "memory",
+    type: "memory",
+    keywords: ["memory", "pinned", "long-term"],
+    execute: { kind: "memory", target: "pinned" },
+  },
+  {
+    id: "knowledge-search",
+    title: "Search Knowledge",
+    description: "Search knowledge references and documents",
+    group: "knowledge",
+    type: "knowledge",
+    keywords: ["knowledge", "documents", "search", "references"],
+    execute: { kind: "knowledge", target: "search" },
+  },
+  {
+    id: "knowledge-recent",
+    title: "Recent Documents",
+    description: "Open recent indexed knowledge documents",
+    group: "knowledge",
+    type: "knowledge",
+    keywords: ["knowledge", "recent", "documents"],
+    execute: { kind: "knowledge", target: "recent-documents" },
+  },
+  {
+    id: "knowledge-pinned",
+    title: "Pinned Documents",
+    description: "Open pinned knowledge references",
+    group: "knowledge",
+    type: "knowledge",
+    keywords: ["knowledge", "pinned", "documents"],
+    execute: { kind: "knowledge", target: "pinned-documents" },
+  },
+  {
+    id: "agent-launch-sales",
+    title: "Launch Sales Agent",
+    description: "Start Sales Agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "sales", "launch", "run"],
+    execute: { kind: "agent", target: "launch-sales" },
+  },
+  {
+    id: "agent-launch-executive",
+    title: "Launch Executive Agent",
+    description: "Start Executive Agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "executive", "launch", "run"],
+    execute: { kind: "agent", target: "launch-executive" },
+  },
+  {
+    id: "agent-launch-knowledge",
+    title: "Launch Knowledge Agent",
+    description: "Start Knowledge Agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "knowledge", "launch", "run"],
+    execute: { kind: "agent", target: "launch-knowledge" },
+  },
+  {
+    id: "agent-launch-operations",
+    title: "Launch Operations Agent",
+    description: "Start Operations Agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "operations", "launch", "run"],
+    execute: { kind: "agent", target: "launch-operations" },
+  },
+  {
+    id: "agent-launch-marketing",
+    title: "Launch Marketing Agent",
+    description: "Start Marketing Agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "marketing", "launch", "run"],
+    execute: { kind: "agent", target: "launch-marketing" },
+  },
+  {
+    id: "agent-pause",
+    title: "Pause Agent",
+    description: "Pause selected agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "pause"],
+    execute: { kind: "agent", target: "pause" },
+  },
+  {
+    id: "agent-restart",
+    title: "Restart Agent",
+    description: "Restart selected agent execution",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "restart"],
+    execute: { kind: "agent", target: "restart" },
+  },
+  {
+    id: "agent-inspect",
+    title: "Inspect Agent",
+    description: "Open selected agent workspace",
+    group: "agents",
+    type: "agent",
+    keywords: ["agent", "inspect", "workspace"],
+    execute: { kind: "navigate", target: "/app/agents" },
+  },
+  {
+    id: "action-create-task",
+    title: "Create Task",
+    description: "Create a new operational task",
+    group: "actions",
+    type: "create",
+    keywords: ["create", "task", "action"],
+    execute: { kind: "action", target: "create-task" },
+  },
+  {
+    id: "action-create-customer",
+    title: "Create Customer",
+    description: "Create a new customer record",
+    group: "actions",
+    type: "create",
+    keywords: ["create", "customer", "account"],
+    execute: { kind: "action", target: "create-customer" },
+  },
+  {
+    id: "action-import-knowledge",
+    title: "Import Knowledge",
+    description: "Import documents into knowledge base",
+    group: "actions",
+    type: "create",
+    keywords: ["import", "knowledge", "documents"],
+    execute: { kind: "action", target: "import-knowledge" },
+  },
+  {
+    id: "action-generate-report",
+    title: "Generate Report",
+    description: "Generate an executive report",
+    group: "reports",
+    type: "create",
+    keywords: ["generate", "report", "executive"],
+    execute: { kind: "action", target: "generate-report" },
+  },
+  {
+    id: "action-run-workflow",
+    title: "Run Workflow",
+    description: "Run an approved autonomous workflow",
+    group: "actions",
+    type: "run",
+    keywords: ["run", "workflow", "automation"],
+    execute: { kind: "action", target: "run-workflow" },
+  },
+  {
+    id: "action-create-workflow",
+    title: "Create Workflow",
+    description: "Open Workflow Builder and start a new workflow draft",
+    group: "actions",
+    type: "create",
+    keywords: ["create", "workflow", "builder", "automation"],
+    execute: { kind: "action", target: "create-workflow" },
+  },
+  {
+    id: "sys-theme",
+    title: "Theme",
+    description: "Open theme controls",
+    group: "system",
+    type: "system",
+    keywords: ["theme", "appearance"],
+    execute: { kind: "system", target: "theme" },
+  },
+  {
+    id: "sys-preferences",
+    title: "Preferences",
+    description: "Open user preferences",
+    group: "settings",
+    type: "settings",
+    keywords: ["preferences", "settings"],
+    execute: { kind: "navigate", target: "/settings" },
+  },
+  {
+    id: "sys-logs",
+    title: "Logs",
+    description: "Open diagnostics logs",
+    group: "system",
+    type: "system",
+    keywords: ["logs", "diagnostics", "developer"],
+    execute: { kind: "system", target: "logs" },
+  },
+  {
+    id: "sys-diagnostics",
+    title: "Diagnostics",
+    description: "Run diagnostics across runtime modules",
+    group: "system",
+    type: "system",
+    keywords: ["diagnostics", "health", "runtime"],
+    execute: { kind: "system", target: "diagnostics" },
   },
   {
     id: "entity-acme",
@@ -130,88 +429,118 @@ export const defaultCommandItems: CommandItem[] = [
     keywords: ["globex", "company", "customer", "account"],
   },
   {
-    id: "cmd-priorities",
-    title: "Show Today's Priorities",
-    description: "Show priority tasks for today",
-    group: "commands",
-    type: "search",
-    keywords: ["today", "priorities", "tasks", "focus"],
-    pinned: true,
+    id: "activity-open",
+    title: "Open Activity",
+    description: "Open universal live activity feed",
+    group: "activity",
+    type: "activity",
+    href: "/activity",
+    keywords: ["activity", "events", "recent activity"],
+    execute: { kind: "navigate", target: "/activity" },
   },
   {
-    id: "cmd-run-sales-agent",
-    title: "Run Sales Agent",
-    description: "Start the Sales Agent workflow",
-    group: "commands",
-    type: "agent",
-    keywords: ["sales", "agent", "run", "workflow"],
-    pinned: true,
-  },
-  {
-    id: "cmd-search-memory-proposal",
-    title: "Search Memory for Proposal",
-    description: "Query memory for proposal-related context",
-    group: "commands",
-    type: "memory",
-    keywords: ["memory", "search", "proposal", "context"],
-  },
-  {
-    id: "cmd-open-projects",
-    title: "Open Projects",
-    description: "Open projects list",
-    group: "commands",
+    id: "task-open",
+    title: "Open Tasks",
+    description: "Inspect active and queued tasks",
+    group: "tasks",
     type: "open",
     href: "/app/actions",
-    keywords: ["projects", "tasks", "actions"],
+    keywords: ["tasks", "queue", "actions"],
+    execute: { kind: "navigate", target: "/app/actions" },
   },
   {
-    id: "ai-ask",
-    title: "Ask AI",
-    description: "Open Ask AI prompt flow",
-    group: "ai-suggestions",
+    id: "customer-open",
+    title: "Open Customers",
+    description: "Inspect customer workspace and accounts",
+    group: "customers",
+    type: "open",
+    href: "/app/customers",
+    keywords: ["customers", "accounts", "companies"],
+    execute: { kind: "navigate", target: "/app/customers" },
+  },
+  {
+    id: "report-open",
+    title: "Open Reports",
+    description: "Open reporting workspace",
+    group: "reports",
+    type: "open",
+    href: "/app/reports",
+    keywords: ["reports", "reporting", "exports"],
+    execute: { kind: "navigate", target: "/app/reports" },
+  },
+  {
+    id: "ai-summarize-activity",
+    title: "Summarize today's activity",
+    description: "Generate AI summary from live activity feed",
+    group: "ai",
     type: "ai",
-    keywords: ["ask", "ai", "question"],
+    keywords: ["summarize", "activity", "ai"],
     pinned: true,
+    execute: { kind: "ai", target: "summarize-activity" },
   },
   {
-    id: "ai-summarise",
-    title: "Summarise",
-    description: "Summarise selected business context",
-    group: "ai-suggestions",
+    id: "ai-explain-execution",
+    title: "Explain latest execution",
+    description: "Explain most recent runtime execution",
+    group: "ai",
     type: "ai",
-    keywords: ["summarise", "summary", "ai"],
+    keywords: ["explain", "latest", "execution", "ai"],
+    execute: { kind: "ai", target: "explain-execution" },
   },
   {
-    id: "ai-explain",
-    title: "Explain",
-    description: "Explain a metric or recommendation",
-    group: "ai-suggestions",
+    id: "ai-find-customer-risk",
+    title: "Find customer risk",
+    description: "Analyze accounts for churn and expansion risk",
+    group: "ai",
     type: "ai",
-    keywords: ["explain", "analysis", "ai"],
+    keywords: ["find", "customer", "risk", "ai"],
+    execute: { kind: "ai", target: "find-customer-risk" },
   },
   {
-    id: "ai-generate",
-    title: "Generate",
-    description: "Generate content or workflow draft",
-    group: "ai-suggestions",
+    id: "ai-search-company-knowledge",
+    title: "Search company knowledge",
+    description: "Retrieve contextual references from knowledge base",
+    group: "ai",
     type: "ai",
-    keywords: ["generate", "draft", "ai"],
+    keywords: ["search", "company", "knowledge", "ai"],
+    execute: { kind: "ai", target: "search-company-knowledge" },
   },
   {
-    id: "ai-execute",
-    title: "Execute",
-    description: "Execute a validated AI action",
-    group: "ai-suggestions",
+    id: "ai-generate-executive-report",
+    title: "Generate executive report",
+    description: "Generate AI-based executive operations report",
+    group: "ai",
     type: "ai",
-    keywords: ["execute", "run", "ai", "action"],
+    keywords: ["generate", "executive", "report", "ai"],
+    execute: { kind: "ai", target: "generate-executive-report" },
   },
   {
-    id: "ai-analyse",
-    title: "Analyse",
-    description: "Run deeper business analysis",
-    group: "ai-suggestions",
+    id: "ai-analyze-sales-pipeline",
+    title: "Analyze sales pipeline",
+    description: "Analyze opportunity momentum and conversion risk",
+    group: "ai",
     type: "ai",
-    keywords: ["analyse", "analysis", "ai", "insight"],
+    keywords: ["analyze", "sales", "pipeline", "ai"],
+    execute: { kind: "ai", target: "analyze-sales-pipeline" },
+  },
+  {
+    id: "trend-agent-workspace",
+    title: "Trending: Open Agent Workspace",
+    description: "Popular action this hour",
+    group: "trending",
+    type: "navigation",
+    href: "/app/agents",
+    keywords: ["trending", "agents", "workspace"],
+    execute: { kind: "navigate", target: "/app/agents" },
+  },
+  {
+    id: "trend-runtime-panel",
+    title: "Trending: Inspect Runtime",
+    description: "Popular runtime operation",
+    group: "trending",
+    type: "runtime",
+    keywords: ["trending", "runtime", "status"],
+    execute: { kind: "runtime", target: "inspect" },
   },
 ]
 
@@ -260,6 +589,14 @@ function scoreMatch(item: CommandItem, query: string): number {
     }
   }
 
+  if (isFuzzySubsequence(normalizedQuery, normalizedTitle)) {
+    score += 26
+  }
+
+  if (isFuzzySubsequence(normalizedQuery, item.keywords.join(" ").toLowerCase())) {
+    score += 18
+  }
+
   if (item.pinned) {
     score += 5
   }
@@ -278,17 +615,91 @@ export function toGroupLabel(group: CommandItem["group"]): string {
   switch (group) {
     case "recent":
       return "Recent"
+    case "favorites":
+      return "Favorites"
+    case "trending":
+      return "Trending"
+    case "frequent":
+      return "Frequently Used"
     case "suggestions":
       return "Suggestions"
     case "navigation":
       return "Navigation"
+    case "runtime":
+      return "Runtime"
+    case "memory":
+      return "Memory"
+    case "knowledge":
+      return "Knowledge"
+    case "agents":
+      return "Agents"
+    case "actions":
+      return "Actions"
+    case "system":
+      return "System"
     case "entities":
       return "Entities"
+    case "tasks":
+      return "Tasks"
+    case "customers":
+      return "Customers"
+    case "reports":
+      return "Reports"
+    case "settings":
+      return "Settings"
+    case "executions":
+      return "Executions"
+    case "activity":
+      return "Recent Activity"
     case "commands":
       return "Commands"
+    case "ai":
+      return "AI Commands"
     case "ai-suggestions":
       return "AI Suggestions"
     default:
       return "Results"
   }
+}
+
+function isFuzzySubsequence(query: string, target: string): boolean {
+  if (!query) {
+    return true
+  }
+
+  let qIndex = 0
+  for (let tIndex = 0; tIndex < target.length; tIndex += 1) {
+    if (query[qIndex] === target[tIndex]) {
+      qIndex += 1
+    }
+    if (qIndex === query.length) {
+      return true
+    }
+  }
+
+  return false
+}
+
+export function getHighlightParts(text: string, query: string): Array<{ text: string; match: boolean }> {
+  const normalizedQuery = query.trim().toLowerCase()
+  if (!normalizedQuery) {
+    return [{ text, match: false }]
+  }
+
+  const normalizedText = text.toLowerCase()
+  const index = normalizedText.indexOf(normalizedQuery)
+
+  if (index === -1) {
+    return [{ text, match: false }]
+  }
+
+  const before = text.slice(0, index)
+  const match = text.slice(index, index + normalizedQuery.length)
+  const after = text.slice(index + normalizedQuery.length)
+
+  return [
+    ...(before ? [{ text: before, match: false }] : []),
+    { text: match, match: true },
+    ...(after ? [{ text: after, match: false }] : []),
+  ]
 }

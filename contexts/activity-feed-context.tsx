@@ -20,7 +20,9 @@ import type {
 import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
 import { useCommandPaletteContext } from "@/contexts/command-palette-context"
 import { useNotificationContext } from "@/contexts/notification-context"
+import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
+import type { RuntimeEvent } from "@/types"
 import {
   applyActivityFilters,
   buildActivityTimeline,
@@ -75,10 +77,66 @@ function makeSystemEvent(partial: Partial<ActivityItem>): ActivityItem {
   }
 }
 
+function runtimeEventToActivity(event: RuntimeEvent): ActivityItem {
+  return makeSystemEvent({
+    id: event.id,
+    title: event.title,
+    summary: event.summary,
+    timestamp: event.timestamp,
+    category: event.category,
+    priority: event.priority,
+    source:
+      event.category === "memory"
+        ? { key: "memory", label: "Runtime Memory", workspace: "Knowledge" }
+        : event.category === "agents"
+          ? { key: "agents", label: "Runtime Agents", workspace: "Orchestrator" }
+          : event.category === "automations"
+            ? { key: "automations", label: "Runtime Automations", workspace: "Workflows" }
+            : { key: "ai-runtime", label: "AI Runtime", workspace: "Executive" },
+    actor: {
+      id: `runtime-${event.id}`,
+      name: "AIOS Runtime Engine",
+      kind: "system",
+    },
+    metadata: {
+      eventType:
+        event.kind === "execution-failed"
+          ? "Error"
+          : event.kind === "task-completed"
+            ? "Task Completed"
+            : event.kind === "agent-executing"
+              ? "Agent Started"
+              : event.kind === "decision-made"
+                ? "AI Decision"
+                : "Automation Executed",
+      workspace:
+        event.category === "memory"
+          ? "Knowledge"
+          : event.category === "agents"
+            ? "Orchestrator"
+            : event.category === "automations"
+              ? "Workflows"
+              : "Executive",
+      status:
+        event.kind === "execution-failed"
+          ? "error"
+          : event.kind === "task-completed"
+            ? "completed"
+            : event.kind === "agent-executing"
+              ? "running"
+              : "info",
+      relatedObjects: [{ type: "runtime-event", id: event.id, label: event.title }],
+      tags: [event.kind, event.category],
+      replayToken: event.id,
+    },
+  })
+}
+
 export function ActivityFeedProvider({ children }: { children: ReactNode }) {
   const { unreadCount } = useNotificationContext()
   const { overallHealth, connectionState, modules } = useRuntimeStatusContext()
   const { agentStatuses } = useAIAssistantContext()
+  const { events: runtimeEvents } = useRuntimeLiveContext()
   const { isOpen: isSearchOpen, query: searchQuery } = useCommandPaletteContext()
 
   const [activities, setActivities] = useState<ActivityItem[]>(() => mockActivityFeed())
@@ -109,6 +167,23 @@ export function ActivityFeedProvider({ children }: { children: ReactNode }) {
 
     return () => window.clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    if (runtimeEvents.length === 0) {
+      return
+    }
+
+    setActivities((previous) => {
+      const existing = new Set(previous.map((item) => item.id))
+      const next = runtimeEvents
+        .slice(0, 24)
+        .map(runtimeEventToActivity)
+        .filter((item) => !existing.has(item.id))
+
+      return [...next, ...previous].slice(0, 10_000)
+    })
+    setLoading(false)
+  }, [runtimeEvents])
 
   useEffect(() => {
     if (!isSearchOpen) {

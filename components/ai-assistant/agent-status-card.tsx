@@ -29,10 +29,19 @@ export function AgentStatusCard({ agent }: AgentStatusCardProps) {
         </span>
       </div>
       <p className="mt-1 text-xs text-text-secondary">{agent.step}</p>
+      {agent.reasoningStage ? (
+        <p className="mt-1 text-[11px] uppercase tracking-wide text-text-muted">{agent.reasoningStage}</p>
+      ) : null}
       <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-border">
         <div className="h-full rounded-full bg-brand-primary" style={{ width: `${agent.progress}%` }} />
       </div>
-      <p className="mt-1 text-[11px] text-text-muted">{agent.progress}%</p>
+      <div className="mt-1 flex items-center justify-between gap-2 text-[11px] text-text-muted">
+        <span>{agent.progress}%</span>
+        {typeof agent.confidence === "number" ? <span>{agent.confidence}% confidence</span> : null}
+        {typeof agent.etaSeconds === "number" && agent.etaSeconds > 0 ? (
+          <span>ETA {Math.ceil(agent.etaSeconds / 60)}m</span>
+        ) : null}
+      </div>
     </article>
   )
 }

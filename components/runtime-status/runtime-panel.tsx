@@ -11,6 +11,9 @@ import { RuntimeModuleCard } from "./runtime-module-card"
 import { RuntimeSummary } from "./runtime-summary"
 import { AgentRuntimeStatus } from "./agent-runtime-status"
 import { MemoryRuntimeStatus } from "./memory-runtime-status"
+import { LiveAgentsPanel } from "./live-agents-panel"
+import { LiveMemoryMonitor } from "./live-memory-monitor"
+import { LiveExecutionQueue } from "./live-execution-queue"
 
 type RuntimePanelProps = {
   open: boolean
@@ -101,6 +104,9 @@ function PanelContent({
         <ConnectionStatus />
         <AgentRuntimeStatus />
         <MemoryRuntimeStatus />
+        <LiveAgentsPanel />
+        <LiveMemoryMonitor />
+        <LiveExecutionQueue />
         {modules
           .filter((moduleStatus) => moduleStatus.key !== "agents" && moduleStatus.key !== "memory")
           .map((moduleStatus) => (

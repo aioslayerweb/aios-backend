@@ -18,7 +18,9 @@ export function CommandFooter({ total }: CommandFooterProps) {
         <CommandShortcut value="Enter" />
         <span>Run</span>
         <CommandShortcut value="Tab" />
-        <span>Autocomplete</span>
+        <span>Next section</span>
+        <CommandShortcut value="Shift Tab" />
+        <span>Prev section</span>
         <CommandShortcut value="Esc" />
         <span>Close</span>
       </div>

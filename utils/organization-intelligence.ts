@@ -26,26 +26,27 @@ export function createOrganizationIntelligenceDefaults() {
   ]
 
   const users: UserRecord[] = [
-    { id: "user-1", organizationId: "org-1", name: "Ava Chen", email: "ava@northwind.ai", department: "executive", roleId: "role-owner", status: "active", lastLogin: "4 min ago", assignedAgents: ["Executive Analyst", "Revenue Agent"], assignedWorkflows: ["Quarterly Board Pack", "Executive Outreach"] },
-    { id: "user-2", organizationId: "org-1", name: "Nina Park", email: "nina@northwind.ai", department: "support", roleId: "role-manager", status: "active", lastLogin: "19 min ago", assignedAgents: ["Retention Agent"], assignedWorkflows: ["Support Recovery Workflow"] },
-    { id: "user-3", organizationId: "org-1", name: "Marco Silva", email: "marco@northwind.ai", department: "finance", roleId: "role-admin", status: "active", lastLogin: "1 hr ago", assignedAgents: ["Finance Review Agent"], assignedWorkflows: ["Finance Approval Flow"] },
-    { id: "user-4", organizationId: "org-2", name: "Lena Ortiz", email: "lena@helios.ai", department: "operations", roleId: "role-operator", status: "invited", lastLogin: "Pending invite", assignedAgents: ["Operations Agent"], assignedWorkflows: ["Operational Readiness"] },
+    { id: "user-1", organizationId: "org-1", workspaceId: "ws-1", departmentId: "dept-executive", teamIds: ["team-1"], name: "Ava Chen", email: "ava@northwind.ai", department: "executive", roleId: "role-owner", status: "active", lastLogin: "4 min ago", assignedAgents: ["Executive Analyst", "Revenue Agent"], assignedWorkflows: ["Quarterly Board Pack", "Executive Outreach"], serviceAccount: false },
+    { id: "user-2", organizationId: "org-1", workspaceId: "ws-3", departmentId: "dept-support", teamIds: ["team-3"], name: "Nina Park", email: "nina@northwind.ai", department: "support", roleId: "role-manager", status: "active", lastLogin: "19 min ago", assignedAgents: ["Retention Agent"], assignedWorkflows: ["Support Recovery Workflow"], serviceAccount: false },
+    { id: "user-3", organizationId: "org-1", workspaceId: "ws-4", departmentId: "dept-finance", teamIds: ["team-4"], name: "Marco Silva", email: "marco@northwind.ai", department: "finance", roleId: "role-admin", status: "active", lastLogin: "1 hr ago", assignedAgents: ["Finance Review Agent"], assignedWorkflows: ["Finance Approval Flow"], serviceAccount: false },
+    { id: "user-4", organizationId: "org-2", workspaceId: "ws-5", departmentId: "dept-operations", teamIds: ["team-5"], name: "Lena Ortiz", email: "lena@helios.ai", department: "operations", roleId: "role-operator", status: "invited", lastLogin: "Pending invite", assignedAgents: ["Operations Agent"], assignedWorkflows: ["Operational Readiness"], serviceAccount: false },
   ]
 
   const teamRecords: TeamRecord[] = [
-    { id: "team-1", name: "Executive Leadership", workspace: "executive", members: 8, lead: "Ava Chen" },
-    { id: "team-2", name: "Revenue Ops", workspace: "sales", members: 14, lead: "Jon Mercer" },
-    { id: "team-3", name: "Support Control", workspace: "support", members: 12, lead: "Nina Park" },
-    { id: "team-4", name: "Finance Governance", workspace: "finance", members: 7, lead: "Marco Silva" },
+    { id: "team-1", organizationId: "org-1", workspaceId: "ws-1", departmentId: "dept-executive", name: "Executive Leadership", members: 8, lead: "Ava Chen" },
+    { id: "team-2", organizationId: "org-1", workspaceId: "ws-2", departmentId: "dept-sales", name: "Revenue Ops", members: 14, lead: "Jon Mercer" },
+    { id: "team-3", organizationId: "org-1", workspaceId: "ws-3", departmentId: "dept-support", name: "Support Control", members: 12, lead: "Nina Park" },
+    { id: "team-4", organizationId: "org-1", workspaceId: "ws-4", departmentId: "dept-finance", name: "Finance Governance", members: 7, lead: "Marco Silva" },
+    { id: "team-5", organizationId: "org-2", workspaceId: "ws-5", departmentId: "dept-operations", name: "Operations Core", members: 5, lead: "Lena Ortiz" },
   ]
 
   const teams: OrgStructureItem[] = teamRecords.map((team) => ({
     id: team.id,
     label: team.name,
     type: "team",
-    parentId: `dept-${team.workspace}`,
+    parentId: team.departmentId,
     owner: team.lead,
-    summary: `${team.members} members operating from the ${team.workspace} workspace.`,
+    summary: `${team.members} members operating from workspace ${team.workspaceId}.`,
   }))
 
   const employees: UserRecord[] = users

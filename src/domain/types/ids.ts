@@ -15,6 +15,8 @@ export type RoleId = Brand<string, "RoleId">
 export type PermissionId = Brand<string, "PermissionId">
 /** User identifier. */
 export type UserId = Brand<string, "UserId">
+/** Person identifier. */
+export type PersonId = Brand<string, "PersonId">
 /** Customer identifier. */
 export type CustomerId = Brand<string, "CustomerId">
 /** Company identifier. */
@@ -35,6 +37,8 @@ export type TaskId = Brand<string, "TaskId">
 export type ProjectId = Brand<string, "ProjectId">
 /** Calendar event identifier. */
 export type CalendarEventId = Brand<string, "CalendarEventId">
+/** Event identifier. */
+export type EventId = Brand<string, "EventId">
 /** Conversation identifier. */
 export type ConversationId = Brand<string, "ConversationId">
 /** Email identifier. */
@@ -47,6 +51,8 @@ export type DocumentId = Brand<string, "DocumentId">
 export type KnowledgeArticleId = Brand<string, "KnowledgeArticleId">
 /** Knowledge collection identifier. */
 export type KnowledgeCollectionId = Brand<string, "KnowledgeCollectionId">
+/** Knowledge item identifier. */
+export type KnowledgeId = Brand<string, "KnowledgeId">
 /** Memory aggregate identifier. */
 export type MemoryId = Brand<string, "MemoryId">
 /** Memory entry identifier. */
@@ -59,6 +65,8 @@ export type InsightId = Brand<string, "InsightId">
 export type KPIId = Brand<string, "KPIId">
 /** Goal identifier. */
 export type GoalId = Brand<string, "GoalId">
+/** Policy identifier. */
+export type PolicyId = Brand<string, "PolicyId">
 /** Decision identifier. */
 export type DecisionId = Brand<string, "DecisionId">
 /** Recommendation identifier. */
@@ -85,6 +93,8 @@ export type AutomationId = Brand<string, "AutomationId">
 export type AutomationExecutionId = Brand<string, "AutomationExecutionId">
 /** Agent identifier. */
 export type AgentId = Brand<string, "AgentId">
+/** Integration identifier. */
+export type IntegrationId = Brand<string, "IntegrationId">
 /** Agent capability identifier. */
 export type AgentCapabilityId = Brand<string, "AgentCapabilityId">
 /** Agent execution identifier. */

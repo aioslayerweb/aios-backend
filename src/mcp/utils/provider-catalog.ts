@@ -1,0 +1,26 @@
+import type { MCPProviderDescriptor } from "@/src/mcp/types"
+
+export const mcpProviderCatalog: MCPProviderDescriptor[] = [
+  { id: "github", name: "GitHub", category: "platform", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: false, supportsRealtime: true, featureFlags: ["event-driven"] },
+  { id: "slack", name: "Slack", category: "collaboration", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "realtime", "event-driven"] },
+  { id: "microsoft-teams", name: "Microsoft Teams", category: "collaboration", runtimeMode: "external", authenticationMethods: ["oauth", "enterprise-sso", "service-account"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "realtime", "event-driven"] },
+  { id: "notion", name: "Notion", category: "knowledge", runtimeMode: "external", authenticationMethods: ["oauth"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch"] },
+  { id: "jira", name: "Jira", category: "platform", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: false, supportsRealtime: true, featureFlags: ["event-driven"] },
+  { id: "confluence", name: "Confluence", category: "knowledge", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch"] },
+  { id: "salesforce", name: "Salesforce", category: "crm", runtimeMode: "external", authenticationMethods: ["oauth", "enterprise-sso"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["realtime", "event-driven"] },
+  { id: "hubspot", name: "HubSpot", category: "crm", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: false, supportsRealtime: true, featureFlags: ["event-driven"] },
+  { id: "supabase", name: "Supabase", category: "data", runtimeMode: "external", authenticationMethods: ["api-key", "service-account", "oauth"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "realtime"] },
+  { id: "postgresql", name: "PostgreSQL", category: "data", runtimeMode: "self-hosted", authenticationMethods: ["service-account", "api-key"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch"] },
+  { id: "mysql", name: "MySQL", category: "data", runtimeMode: "self-hosted", authenticationMethods: ["service-account", "api-key"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch"] },
+  { id: "snowflake", name: "Snowflake", category: "data", runtimeMode: "external", authenticationMethods: ["oauth", "service-account"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch"] },
+  { id: "sap", name: "SAP", category: "erp", runtimeMode: "external", authenticationMethods: ["enterprise-sso", "service-account", "oauth"], supportsStreaming: false, supportsRealtime: false, featureFlags: ["batch", "event-driven"] },
+  { id: "stripe", name: "Stripe", category: "finance", runtimeMode: "external", authenticationMethods: ["api-key", "service-account"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["realtime", "event-driven"] },
+  { id: "shopify", name: "Shopify", category: "finance", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["realtime", "event-driven"] },
+  { id: "zendesk", name: "Zendesk", category: "platform", runtimeMode: "external", authenticationMethods: ["oauth", "api-key"], supportsStreaming: false, supportsRealtime: true, featureFlags: ["event-driven"] },
+  { id: "servicenow", name: "ServiceNow", category: "platform", runtimeMode: "external", authenticationMethods: ["oauth", "enterprise-sso", "api-key"], supportsStreaming: false, supportsRealtime: true, featureFlags: ["event-driven"] },
+  { id: "aws", name: "AWS", category: "cloud", runtimeMode: "external", authenticationMethods: ["service-account", "oidc"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "event-driven"] },
+  { id: "azure", name: "Azure", category: "cloud", runtimeMode: "external", authenticationMethods: ["service-account", "oidc", "saml"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "event-driven"] },
+  { id: "google-cloud", name: "Google Cloud", category: "cloud", runtimeMode: "external", authenticationMethods: ["service-account", "oidc"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "event-driven"] },
+  { id: "aios", name: "AIOS Internal MCP", category: "platform", runtimeMode: "internal", authenticationMethods: ["enterprise-sso", "service-account"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "realtime", "event-driven"] },
+  { id: "custom", name: "Custom Enterprise MCP", category: "platform", runtimeMode: "marketplace", authenticationMethods: ["oauth", "api-key", "service-account", "enterprise-sso"], supportsStreaming: true, supportsRealtime: true, featureFlags: ["streaming", "realtime", "batch", "event-driven"] },
+]

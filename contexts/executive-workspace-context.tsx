@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
-import { DecisionStatus, RuntimeStatus } from "@/src/domain"
+import { DecisionStatus, RuntimeStatus } from "@/src/domain/common/enums"
 import { useActivityFeedContext } from "@/contexts/activity-feed-context"
 import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
 import { useNotificationContext } from "@/contexts/notification-context"

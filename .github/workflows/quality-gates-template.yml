@@ -1,0 +1,32 @@
+name: quality-gates-template
+
+on:
+  workflow_dispatch:
+
+jobs:
+  baseline-quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Note
+        run: echo "Template workflow for M7.3 quality gates. Extend with test runners as they are introduced."

@@ -20,6 +20,18 @@ import {
   Network,
   BrainCircuit,
   ShieldCheck,
+  Users,
+  User,
+  Shield,
+  ClipboardList,
+  KeyRound,
+  PlugZap,
+  Blocks,
+  Wrench,
+  FolderTree,
+  FileText,
+  HeartPulse,
+  Route,
 } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
@@ -59,6 +71,21 @@ const iconByKey = {
   insights: LineChart,
   reports: ListChecks,
   settings: Settings,
+  mcp: PlugZap,
+  "mcp-registry": Blocks,
+  "mcp-tools": Wrench,
+  "mcp-resources": FolderTree,
+  "mcp-prompts": FileText,
+  "mcp-health": HeartPulse,
+  "mcp-gateway": Route,
+  security: ShieldCheck,
+  organizations: Users,
+  users: User,
+  teams: Users,
+  roles: Shield,
+  permissions: Shield,
+  audit: ClipboardList,
+  "api-keys": KeyRound,
 } as const
 
 function titleFromPath(pathname: string): string {

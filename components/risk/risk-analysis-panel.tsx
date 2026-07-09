@@ -1,4 +1,4 @@
-import { RiskLevel } from "@/src/domain"
+import { RiskLevel } from "@/src/domain/common/enums"
 import type { GovernanceRiskItem } from "@/types"
 
 type RiskAnalysisPanelProps = {

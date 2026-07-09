@@ -6,6 +6,102 @@ export enum Priority {
   Critical = "critical",
 }
 
+/** Shared role classification across the enterprise domain model. */
+export enum Role {
+  Owner = "owner",
+  Administrator = "administrator",
+  Executive = "executive",
+  Manager = "manager",
+  Operator = "operator",
+  Employee = "employee",
+  Guest = "guest",
+  Custom = "custom",
+}
+
+/** Shared department classification. */
+export enum DepartmentType {
+  Executive = "executive",
+  Revenue = "revenue",
+  Marketing = "marketing",
+  Operations = "operations",
+  Finance = "finance",
+  Support = "support",
+  People = "people",
+  Technology = "technology",
+  Custom = "custom",
+}
+
+/** Shared agent classification. */
+export enum AgentType {
+  Reasoning = "reasoning",
+  Planner = "planner",
+  Executor = "executor",
+  Observer = "observer",
+  Analyzer = "analyzer",
+  Coordinator = "coordinator",
+  Custom = "custom",
+}
+
+/** Workflow lifecycle status. */
+export enum WorkflowStatus {
+  Draft = "draft",
+  Ready = "ready",
+  Running = "running",
+  Monitoring = "monitoring",
+  Learning = "learning",
+  Completed = "completed",
+  Archived = "archived",
+}
+
+/** Policy lifecycle status. */
+export enum PolicyStatus {
+  Draft = "draft",
+  Review = "review",
+  Active = "active",
+  Disabled = "disabled",
+  Archived = "archived",
+}
+
+/** Goal lifecycle status. */
+export enum GoalStatus {
+  Draft = "draft",
+  Active = "active",
+  AtRisk = "at_risk",
+  Blocked = "blocked",
+  Completed = "completed",
+  Archived = "archived",
+}
+
+/** Knowledge lifecycle classification. */
+export enum KnowledgeType {
+  Article = "article",
+  Insight = "insight",
+  Procedure = "procedure",
+  Decision = "decision",
+  Reference = "reference",
+  Model = "model",
+  Custom = "custom",
+}
+
+/** Memory lifecycle classification. */
+export enum MemoryType {
+  Working = "working",
+  Session = "session",
+  LongTerm = "long_term",
+  Knowledge = "knowledge",
+  Decision = "decision",
+  Custom = "custom",
+}
+
+/** Notification severity classification. */
+export enum NotificationSeverity {
+  Info = "info",
+  Success = "success",
+  Warning = "warning",
+  Error = "error",
+  Critical = "critical",
+}
+
 /** Generic lifecycle status used by domain entities where no specific status exists. */
 export enum Status {
   Draft = "draft",

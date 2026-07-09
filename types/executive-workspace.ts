@@ -1,4 +1,4 @@
-import type { DecisionStatus, Priority, RiskLevel, RuntimeStatus, TaskStatus } from "@/src/domain"
+import type { DecisionStatus, Priority, RiskLevel, RuntimeStatus, TaskStatus } from "@/src/domain/common/enums"
 
 export type ExecutiveMetric = {
   id: string

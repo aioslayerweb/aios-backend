@@ -19,6 +19,9 @@ import { GovernanceProvider } from "@/contexts/governance-context"
 import { KnowledgeGraphProvider } from "@/contexts/knowledge-graph-context"
 import { ExecutiveReportsProvider } from "@/contexts/executive-reports-context"
 import { SecurityProvider } from "@/contexts/security-context"
+import { TenantProvider } from "@/contexts/tenant-context"
+import { AuthProvider } from "@/contexts/auth-context"
+import { RoleContextProvider } from "@/contexts/role-context"
 import { RoleIntelligenceProvider } from "@/contexts/role-intelligence-context"
 import { OrganizationIntelligenceProvider } from "@/contexts/organization-intelligence-context"
 import { IntegrationProvider } from "@/contexts/integration-context"
@@ -28,6 +31,9 @@ import { OrchestratorProvider } from "@/contexts/orchestrator-context"
 import { PlanningEngineProvider } from "@/contexts/planning-engine-context"
 import { WorkspaceProvider } from "@/contexts/workspace-context"
 import { SidebarProvider } from "@/contexts/sidebar-context"
+import { MCPPlatformProvider } from "@/contexts/mcp-platform-context"
+import { RuntimePlatformProvider } from "@/contexts/runtime-platform-context"
+import { InfrastructureProvider } from "@/contexts/infrastructure-context"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
@@ -56,9 +62,21 @@ export function AppProviders({ children }: { children: ReactNode }) {
                                                   <KnowledgeGraphProvider>
                                                     <ExecutiveReportsProvider>
                                                       <SecurityProvider>
-                                                        <RoleIntelligenceProvider>
-                                                          <OrganizationIntelligenceProvider>{children}</OrganizationIntelligenceProvider>
-                                                        </RoleIntelligenceProvider>
+                                                        <TenantProvider>
+                                                          <AuthProvider>
+                                                            <RoleContextProvider>
+                                                              <RuntimePlatformProvider>
+                                                                <InfrastructureProvider>
+                                                                  <MCPPlatformProvider>
+                                                                    <RoleIntelligenceProvider>
+                                                                      <OrganizationIntelligenceProvider>{children}</OrganizationIntelligenceProvider>
+                                                                    </RoleIntelligenceProvider>
+                                                                  </MCPPlatformProvider>
+                                                                </InfrastructureProvider>
+                                                              </RuntimePlatformProvider>
+                                                            </RoleContextProvider>
+                                                          </AuthProvider>
+                                                        </TenantProvider>
                                                       </SecurityProvider>
                                                     </ExecutiveReportsProvider>
                                                   </KnowledgeGraphProvider>

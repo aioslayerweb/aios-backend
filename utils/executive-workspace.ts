@@ -1,4 +1,4 @@
-import { DecisionStatus, Priority, RiskLevel, RuntimeStatus, TaskStatus } from "@/src/domain"
+import { DecisionStatus, Priority, RiskLevel, RuntimeStatus, TaskStatus } from "@/src/domain/common/enums"
 import type {
   BusinessHealthItem,
   DecisionCenterItem,

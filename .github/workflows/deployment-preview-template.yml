@@ -1,0 +1,14 @@
+name: deployment-preview-template
+
+on:
+  workflow_dispatch:
+
+jobs:
+  preview-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Preview Deployment Placeholder
+        run: echo "Attach preview deployment mechanism for staging or ephemeral environments."

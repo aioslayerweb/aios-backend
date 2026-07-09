@@ -5,6 +5,8 @@ const modules = [
   { title: "Actions", description: "Workflow execution and cross-module orchestration.", href: "/app/actions" },
   { title: "Customers", description: "Customer intelligence and account health signals.", href: "/app/customers" },
   { title: "Knowledge", description: "Shared knowledge and policy memory.", href: "/app/knowledge" },
+  { title: "Security", description: "Enterprise security, RBAC, auditability, and multi-tenancy controls.", href: "/app/security" },
+  { title: "MCP Platform", description: "Host, server, gateway, and registry architecture for enterprise MCP orchestration.", href: "/app/mcp" },
 ];
 
 export default function AppHomePage() {

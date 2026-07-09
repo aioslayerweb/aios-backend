@@ -22,6 +22,7 @@ import { useSupabaseContext } from "@/contexts/supabase-context"
 import { useWorkflowBuilderContext } from "@/contexts/workflow-builder-context"
 import type {
   ApiKeyRecord,
+  DepartmentRecord,
   OrganizationRecord,
   PermissionRecord,
   RoleRecord,
@@ -38,6 +39,7 @@ import { createSecurityDefaults, filterByQuery, selectOrganization, selectWorksp
 type SecurityContextValue = SecurityState & {
   filteredOrganizations: OrganizationRecord[]
   filteredWorkspaces: WorkspaceRecord[]
+  filteredDepartments: DepartmentRecord[]
   filteredUsers: UserRecord[]
   filteredTeams: TeamRecord[]
   filteredRoles: RoleRecord[]
@@ -73,6 +75,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
 
   const [organizations, setOrganizations] = useState(defaults.organizations)
   const [workspaces, setWorkspaces] = useState(defaults.workspaces)
+  const [departments] = useState(defaults.departments)
   const [users, setUsers] = useState(defaults.users)
   const [teams] = useState(defaults.teams)
   const [roles] = useState(defaults.roles)
@@ -130,16 +133,22 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
     setAuditLogs((previous) => [
       {
         id: `audit-${Date.now()}`,
+        organizationId: selectedOrganizationId,
+        workspaceId: selectedWorkspaceId,
+        userId: users[0]?.id ?? "system",
         timestamp: Date.now(),
+        resource: "runtime",
+        action: "settings_changed" as const,
+        metadata: { queueDepth: runtimeLive.queueDepth },
         actor: "Runtime Engine",
-        event: "security-event" as const,
+        event: "settings_changed",
         detail: `Runtime observed ${runtimeLive.queueDepth} queued events with tenant isolation monitoring active.`,
         source: "Runtime Engine",
         result: runtimeLive.queueDepth > 18 ? "warning" as const : "success" as const,
       },
       ...previous,
     ].slice(0, 48))
-  }, [runtimeLive.events, runtimeLive.queueDepth])
+  }, [runtimeLive.events, runtimeLive.queueDepth, selectedOrganizationId, selectedWorkspaceId, users])
 
   useEffect(() => {
     if (!liveMode) {
@@ -174,16 +183,22 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
     setAuditLogs((previous) => [
       {
         id: `audit-${Date.now()}`,
+        organizationId: selectedOrganizationId,
+        workspaceId: selectedWorkspaceId,
+        userId: users[0]?.id ?? "system",
         timestamp: Date.now(),
+        resource: "prompt",
+        action: "settings_changed" as const,
+        metadata: { prompt: prompt.prompt.slice(0, 80) },
         actor: "Prompt OS",
-        event: "security-event" as const,
+        event: "settings_changed",
         detail: `Prompt context updated under governed enterprise policy: ${prompt.prompt.slice(0, 88)}`,
         source: "Prompt OS",
         result: "success" as const,
       },
       ...previous,
     ].slice(0, 48))
-  }, [prompt.prompt])
+  }, [prompt.prompt, selectedOrganizationId, selectedWorkspaceId, users])
 
   useEffect(() => {
     const selectedWorkflow = workflowBuilder.selectedWorkflow
@@ -194,16 +209,22 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
     setAuditLogs((previous) => [
       {
         id: `audit-${Date.now()}`,
+        organizationId: selectedOrganizationId,
+        workspaceId: selectedWorkspaceId,
+        userId: users[0]?.id ?? "system",
         timestamp: Date.now(),
+        resource: "workflow",
+        action: "workflow_executed" as const,
+        metadata: { workflowName: selectedWorkflow.name },
         actor: "Workflow Builder",
-        event: "workflow-execution" as const,
+        event: "workflow_executed",
         detail: `Workflow ${selectedWorkflow.name} is linked to tenant-aware execution controls.`,
         source: "Workflow Builder",
         result: workflowBuilder.execution.running ? "warning" as const : "success" as const,
       },
       ...previous,
     ].slice(0, 48))
-  }, [workflowBuilder.execution.running, workflowBuilder.selectedWorkflow])
+  }, [workflowBuilder.execution.running, workflowBuilder.selectedWorkflow, selectedOrganizationId, selectedWorkspaceId, users])
 
   useEffect(() => {
     setPolicies((previous) =>
@@ -217,8 +238,9 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
 
   const filteredOrganizations = useMemo(() => filterByQuery(organizations, query, ["name", "region", "owner", "subscription"]), [organizations, query])
   const filteredWorkspaces = useMemo(() => filterByQuery(workspaces, query, ["name", "key", "status"]), [workspaces, query])
+  const filteredDepartments = useMemo(() => filterByQuery(departments, query, ["name", "key", "status"]), [departments, query])
   const filteredUsers = useMemo(() => filterByQuery(users, query, ["name", "email", "department", "lastLogin"]), [users, query])
-  const filteredTeams = useMemo(() => filterByQuery(teams, query, ["name", "workspace", "lead"]), [teams, query])
+  const filteredTeams = useMemo(() => filterByQuery(teams, query, ["name", "workspaceId", "departmentId", "lead"]), [teams, query])
   const filteredRoles = useMemo(() => filterByQuery(roles, query, ["name", "description", "scope"]), [roles, query])
   const filteredPermissions = useMemo(() => filterByQuery(permissions, query, ["key", "category", "description"]), [permissions, query])
   const filteredAuditLogs = useMemo(() => filterByQuery(auditLogs, query, ["actor", "event", "detail", "source", "result"]), [auditLogs, query])
@@ -247,9 +269,15 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       setAuditLogs((previous) => [
         {
           id: `audit-${Date.now()}`,
+          organizationId: selectedOrganizationId,
+          workspaceId: selectedWorkspaceId,
+          userId: users[0]?.id ?? "system",
           timestamp: Date.now(),
+          resource: "session",
+          action: "session_revoked" as const,
+          metadata: { sessionId: session.id },
           actor: "Enterprise Security",
-          event: "security-event" as const,
+          event: "session_revoked",
           detail: `Session revoked for ${session.user} on ${session.device}.`,
           source: "Sessions",
           result: "success" as const,
@@ -291,7 +319,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
         autoDismissMs: 2800,
       })
     },
-    [addActivity, addEntry, notify, sessions]
+    [addActivity, addEntry, notify, selectedOrganizationId, selectedWorkspaceId, sessions, users]
   )
 
   const rotateApiKey = useCallback(
@@ -305,9 +333,15 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       setAuditLogs((previous) => [
         {
           id: `audit-${Date.now()}`,
+          organizationId: selectedOrganizationId,
+          workspaceId: selectedWorkspaceId,
+          userId: users[0]?.id ?? "system",
           timestamp: Date.now(),
+          resource: "api_key",
+          action: "api_key_created" as const,
+          metadata: { keyId: key.id },
           actor: "Enterprise Security",
-          event: "security-event" as const,
+          event: "api_key_created",
           detail: `API key rotation requested for ${key.name}.`,
           source: "API Keys",
           result: "warning" as const,
@@ -324,13 +358,14 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
         autoDismissMs: 2600,
       })
     },
-    [apiKeys, notify]
+    [apiKeys, notify, selectedOrganizationId, selectedWorkspaceId, users]
   )
 
   const value = useMemo<SecurityContextValue>(
     () => ({
       organizations,
       workspaces,
+      departments,
       users,
       teams,
       roles,
@@ -345,6 +380,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       liveMode,
       filteredOrganizations,
       filteredWorkspaces,
+      filteredDepartments,
       filteredUsers,
       filteredTeams,
       filteredRoles,
@@ -362,7 +398,7 @@ export function SecurityProvider({ children }: { children: ReactNode }) {
       revokeSession,
       rotateApiKey,
     }),
-    [apiKeys, auditLogs, filteredApiKeys, filteredAuditLogs, filteredOrganizations, filteredPermissions, filteredPolicies, filteredRoles, filteredSessions, filteredTeams, filteredUsers, filteredWorkspaces, liveMode, organizations, permissions, policies, query, revokeSession, roles, rotateApiKey, selectedOrganization, selectedOrganizationId, selectedWorkspace, selectedWorkspaceId, sessions, teams, users, workspaces]
+    [apiKeys, auditLogs, departments, filteredApiKeys, filteredAuditLogs, filteredDepartments, filteredOrganizations, filteredPermissions, filteredPolicies, filteredRoles, filteredSessions, filteredTeams, filteredUsers, filteredWorkspaces, liveMode, organizations, permissions, policies, query, revokeSession, roles, rotateApiKey, selectedOrganization, selectedOrganizationId, selectedWorkspace, selectedWorkspaceId, sessions, teams, users, workspaces]
   )
 
   return <SecurityContext.Provider value={value}>{children}</SecurityContext.Provider>

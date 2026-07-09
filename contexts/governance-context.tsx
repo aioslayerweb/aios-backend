@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { DecisionStatus, RiskLevel } from "@/src/domain"
+import { DecisionStatus, RiskLevel } from "@/src/domain/common/enums"
 import { useActivityFeedContext } from "@/contexts/activity-feed-context"
 import { useDecisionEngineContext } from "@/contexts/decision-engine-context"
 import { useMemoryContext } from "@/contexts/memory-context"

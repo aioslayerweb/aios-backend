@@ -13,10 +13,13 @@ export interface Entity<Id extends string = string> {
 }
 
 /** Timestamp contract for creation and update lifecycle. */
-export interface Timestamped {
+export interface TimestampedEntity {
   readonly createdAt: string
   readonly updatedAt: string
 }
+
+/** Backward-compatible alias for legacy code paths. */
+export type Timestamped = TimestampedEntity
 
 /** Ownership contract used for multi-tenant and access-aware entities. */
 export interface OwnedEntity<OwnerId extends string = UserId> {
@@ -38,6 +41,30 @@ export interface VersionedEntity {
 export interface AuditableEntity {
   readonly createdBy: UserId
   readonly updatedBy: UserId
+}
+
+/** Simple entity reference used to express relationships without duplication. */
+export interface EntityReference<Id extends string = string> {
+  readonly id: Id
+  readonly type: string
+  readonly label: string
+}
+
+/** Explicit relationship definition between two domain entities. */
+export interface RelationshipDefinition<FromId extends string = string, ToId extends string = string> {
+  readonly fromId: FromId
+  readonly toId: ToId
+  readonly relationship: string
+  readonly direction: "one-way" | "two-way"
+  readonly weight?: number
+}
+
+/** Lightweight metadata block used by domain aggregates and value objects. */
+export interface DomainMetadata {
+  readonly namespace: string
+  readonly displayName: string
+  readonly description?: string
+  readonly tags: ReadonlyArray<string>
 }
 
 /** Search metadata for indexing and query acceleration. */

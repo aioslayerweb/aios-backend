@@ -1,0 +1,95 @@
+import type { WorkflowSimulationScenario } from "@/tests/shared"
+
+export const workflowSimulationScenarios: WorkflowSimulationScenario[] = [
+  {
+    id: "scenario-lead-lifecycle",
+    name: "Lead lifecycle",
+    description: "From inbound lead signal to won or lost disposition with memory updates.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "lead-lifecycle-v1",
+    steps: [
+      { id: "s1", action: "Ingest inbound lead event", expectedOutcome: "Lead object created and routed" },
+      { id: "s2", action: "Run qualification workflow", expectedOutcome: "Opportunity score assigned" },
+      { id: "s3", action: "Update executive insight", expectedOutcome: "Revenue forecast adjusted" },
+    ],
+  },
+  {
+    id: "scenario-support-ticket",
+    name: "Support ticket",
+    description: "Escalation flow with policy checks and customer health impact.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "support-ticket-v1",
+    steps: [
+      { id: "s1", action: "Create high-priority ticket", expectedOutcome: "Ticket routed to support workspace" },
+      { id: "s2", action: "Invoke recovery workflow", expectedOutcome: "Retention actions generated" },
+      { id: "s3", action: "Sync memory and audit", expectedOutcome: "Replay trail recorded" },
+    ],
+  },
+  {
+    id: "scenario-executive-briefing",
+    name: "Executive briefing",
+    description: "Compiles strategic summary from signals, decisions, and risks.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "executive-briefing-v1",
+    steps: [
+      { id: "s1", action: "Collect latest business signals", expectedOutcome: "Signal set normalized" },
+      { id: "s2", action: "Generate recommendation narrative", expectedOutcome: "Board-ready briefing produced" },
+      { id: "s3", action: "Publish report to registry", expectedOutcome: "Report revision stored" },
+    ],
+  },
+  {
+    id: "scenario-sales-opportunity",
+    name: "Sales opportunity",
+    description: "Tracks opportunity progression and forecast effects.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "sales-opportunity-v1",
+    steps: [
+      { id: "s1", action: "Detect stage progression", expectedOutcome: "Pipeline metrics updated" },
+      { id: "s2", action: "Run deal risk agent", expectedOutcome: "Deal recommendations generated" },
+      { id: "s3", action: "Sync forecast workspace", expectedOutcome: "Forecast confidence recalculated" },
+    ],
+  },
+  {
+    id: "scenario-customer-onboarding",
+    name: "Customer onboarding",
+    description: "Cross-functional onboarding workflow and readiness checks.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "customer-onboarding-v1",
+    steps: [
+      { id: "s1", action: "Create onboarding plan", expectedOutcome: "Plan attached to account" },
+      { id: "s2", action: "Run integration readiness checks", expectedOutcome: "Dependencies validated" },
+      { id: "s3", action: "Publish onboarding health", expectedOutcome: "Status visible in executive view" },
+    ],
+  },
+  {
+    id: "scenario-internal-approval",
+    name: "Internal approval",
+    description: "Approval flow with policy and role context enforcement.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "internal-approval-v1",
+    steps: [
+      { id: "s1", action: "Submit approval request", expectedOutcome: "Policy gate evaluated" },
+      { id: "s2", action: "Route to approver", expectedOutcome: "Role-appropriate approver selected" },
+      { id: "s3", action: "Record outcome", expectedOutcome: "Audit and memory updated" },
+    ],
+  },
+  {
+    id: "scenario-finance-workflow",
+    name: "Finance workflow",
+    description: "Finance mutation requiring approval and compliance trail.",
+    tenantScoped: true,
+    roleScoped: true,
+    seed: "finance-workflow-v1",
+    steps: [
+      { id: "s1", action: "Initiate ERP mutation", expectedOutcome: "Finance policy validated" },
+      { id: "s2", action: "Require manager approval", expectedOutcome: "Approval state tracked" },
+      { id: "s3", action: "Complete and log transaction", expectedOutcome: "Replayable execution event captured" },
+    ],
+  },
+]

@@ -1,3 +1,3 @@
 "use client"
 
-export { useRoleIntelligenceContext as useRoleContext } from "@/contexts/role-intelligence-context"
+export { useRoleContextValue as useRoleContext } from "@/contexts/role-context"

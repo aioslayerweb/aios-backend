@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { DecisionStatus } from "@/src/domain"
+import { DecisionStatus } from "@/src/domain/common/enums"
 import { useActivityFeedContext } from "@/contexts/activity-feed-context"
 import { useExecutiveWorkspaceContext } from "@/contexts/executive-workspace-context"
 import { useMemoryContext } from "@/contexts/memory-context"

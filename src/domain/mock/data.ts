@@ -1,17 +1,13 @@
-import {
-  createAgent,
-  createAgentCapability,
-  createKnowledgeArticle,
-  createKnowledgeCollection,
-  createMemory,
-  createMemoryEntry,
-  createOrganization,
-  createProject,
-  createReport,
-  createCustomer,
-  createTask,
-  createWorkspace,
-} from "@/src/domain"
+import { createAgent } from "@/src/domain/agent"
+import { createAgentCapability } from "@/src/domain/agent/factories"
+import { createCustomer } from "@/src/domain/customer"
+import { createKnowledgeArticle, createKnowledgeCollection } from "@/src/domain/knowledge/factories"
+import { createMemory, createMemoryEntry } from "@/src/domain/memory/factories"
+import { createOrganization } from "@/src/domain/organization/factories"
+import { createProject } from "@/src/domain/project"
+import { createReport } from "@/src/domain/report"
+import { createTask } from "@/src/domain/task"
+import { createWorkspace } from "@/src/domain/workspace/factories"
 
 /** Canonical mock organization dataset for local development and tests. */
 export const mockOrganizations = [

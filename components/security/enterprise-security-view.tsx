@@ -20,8 +20,11 @@ import { OrganizationPanel } from "@/components/organizations/organization-panel
 import { PermissionsPanel } from "@/components/permissions/permissions-panel"
 import { RolesPanel } from "@/components/roles/roles-panel"
 import { ActiveSessionsPanel } from "@/components/sessions/active-sessions-panel"
+import { AuthStatusCard } from "@/components/auth/auth-status-card"
 import { SecurityPoliciesPanel } from "./security-policies-panel"
+import { TenantSwitcher } from "@/components/tenants/tenant-switcher"
 import { SecurityWorkspacesPanel } from "@/components/workspaces/security-workspaces-panel"
+import { TeamsPanel } from "@/components/teams/teams-panel"
 import { UsersPanel } from "@/components/users/users-panel"
 import { StatusIndicator } from "@/components/ui"
 
@@ -128,22 +131,28 @@ export function EnterpriseSecurityView() {
         </div>
       </section>
 
+      <div className="grid gap-4 xl:grid-cols-2" aria-label="Identity and tenant overview">
+        <AuthStatusCard />
+        <TenantSwitcher />
+      </div>
+
       <div className="grid gap-4 xl:grid-cols-[320px_minmax(0,1fr)_360px]">
-        <aside className="space-y-4" aria-label="Security left column">
+        <aside className="space-y-4" aria-label="Security left column" id="organizations">
           <OrganizationPanel organizations={organizations} selectedOrganizationId={selectedOrganizationId} onSelectOrganization={setSelectedOrganizationId} />
           <SecurityWorkspacesPanel workspaces={workspaces} selectedWorkspaceId={selectedWorkspaceId} onSelectWorkspace={setSelectedWorkspaceId} />
         </aside>
 
         <main className="space-y-4" aria-label="Security main administration content">
-          <UsersPanel users={users} />
-          <RolesPanel roles={roles} />
-          <PermissionsPanel permissions={permissions} />
+          <div id="users"><UsersPanel users={users} /></div>
+          <div id="teams"><TeamsPanel teams={filteredTeams} /></div>
+          <div id="roles"><RolesPanel roles={roles} /></div>
+          <div id="permissions"><PermissionsPanel permissions={permissions} /></div>
           <SecurityPoliciesPanel policies={policies} />
         </main>
 
         <aside className="space-y-4" aria-label="Security right column">
-          <SecurityAuditLogsPanel logs={auditTrail} />
-          <ApiKeysPanel apiKeys={apiKeys} onRotateApiKey={rotateApiKey} />
+          <div id="audit"><SecurityAuditLogsPanel logs={auditTrail} /></div>
+          <div id="api-keys"><ApiKeysPanel apiKeys={apiKeys} onRotateApiKey={rotateApiKey} /></div>
           <ActiveSessionsPanel sessions={sessions} onRevokeSession={revokeSession} />
         </aside>
       </div>

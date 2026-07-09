@@ -19,3 +19,21 @@ Reading order:
 11. Roadmap
 
 These files are the single source of truth for AIOS.
+
+Additional architecture references for GA readiness:
+
+- `docs/architecture/security.md`
+- `docs/architecture/mcp-platform.md`
+- `docs/architecture/production-runtime.md`
+- `docs/architecture/devops-platform.md`
+- `docs/architecture/sdk-platform.md`
+- `docs/architecture/developer-platform.md`
+- `docs/architecture/extension-platform.md`
+- `docs/architecture/platform-unification-ga.md`
+
+Release references:
+
+- `CHANGELOG.md`
+- `docs/release/release-checklist-v1.0.0.md`
+- `docs/release/migration-notes-v1.0.0.md`
+- `docs/release/architecture-summary-v1.0.0.md`

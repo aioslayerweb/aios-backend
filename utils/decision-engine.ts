@@ -1,4 +1,4 @@
-import { DecisionStatus, RiskLevel } from "@/src/domain"
+import { DecisionStatus, RiskLevel } from "@/src/domain/common/enums"
 import type {
   BusinessSignal,
   ConfidenceAnalysis,

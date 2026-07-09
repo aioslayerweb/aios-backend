@@ -1,4 +1,4 @@
-import type { DecisionStatus, RiskLevel } from "@/src/domain"
+import type { DecisionStatus, RiskLevel } from "@/src/domain/common/enums"
 
 export type DecisionDepartment =
   | "executive"

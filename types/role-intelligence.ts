@@ -155,3 +155,25 @@ export type RoleContextState = {
   availableRoles: RoleProfile[]
   roleDashboard: RoleDashboardState
 }
+
+export type BusinessFunctionRole =
+  | "CEO"
+  | "Sales Director"
+  | "Customer Success"
+  | "Finance"
+  | "Marketing"
+  | "Operations"
+  | "HR"
+
+export type RoleIntelligenceProfile = {
+  id: BusinessFunctionRole
+  focusAreas: string[]
+  dashboardPriorities: string[]
+  alertPreferences: string[]
+  recommendationThemes: string[]
+  insightBias: string[]
+  agentSuggestions: string[]
+  priorityQueues: string[]
+  homeScreenModules: string[]
+  commandPaletteHints: string[]
+}

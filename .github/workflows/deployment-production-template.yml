@@ -1,0 +1,22 @@
+name: deployment-production-template
+
+on:
+  workflow_dispatch:
+
+jobs:
+  production-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Production Deployment Placeholder
+        run: echo "Attach production deployment automation with approvals and rollback safeguards."
+
+  rollback:
+    runs-on: ubuntu-latest
+    needs: production-deploy
+    if: ${{ always() }}
+    steps:
+      - name: Rollback Placeholder
+        run: echo "Attach rollback automation strategy (standard/canary/blue-green)."

@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { Bot, Building2, Database, BrainCircuit, Sparkles, ShieldCheck, Network } from "lucide-react";
+import { Bot, Building2, Database, BrainCircuit, Sparkles, ShieldCheck, Network, PlugZap } from "lucide-react";
 import { moduleCatalog } from "@/modules";
 
 const navItems = [
   { label: "Overview", href: "/app", icon: BrainCircuit },
   { label: "Insights", href: "/app/insights", icon: Sparkles },
   { label: "Executive", href: "/app/executive", icon: Building2 },
+  { label: "Security", href: "/app/security", icon: ShieldCheck },
+  { label: "MCP", href: "/app/mcp", icon: PlugZap },
   { label: "Knowledge", href: "/app/knowledge", icon: Database },
   { label: "Orchestrator", href: "/app/orchestrator", icon: Network },
   { label: "Planning", href: "/app/planning", icon: BrainCircuit },

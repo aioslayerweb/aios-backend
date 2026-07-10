@@ -10,7 +10,7 @@ export default function DebugPanel() {
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
+    <div className="mt-4 rounded-2xl border border-[var(--color-semantic-warning)]/20 bg-semantic-warning/10 p-4">
       <p className="text-sm font-semibold text-amber-300">Debug Trace</p>
       {activeTrace ? (
         <div className="mt-3 space-y-3 text-xs text-slate-300">

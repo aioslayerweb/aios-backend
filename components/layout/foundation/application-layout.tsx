@@ -53,6 +53,7 @@ import { CommandPalette } from "@/components/command-palette"
 import { AIAssistantPanel } from "@/components/ai-assistant"
 import { NotificationBell, NotificationDrawer, NotificationToastHost } from "@/components/notifications"
 import { RuntimeStatusBar } from "@/components/runtime-status"
+import { BrandLogo } from "@/components/branding"
 
 const iconByKey = {
   home: Home,
@@ -287,7 +288,9 @@ function ShellSidebar() {
       aria-label="Primary workspace navigation"
     >
       <div className="flex h-14 items-center justify-between px-3">
-        <span className={cn("text-sm font-semibold text-brand-navy", collapsed && "sr-only")}>AIOS</span>
+        <div className={cn("flex items-center", collapsed && "sr-only")}>
+          <BrandLogo width={110} height={26} />
+        </div>
         <button
           type="button"
           onClick={toggle}
@@ -324,7 +327,7 @@ function ShellMobileSidebarDrawer({
             aria-label="Mobile workspace navigation drawer"
           >
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <span className="text-sm font-semibold text-brand-navy">Navigation</span>
+              <BrandLogo width={102} height={24} />
               <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close navigation drawer">
                 <X className="h-4 w-4" />
               </Button>

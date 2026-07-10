@@ -31,7 +31,7 @@ export function ExecutiveReportsView() {
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.28 }}
-        className="overflow-hidden rounded-[28px] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
+        className="overflow-hidden rounded-[28px] border border-[var(--color-semantic-info)] bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
         aria-label="Executive reports header"
       >
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(28,130,242,0.16),_transparent_38%),linear-gradient(135deg,#ffffff_0%,#f5f9ff_58%,#eef6ff_100%)] p-6 md:p-7">
@@ -43,31 +43,31 @@ export function ExecutiveReportsView() {
                 Board-ready intelligence that explains what happened, why it happened, what changed, where the risks and opportunities are, and what leadership should do next.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">Executive Intelligence linked</span>
+                <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 text-xs font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Executive Intelligence linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Knowledge Graph linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Decision + Governance linked</span>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[500px]">
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Board report templates</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{boardReports.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Weekly to annual reporting architecture is ready.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Strategic KPI coverage</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{strategicKPIs.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Board-level performance indicators under active tracking.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Reporting mode</p>
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <StatusIndicator tone={liveMode ? "success" : "neutral"} label={liveMode ? "Live reporting" : "Paused"} />
                   <button type="button" onClick={() => setLiveMode(!liveMode)} className="rounded-md border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-surface-muted">{liveMode ? "Pause" : "Resume"}</button>
                 </div>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Selected trend</p>
                 <p className="mt-2 text-sm font-semibold text-brand-navy">{selectedTrend?.title ?? "No trend selected"}</p>
                 <p className="mt-1 text-xs text-text-secondary">{selectedTrend?.summary ?? "Select a trend horizon to inspect."}</p>

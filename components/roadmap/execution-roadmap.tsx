@@ -17,7 +17,7 @@ export function ExecutionRoadmap({ roadmap }: ExecutionRoadmapProps) {
         {roadmap.map((stage, index) => (
           <motion.article
             key={stage.id}
-            className={stage.status === "executing" ? "rounded-xl border border-blue-400 bg-blue-50 p-3" : stage.status === "completed" ? "rounded-xl border border-emerald-300 bg-emerald-50 p-3" : "rounded-xl border border-border bg-surface-muted p-3"}
+            className={stage.status === "executing" ? "rounded-xl border border-blue-400 bg-blue-50 p-3" : stage.status === "completed" ? "rounded-xl border border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] p-3" : "rounded-xl border border-border bg-surface-muted p-3"}
             initial={reduceMotion ? false : { opacity: 0.8, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03 }}

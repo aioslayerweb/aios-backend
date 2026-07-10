@@ -5,8 +5,8 @@ import { TrendingDown, TrendingUp } from "lucide-react"
 import { useRoleKPIs } from "@/hooks/use-role-kpis"
 
 const toneStyles = {
-  positive: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  warning: "border-amber-200 bg-amber-50 text-amber-700",
+  positive: "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]",
+  warning: "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]",
   neutral: "border-slate-200 bg-slate-50 text-slate-700",
 } as const
 

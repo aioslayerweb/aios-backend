@@ -7,11 +7,11 @@ type ConfidenceAnalysisPanelProps = {
 function labelClass(level: ConfidenceAnalysis["level"]) {
   switch (level) {
     case "high":
-      return "bg-emerald-50 text-emerald-700"
+      return "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]"
     case "medium":
-      return "bg-amber-50 text-amber-700"
+      return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]"
     case "low":
-      return "bg-rose-50 text-rose-700"
+      return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]"
   }
 }
 
@@ -31,7 +31,7 @@ export function ConfidenceAnalysisPanel({ confidence }: ConfidenceAnalysisPanelP
       <p className="mt-2 text-xs leading-5 text-text-secondary">{confidence?.explanation ?? "Select a decision to inspect confidence analysis."}</p>
       <div className="mt-4 flex flex-wrap gap-1.5">
         {(confidence?.drivers ?? []).map((driver) => (
-          <span key={driver} className="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[11px] text-sky-700">
+          <span key={driver} className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2 py-1 text-[11px] text-[var(--color-semantic-info-text)]">
             {driver}
           </span>
         ))}

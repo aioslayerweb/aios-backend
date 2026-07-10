@@ -16,15 +16,15 @@ function nodeTone(status: OrchestratorAgentNode["status"]): string {
   }
 
   if (status === "failed") {
-    return "border-rose-300 bg-rose-50"
+    return "border-[var(--color-semantic-error)] bg-[var(--color-semantic-error-soft)]"
   }
 
   if (status === "waiting") {
-    return "border-amber-300 bg-amber-50"
+    return "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)]"
   }
 
   if (status === "completed") {
-    return "border-emerald-300 bg-emerald-50"
+    return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)]"
   }
 
   return "border-border bg-white"

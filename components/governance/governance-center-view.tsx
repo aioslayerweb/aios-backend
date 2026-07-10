@@ -55,7 +55,7 @@ export function GovernanceCenterView() {
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.28 }}
-        className="overflow-hidden rounded-[28px] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
+        className="overflow-hidden rounded-[28px] border border-[var(--color-semantic-info)] bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
         aria-label="Governance dashboard header"
       >
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(28,130,242,0.16),_transparent_38%),linear-gradient(135deg,#ffffff_0%,#f5f9ff_58%,#eef6ff_100%)] p-6 md:p-7">
@@ -67,31 +67,31 @@ export function GovernanceCenterView() {
                 Transparent, auditable views across recommendations, approvals, evidence, policies, and risk so executives, auditors, and compliance teams can always answer why, when, who, and based on what.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">Decision Engine linked</span>
+                <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 text-xs font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Decision Engine linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Runtime + Replay linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Memory + Prompt OS linked</span>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[480px]">
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Explainability coverage</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{summary.explainabilityCoverage}%</p>
                 <p className="mt-1 text-xs text-text-secondary">Decision records with user-facing reasoning attached.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Compliance attention</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{summary.complianceAttention}</p>
                 <p className="mt-1 text-xs text-text-secondary">Framework views currently needing additional control work.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Live governance</p>
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <StatusIndicator tone={liveMode ? "success" : "neutral"} label={liveMode ? "Monitoring" : "Paused"} />
                   <Button variant="secondary" size="sm" onClick={() => setLiveMode(!liveMode)} aria-pressed={liveMode}>{liveMode ? "Pause" : "Resume"}</Button>
                 </div>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Confidence posture</p>
                 <p className="mt-2 text-sm font-semibold capitalize text-brand-navy">{summary.confidenceLevel}</p>
                 <p className="mt-1 text-xs text-text-secondary">Portfolio-level confidence across governed decisions.</p>

@@ -19,16 +19,16 @@ const colorMap = {
     badge: "bg-primary-100 text-primary-700",
   },
   emerald: {
-    bg: "bg-emerald-50",
+    bg: "bg-[var(--color-semantic-success-soft)]",
     icon: "text-emerald-600",
     iconBg: "bg-emerald-100",
-    badge: "bg-emerald-100 text-emerald-700",
+    badge: "bg-emerald-100 text-[var(--color-semantic-success-text)]",
   },
   amber: {
-    bg: "bg-amber-50",
+    bg: "bg-[var(--color-semantic-warning-soft)]",
     icon: "text-amber-600",
     iconBg: "bg-amber-100",
-    badge: "bg-amber-100 text-amber-700",
+    badge: "bg-amber-100 text-[var(--color-semantic-warning-text)]",
   },
 };
 
@@ -52,7 +52,7 @@ export default function KpiCard({
         <span
           className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${
             isPositive
-              ? "bg-emerald-50 text-emerald-700"
+              ? "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]"
               : "bg-red-50 text-red-600"
           }`}
         >

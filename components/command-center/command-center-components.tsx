@@ -60,9 +60,9 @@ const itemMotion = {
 };
 
 function chipToneClass(tone: CommandChip["tone"]): string {
-  if (tone === "info") return "border-sky-200 bg-sky-50 text-sky-700";
-  if (tone === "success") return "border-emerald-200 bg-emerald-50 text-emerald-700";
-  if (tone === "warning") return "border-amber-200 bg-amber-50 text-amber-700";
+  if (tone === "info") return "border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]";
+  if (tone === "success") return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]";
+  if (tone === "warning") return "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]";
   return "border-border bg-surface-muted text-text-secondary";
 }
 
@@ -74,20 +74,20 @@ function metricToneClass(tone: CardMetric["tone"]): string {
 }
 
 function severityToneClass(level: NotificationItem["severity"]): string {
-  if (level === "critical") return "bg-rose-500";
-  if (level === "warning") return "bg-amber-500";
-  return "bg-sky-500";
+  if (level === "critical") return "bg-semantic-error";
+  if (level === "warning") return "bg-semantic-warning";
+  return "bg-semantic-info";
 }
 
 function statusToneClass(status: DecisionItem["status"]): string {
-  if (status === "approved") return "bg-emerald-50 text-emerald-700 ring-emerald-200";
-  if (status === "blocked") return "bg-rose-50 text-rose-700 ring-rose-200";
-  return "bg-amber-50 text-amber-700 ring-amber-200";
+  if (status === "approved") return "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)] ring-emerald-200";
+  if (status === "blocked") return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)] ring-rose-200";
+  return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)] ring-amber-200";
 }
 
 function agentToneClass(status: AgentItem["status"]): string {
-  if (status === "active") return "bg-emerald-500";
-  if (status === "attention") return "bg-rose-500";
+  if (status === "active") return "bg-semantic-success";
+  if (status === "attention") return "bg-semantic-error";
   return "bg-slate-400";
 }
 
@@ -283,7 +283,7 @@ export function PriorityCard({ item }: { item: PriorityItem }) {
     <article className="rounded-xl border border-border bg-surface-canvas p-3">
       <div className="flex items-start justify-between gap-2">
         <h4 className="text-sm font-semibold text-brand-navy">{item.title}</h4>
-        <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-700">{item.score}</span>
+        <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-semantic-info-text)]">{item.score}</span>
       </div>
       <p className="mt-2 text-xs text-text-secondary">Owner: {item.owner}</p>
       <p className="mt-1 text-xs text-text-muted">Due: {item.due}</p>
@@ -406,7 +406,7 @@ export function ConnectedSystemCard({ item }: { item: ConnectedSystem }) {
         </span>
         <p className="text-sm font-medium text-brand-navy">{item.name}</p>
       </div>
-      <span className={cn("h-2.5 w-2.5 rounded-full", item.state === "connected" ? "bg-emerald-500" : "bg-amber-500")} />
+      <span className={cn("h-2.5 w-2.5 rounded-full", item.state === "connected" ? "bg-semantic-success" : "bg-semantic-warning")} />
     </article>
   );
 }

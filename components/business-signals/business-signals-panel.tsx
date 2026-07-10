@@ -9,7 +9,7 @@ type BusinessSignalsPanelProps = {
 
 function strengthClass(strength: number) {
   if (strength >= 85) {
-    return "bg-emerald-500"
+    return "bg-semantic-success"
   }
 
   if (strength >= 70) {

@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { Bell, Search } from "lucide-react";
+import { brandIcons } from "@/components/branding";
 
 const pageTitles: Record<string, { title: string; subtitle: string }> = {
   "/": { title: "Dashboard", subtitle: "Welcome back — here's what's happening today." },
@@ -16,31 +17,31 @@ export default function Topbar() {
   const page = pageTitles[pathname] ?? pageTitles["/"];
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 bg-white/95 border-b border-slate-200 backdrop-blur-sm flex items-center justify-between px-8 z-10">
+    <header className="fixed left-64 right-0 top-0 z-10 flex h-16 items-center justify-between border-b border-border bg-white/95 px-8 backdrop-blur-sm">
       <div>
-        <h1 className="text-lg font-semibold text-slate-900 leading-tight">{page.title}</h1>
-        <p className="text-xs text-slate-400 mt-0.5">{page.subtitle}</p>
+        <h1 className="leading-tight text-lg font-semibold text-brand-navy">{page.title}</h1>
+        <p className="mt-0.5 text-xs text-text-muted">{page.subtitle}</p>
       </div>
 
       <div className="flex items-center gap-3">
         <div className="relative hidden md:block">
           <Search
-            size={15}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            size={brandIcons.small}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
           />
           <input
             type="text"
             placeholder="Search..."
-            className="pl-9 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg w-52 focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-400 transition-all text-slate-700 placeholder:text-slate-400"
+            className="w-52 rounded-lg border border-border bg-surface-muted py-2 pl-9 pr-4 text-sm text-text-secondary transition-all placeholder:text-text-muted focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-subtle"
           />
         </div>
 
-        <button className="relative w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors">
-          <Bell size={17} className="text-slate-500" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-primary-500 rounded-full border-2 border-white" />
+        <button className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-white transition-colors hover:bg-surface-muted">
+          <Bell size={brandIcons.medium} className="text-text-secondary" />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full border-2 border-white bg-brand-primary" />
         </button>
 
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-cyan-500 flex items-center justify-center text-white text-sm font-semibold shadow-sm cursor-pointer">
+        <div className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg bg-gradient-to-br from-brand-primary to-brand-soft text-sm font-semibold text-white shadow-sm">
           A
         </div>
       </div>

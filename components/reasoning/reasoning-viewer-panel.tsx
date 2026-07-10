@@ -31,7 +31,7 @@ export function ReasoningViewerPanel({ reasoning }: ReasoningViewerPanelProps) {
         <article className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">
           <p className="text-sm font-semibold text-brand-navy">Policies evaluated</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            {(reasoning?.policiesEvaluated ?? []).map((item) => <span key={item} className="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[11px] text-sky-700">{item}</span>)}
+            {(reasoning?.policiesEvaluated ?? []).map((item) => <span key={item} className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2 py-1 text-[11px] text-[var(--color-semantic-info-text)]">{item}</span>)}
           </div>
         </article>
         <article className="rounded-2xl border border-slate-100 bg-slate-50/70 p-3">

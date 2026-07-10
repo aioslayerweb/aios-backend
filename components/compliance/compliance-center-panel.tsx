@@ -49,7 +49,7 @@ export function ComplianceCenterPanel({ compliance, complianceView, onChangeView
             </div>
             <p className="mt-2 text-xs leading-5 text-text-secondary">{item.summary}</p>
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {item.mappedPolicies.map((policy) => <span key={policy} className="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[11px] text-sky-700">{policy}</span>)}
+              {item.mappedPolicies.map((policy) => <span key={policy} className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2 py-1 text-[11px] text-[var(--color-semantic-info-text)]">{policy}</span>)}
             </div>
           </article>
         ))}

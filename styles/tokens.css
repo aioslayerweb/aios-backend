@@ -7,9 +7,17 @@
   --color-brand-subtle: #EAF4FF;
 
   --color-semantic-success: #1F9D67;
+  --color-semantic-success-soft: #EAF8F1;
+  --color-semantic-success-text: #0E5A3A;
   --color-semantic-warning: #C88719;
+  --color-semantic-warning-soft: #FFF6E8;
+  --color-semantic-warning-text: #7A4C08;
   --color-semantic-error: #C73E3A;
+  --color-semantic-error-soft: #FDEDED;
+  --color-semantic-error-text: #7F1D1D;
   --color-semantic-info: #1C82F2;
+  --color-semantic-info-soft: #EAF4FF;
+  --color-semantic-info-text: #124EA8;
 
   --color-bg-app: #F9FAFB;
   --color-bg-canvas: #FFFFFF;
@@ -25,7 +33,7 @@
   --color-text-muted: #6B7280;
   --color-text-inverse: #FFFFFF;
 
-  --font-sans: "Satoshi", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-sans: "Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
 
   --radius-sm: 8px;

@@ -8,15 +8,15 @@ type AgentToolsPanelProps = {
 
 function statusClass(status: ToolRecord["status"]): string {
   if (status === "connected") {
-    return "bg-emerald-100 text-emerald-700"
+    return "bg-emerald-100 text-[var(--color-semantic-success-text)]"
   }
 
   if (status === "executing") {
-    return "bg-amber-100 text-amber-700"
+    return "bg-amber-100 text-[var(--color-semantic-warning-text)]"
   }
 
   if (status === "error") {
-    return "bg-rose-100 text-rose-700"
+    return "bg-rose-100 text-[var(--color-semantic-error-text)]"
   }
 
   return "bg-slate-100 text-slate-600"

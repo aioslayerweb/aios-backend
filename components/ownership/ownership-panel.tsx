@@ -14,7 +14,7 @@ export function OwnershipPanel() {
       <h2 className="mt-1 text-lg font-semibold text-slate-950">Approval chains and escalation paths</h2>
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {decisionPaths.map((path) => (
-          <article key={path.id} className={`rounded-2xl border p-4 ${path.blocked ? "border-amber-200 bg-amber-50/70" : "border-slate-200 bg-slate-50/70"}`}>
+          <article key={path.id} className={`rounded-2xl border p-4 ${path.blocked ? "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)]/70" : "border-slate-200 bg-slate-50/70"}`}>
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-slate-950">{path.title}</p>

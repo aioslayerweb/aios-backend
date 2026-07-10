@@ -8,10 +8,10 @@ type DecisionCardProps = {
 export function DecisionCard({ item, onApprove }: DecisionCardProps) {
   const riskTone =
     item.riskLevel === "critical"
-      ? "bg-rose-100 text-rose-700"
+      ? "bg-rose-100 text-[var(--color-semantic-error-text)]"
       : item.riskLevel === "high"
-        ? "bg-amber-100 text-amber-700"
-        : "bg-sky-100 text-sky-700"
+        ? "bg-amber-100 text-[var(--color-semantic-warning-text)]"
+        : "bg-sky-100 text-[var(--color-semantic-info-text)]"
 
   return (
     <article className="rounded-xl border border-border bg-white p-4 shadow-sm">

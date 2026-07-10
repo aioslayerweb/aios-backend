@@ -13,11 +13,11 @@ type DecisionQueuePanelProps = {
 function bandClass(band: DecisionQueueItem["priorityBand"]) {
   switch (band) {
     case "critical":
-      return "bg-rose-50 text-rose-700 ring-1 ring-rose-100"
+      return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)] ring-1 ring-rose-100"
     case "high":
-      return "bg-amber-50 text-amber-700 ring-1 ring-amber-100"
+      return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)] ring-1 ring-amber-100"
     case "medium":
-      return "bg-sky-50 text-sky-700 ring-1 ring-sky-100"
+      return "bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)] ring-1 ring-sky-100"
     case "low":
       return "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
   }

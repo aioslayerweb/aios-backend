@@ -17,7 +17,7 @@ export default function AgentStatusCard() {
           <Bot size={16} className="text-primary-600" />
           <h2 className="text-sm font-semibold text-slate-800">AI Agents</h2>
         </div>
-        <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full font-medium">
+        <span className="text-xs bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)] border border-[var(--color-semantic-success)] px-2.5 py-1 rounded-full font-medium">
           3 running
         </span>
       </div>
@@ -39,7 +39,7 @@ export default function AgentStatusCard() {
               <span
                 className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${
                   agent.status === "active"
-                    ? "bg-emerald-50 text-emerald-700"
+                    ? "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]"
                     : "bg-slate-100 text-slate-500"
                 }`}
               >

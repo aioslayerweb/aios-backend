@@ -214,14 +214,14 @@ export function NotificationCenter({ unreadCount }: { unreadCount: number }) {
 
 export function StatusBadge({ label, tone }: { label: string; tone: WorkspaceStatus["tone"] }) {
   const toneClass: Record<WorkspaceStatus["tone"], string> = {
-    success: "bg-emerald-50 text-emerald-700",
-    warning: "bg-amber-50 text-amber-700",
-    critical: "bg-rose-50 text-rose-700",
-    running: "bg-sky-50 text-sky-700",
-    paused: "bg-slate-100 text-slate-700",
-    completed: "bg-emerald-50 text-emerald-700",
-    healthy: "bg-emerald-50 text-emerald-700",
-    offline: "bg-slate-100 text-slate-700",
+    success: "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]",
+    warning: "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]",
+    critical: "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]",
+    running: "bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]",
+    paused: "bg-surface-muted text-text-secondary",
+    completed: "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]",
+    healthy: "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]",
+    offline: "bg-surface-muted text-text-secondary",
   };
 
   return <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", toneClass[tone])}>{label}</span>;

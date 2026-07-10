@@ -71,17 +71,17 @@ function getTone(status: DecisionRecord["approvalStatus"]) {
 }
 
 function toneClass(tone: DecisionRibbonItem["tone"]) {
-  if (tone === "success") return "bg-emerald-50 text-emerald-700";
-  if (tone === "warning") return "bg-amber-50 text-amber-700";
-  if (tone === "critical") return "bg-rose-50 text-rose-700";
+  if (tone === "success") return "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]";
+  if (tone === "warning") return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]";
+  if (tone === "critical") return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]";
   return "bg-slate-100 text-slate-700";
 }
 
 function nodeClass(type: DecisionGraphNode["type"]) {
-  if (type === "decision") return "border-sky-400 bg-sky-50 text-sky-800";
-  if (type === "risk") return "border-rose-400 bg-rose-50 text-rose-800";
+  if (type === "decision") return "border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-sky-800";
+  if (type === "risk") return "border-[var(--color-semantic-error)] bg-[var(--color-semantic-error-soft)] text-rose-800";
   if (type === "executive") return "border-indigo-400 bg-indigo-50 text-indigo-800";
-  if (type === "policy") return "border-emerald-400 bg-emerald-50 text-emerald-800";
+  if (type === "policy") return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] text-emerald-800";
   return "border-slate-300 bg-white text-slate-700";
 }
 
@@ -219,7 +219,7 @@ export function DecisionFilterBar({ filters }: { filters: DecisionFilter[] }) {
   return (
     <div className="flex flex-wrap gap-2">
       {filters.map((filter) => (
-        <Badge key={filter.id} tone="info" className="border border-sky-200 bg-sky-50 text-sky-700">
+        <Badge key={filter.id} tone="info" className="border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]">
           {filter.label}
         </Badge>
       ))}

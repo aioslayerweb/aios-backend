@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -16,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { BrandLogo } from "@/components/branding";
 
 const navItems: Array<{ label: string; href: string; placeholder?: boolean }> = [
   { label: "Platform", href: "#platform" },
@@ -171,7 +171,7 @@ function TopNav() {
     <header className="sticky top-0 z-header border-b border-border/70 bg-white/90 backdrop-blur-md">
       <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-6 lg:px-8" aria-label="Top navigation">
         <Link href="/" className="flex items-center" aria-label="AIOS home">
-          <Image src="/aios_logo_horizontal.png" alt="AIOS" width={142} height={34} priority />
+          <BrandLogo width={142} height={34} priority />
         </Link>
 
         <div className="hidden items-center gap-6 lg:flex">
@@ -541,7 +541,7 @@ export function PublicHomePage() {
       <footer className="border-t border-border bg-white px-6 py-10 lg:px-8">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/aios_logo_horizontal.png" alt="AIOS" width={118} height={28} />
+            <BrandLogo width={118} height={28} />
             <span className="text-sm text-text-muted">Autonomous Business Operating System</span>
           </div>
           <div className="flex flex-wrap items-center gap-4 text-sm text-text-secondary">

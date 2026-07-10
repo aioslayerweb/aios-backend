@@ -11,10 +11,10 @@ type PriorityCardProps = {
 export function PriorityCard({ item, onDefer }: PriorityCardProps) {
   const priorityTone =
     item.priority === "critical"
-      ? "bg-rose-100 text-rose-700"
+      ? "bg-rose-100 text-[var(--color-semantic-error-text)]"
       : item.priority === "high"
-        ? "bg-amber-100 text-amber-700"
-        : "bg-sky-100 text-sky-700"
+        ? "bg-amber-100 text-[var(--color-semantic-warning-text)]"
+        : "bg-sky-100 text-[var(--color-semantic-info-text)]"
 
   return (
     <article className="rounded-xl border border-border bg-white p-4 shadow-sm">

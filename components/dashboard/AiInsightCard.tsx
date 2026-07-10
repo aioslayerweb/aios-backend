@@ -25,7 +25,7 @@ const priorityConfig = {
     iconColor: "text-red-500",
   },
   medium: {
-    badge: "bg-amber-50 text-amber-700 border-amber-100",
+    badge: "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)] border-[var(--color-semantic-warning)]",
     dot: "bg-amber-400",
     icon: Zap,
     iconColor: "text-amber-500",

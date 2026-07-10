@@ -65,8 +65,8 @@ const fadeMotion = {
 };
 
 function nodeClass(type: IntelligenceGraphNode["type"]) {
-  if (type === "revenue") return "border-emerald-400 bg-emerald-50 text-emerald-800";
-  if (type === "risk") return "border-rose-400 bg-rose-50 text-rose-800";
+  if (type === "revenue") return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] text-emerald-800";
+  if (type === "risk") return "border-[var(--color-semantic-error)] bg-[var(--color-semantic-error-soft)] text-rose-800";
   if (type === "goal") return "border-indigo-400 bg-indigo-50 text-indigo-800";
   if (type === "mcp") return "border-cyan-400 bg-cyan-50 text-cyan-800";
   return "border-slate-300 bg-white text-slate-700";
@@ -288,7 +288,7 @@ export const IntelligenceExplorer = memo(function IntelligenceExplorer({
       <CardContent className="space-y-3 p-4">
         <div className="flex flex-wrap gap-2">
           {signals.slice(0, 4).map((signal) => (
-            <Badge key={signal.id} tone="info" className="border border-sky-200 bg-sky-50 text-sky-700">
+            <Badge key={signal.id} tone="info" className="border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]">
               {signal.source}
             </Badge>
           ))}
@@ -569,7 +569,7 @@ export function AnomalyDetectionPanel({ anomalies }: { anomalies: IntelligenceAn
                 <p className="text-sm font-semibold text-brand-navy">{anomaly.title}</p>
                 <p className="mt-1 text-xs text-text-secondary">{anomaly.detail}</p>
               </div>
-              <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", anomaly.severity === "critical" ? "bg-rose-50 text-rose-700" : anomaly.severity === "high" ? "bg-amber-50 text-amber-700" : anomaly.severity === "medium" ? "bg-sky-50 text-sky-700" : "bg-slate-100 text-slate-700")}>
+              <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", anomaly.severity === "critical" ? "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]" : anomaly.severity === "high" ? "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]" : anomaly.severity === "medium" ? "bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]" : "bg-slate-100 text-slate-700")}>
                 {anomaly.severity}
               </span>
             </div>

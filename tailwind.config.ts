@@ -78,7 +78,10 @@ const config: Config = {
         sans: [
           "Satoshi",
           "Plus Jakarta Sans",
-          "Inter",
+          "Segoe UI",
+          "SF Pro Text",
+          "Helvetica Neue",
+          "Arial",
           "system-ui",
           "sans-serif",
         ],

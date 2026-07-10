@@ -21,7 +21,7 @@ export function ActiveSessionsPanel({ sessions, onRevokeSession }: ActiveSession
                 <p className="text-sm font-semibold text-brand-navy">{session.user}</p>
                 <p className="mt-1 text-[11px] text-text-muted">{session.device} · {session.browser}</p>
               </div>
-              {session.current ? <span className="rounded-full bg-emerald-50 px-2 py-1 text-[11px] text-emerald-700">Current</span> : null}
+              {session.current ? <span className="rounded-full bg-[var(--color-semantic-success-soft)] px-2 py-1 text-[11px] text-[var(--color-semantic-success-text)]">Current</span> : null}
             </div>
             <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3 text-xs text-text-secondary">
               <div className="rounded-xl bg-white p-2"><p className="text-text-muted">Location</p><p className="mt-1 text-brand-navy">{session.location}</p></div>

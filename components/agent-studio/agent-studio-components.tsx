@@ -53,9 +53,9 @@ function statusTone(status: AgentStatus): "success" | "warning" | "error" {
 }
 
 function notificationTone(tone: OrganizationNotification["tone"]): string {
-  if (tone === "critical") return "bg-rose-500";
-  if (tone === "warning") return "bg-amber-500";
-  return "bg-sky-500";
+  if (tone === "critical") return "bg-semantic-error";
+  if (tone === "warning") return "bg-semantic-warning";
+  return "bg-semantic-info";
 }
 
 function collaborationTone(type: AgentCollaborationLink["type"]): string {
@@ -137,8 +137,8 @@ export const OverviewMetricCard = memo(function OverviewMetricCard({ metric }: {
 export function AgentHealthBadge({ confidence, health }: { confidence: number; health: number }) {
   return (
     <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-      <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-sky-700">Confidence {confidence}%</span>
-      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-emerald-700">Health {health}%</span>
+      <span className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2 py-0.5 text-[var(--color-semantic-info-text)]">Confidence {confidence}%</span>
+      <span className="rounded-full border border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] px-2 py-0.5 text-[var(--color-semantic-success-text)]">Health {health}%</span>
     </div>
   );
 }
@@ -258,18 +258,18 @@ export function CapabilityBadge({ label }: { label: string }) {
 }
 
 export function KnowledgeBadge({ label }: { label: string }) {
-  return <span className="rounded-full border border-sky-200 bg-sky-50 px-2.5 py-1 text-[11px] text-sky-700">{label}</span>;
+  return <span className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2.5 py-1 text-[11px] text-[var(--color-semantic-info-text)]">{label}</span>;
 }
 
 export function MemoryBadge({ label }: { label: string }) {
-  return <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] text-emerald-700">{label}</span>;
+  return <span className="rounded-full border border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] px-2.5 py-1 text-[11px] text-[var(--color-semantic-success-text)]">{label}</span>;
 }
 
 export function MCPConnectionCard({ tool }: { tool: MCPTool }) {
   return (
     <article className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2">
       <p className="text-sm font-medium text-brand-navy">{tool.name}</p>
-      <span className={cn("h-2.5 w-2.5 rounded-full", tool.status === "connected" ? "bg-emerald-500" : "bg-amber-500")} />
+      <span className={cn("h-2.5 w-2.5 rounded-full", tool.status === "connected" ? "bg-semantic-success" : "bg-semantic-warning")} />
     </article>
   );
 }
@@ -478,7 +478,7 @@ export function ConnectedSystemsPanel({ systems }: { systems: ConnectedSystem[] 
         {systems.map((system) => (
           <article key={system.id} className="flex items-center justify-between rounded-xl border border-border bg-surface-canvas px-3 py-2">
             <p className="text-sm font-medium text-brand-navy">{system.name}</p>
-            <span className={cn("h-2.5 w-2.5 rounded-full", system.status === "online" ? "bg-emerald-500" : "bg-amber-500")} />
+            <span className={cn("h-2.5 w-2.5 rounded-full", system.status === "online" ? "bg-semantic-success" : "bg-semantic-warning")} />
           </article>
         ))}
       </CardContent>

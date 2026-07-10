@@ -46,12 +46,12 @@ export function ActivityIcon({ category, metadata, className }: ActivityIconProp
 
   const toneClass =
     metadata.status === "error"
-      ? "bg-rose-100 text-rose-700"
+      ? "bg-rose-100 text-[var(--color-semantic-error-text)]"
       : metadata.status === "warning"
-        ? "bg-amber-100 text-amber-700"
+        ? "bg-amber-100 text-[var(--color-semantic-warning-text)]"
         : metadata.status === "success" || metadata.status === "completed"
-          ? "bg-emerald-100 text-emerald-700"
-          : "bg-sky-100 text-sky-700"
+          ? "bg-emerald-100 text-[var(--color-semantic-success-text)]"
+          : "bg-sky-100 text-[var(--color-semantic-info-text)]"
 
   return (
     <span className={cn("inline-flex h-9 w-9 items-center justify-center rounded-lg", toneClass, className)}>

@@ -31,9 +31,9 @@ const typeStyles: Record<string, { bg: string; border: string; text: string; lab
     label: "Opportunity",
   },
   Alert: {
-    bg: "bg-amber-50",
-    border: "border-amber-200",
-    text: "text-amber-700",
+    bg: "bg-[var(--color-semantic-warning-soft)]",
+    border: "border-[var(--color-semantic-warning)]",
+    text: "text-[var(--color-semantic-warning-text)]",
     label: "Alert",
   },
 };
@@ -71,8 +71,8 @@ export default function InsightCard({ insight, icon: Icon, onAction }: InsightCa
                   insight.impact_score >= 70
                     ? "bg-red-500"
                     : insight.impact_score >= 40
-                    ? "bg-amber-500"
-                    : "bg-emerald-500"
+                    ? "bg-semantic-warning"
+                    : "bg-semantic-success"
                 }`}
                 style={{ width: `${insight.impact_score}%` }}
               />

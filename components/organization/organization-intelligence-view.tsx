@@ -40,7 +40,7 @@ export function OrganizationIntelligenceView() {
 
   return (
     <div className="space-y-6 bg-slate-50 px-4 py-4 md:px-6 lg:px-8">
-      <motion.section initial={reduceMotion ? false : { opacity: 0, y: 18 }} animate={reduceMotion ? undefined : { opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden rounded-[28px] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]" aria-label="Organization intelligence header">
+      <motion.section initial={reduceMotion ? false : { opacity: 0, y: 18 }} animate={reduceMotion ? undefined : { opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden rounded-[28px] border border-[var(--color-semantic-info)] bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]" aria-label="Organization intelligence header">
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(28,130,242,0.16),_transparent_38%),linear-gradient(135deg,#ffffff_0%,#f5f9ff_58%,#eef6ff_100%)] p-6 md:p-7">
           <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
             <div className="max-w-3xl">
@@ -48,7 +48,7 @@ export function OrganizationIntelligenceView() {
               <h1 className="mt-2 text-3xl font-semibold tracking-tight text-brand-navy md:text-[2.2rem]">AIOS Organization Intelligence Layer</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-text-secondary">AIOS understands the structure, ownership, dependencies, decision flows, and collaboration patterns of the organization, then adapts the operating view for the current role lens: {currentRole.label}.</p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">Role-based intelligence linked</span>
+                <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 text-xs font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Role-based intelligence linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Runtime + Memory linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Knowledge + Decisions + Workflow linked</span>
               </div>

@@ -18,13 +18,13 @@ function tone(status: WorkflowNode["status"]): string {
     return "border-blue-400 bg-blue-50"
   }
   if (status === "success") {
-    return "border-emerald-300 bg-emerald-50"
+    return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)]"
   }
   if (status === "error") {
-    return "border-rose-300 bg-rose-50"
+    return "border-[var(--color-semantic-error)] bg-[var(--color-semantic-error-soft)]"
   }
   if (status === "queued") {
-    return "border-amber-300 bg-amber-50"
+    return "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)]"
   }
   return "border-border bg-white"
 }

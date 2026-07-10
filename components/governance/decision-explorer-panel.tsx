@@ -15,14 +15,14 @@ function statusTone(status: GovernanceDecisionHistoryItem["status"]) {
   switch (status) {
     case "approved":
     case "executed":
-      return "bg-emerald-50 text-emerald-700"
+      return "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]"
     case "rejected":
-      return "bg-rose-50 text-rose-700"
+      return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]"
     case "under_review":
-      return "bg-amber-50 text-amber-700"
+      return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]"
     case "proposed":
     default:
-      return "bg-sky-50 text-sky-700"
+      return "bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]"
   }
 }
 

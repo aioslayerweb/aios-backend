@@ -46,8 +46,8 @@ const insights = [
 ];
 
 const colorClasses = {
-  emerald: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  amber: "bg-amber-50 text-amber-700 border-amber-200",
+  emerald: "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)] border-[var(--color-semantic-success)]",
+  amber: "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)] border-[var(--color-semantic-warning)]",
   red: "bg-red-50 text-red-700 border-red-200",
   blue: "bg-primary-50 text-primary-700 border-primary-200",
 };

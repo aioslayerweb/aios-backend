@@ -36,13 +36,13 @@ const surfaceMotion = {
 function toneClass(tone: ReturnType<typeof integrationHealthTone>) {
   switch (tone) {
     case "success":
-      return "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
+      return "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)] ring-1 ring-emerald-100"
     case "warning":
-      return "bg-amber-50 text-amber-700 ring-1 ring-amber-100"
+      return "bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)] ring-1 ring-amber-100"
     case "error":
-      return "bg-rose-50 text-rose-700 ring-1 ring-rose-100"
+      return "bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)] ring-1 ring-rose-100"
     case "info":
-      return "bg-sky-50 text-sky-700 ring-1 ring-sky-100"
+      return "bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)] ring-1 ring-sky-100"
   }
 }
 
@@ -53,9 +53,9 @@ function syncBarClass(status: "queued" | "running" | "completed" | "failed") {
     case "running":
       return "bg-brand-primary"
     case "completed":
-      return "bg-emerald-500"
+      return "bg-semantic-success"
     case "failed":
-      return "bg-rose-500"
+      return "bg-semantic-error"
   }
 }
 
@@ -95,7 +95,7 @@ export function IntegrationHubView() {
         initial={reduceMotion ? false : surfaceMotion.initial}
         animate={reduceMotion ? undefined : surfaceMotion.animate}
         transition={{ duration: 0.28 }}
-        className="overflow-hidden rounded-[28px] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
+        className="overflow-hidden rounded-[28px] border border-[var(--color-semantic-info)] bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]"
         aria-label="Enterprise Integration Center overview"
       >
         <div className="relative bg-[radial-gradient(circle_at_top_left,_rgba(28,130,242,0.16),_transparent_38%),linear-gradient(135deg,#ffffff_0%,#f5f9ff_58%,#eef6ff_100%)] p-6 md:p-7">
@@ -110,7 +110,7 @@ export function IntegrationHubView() {
                 Adapter-based integration control for synchronization, authentication, health, replay, and orchestration across the digital ecosystem. External providers remain mocked where production APIs are not yet available.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 ring-1 ring-sky-100">Adapter architecture</span>
+                <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 text-xs font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Adapter architecture</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Runtime Engine linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Memory Layer linked</span>
                 <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Prompt OS linked</span>
@@ -119,22 +119,22 @@ export function IntegrationHubView() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[460px]">
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Connected systems</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{connectedSystems.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Extensible adapters registered in the integration provider.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">High attention</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{highRiskSystems}</p>
                 <p className="mt-1 text-xs text-text-secondary">Warnings, offline systems, rate limits, or auth-required states.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Synchronization</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{syncSummary.running}</p>
                 <p className="mt-1 text-xs text-text-secondary">Running sync pipelines now across adapter queues.</p>
               </article>
-              <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Developer mode</p>
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <StatusIndicator tone={developerMode ? "info" : "neutral"} label={developerMode ? "Enabled" : "Disabled"} />
@@ -187,7 +187,7 @@ export function IntegrationHubView() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-50 text-sm font-semibold text-brand-primary ring-1 ring-sky-100">
+                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-semantic-info-soft)] text-sm font-semibold text-brand-primary ring-1 ring-sky-100">
                             {system.name.slice(0, 2).toUpperCase()}
                           </span>
                           <div>
@@ -225,7 +225,7 @@ export function IntegrationHubView() {
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {system.linkedModules.map((module) => (
-                        <span key={module} className="rounded-full border border-sky-100 bg-sky-50 px-2 py-1 text-[11px] text-sky-700">
+                        <span key={module} className="rounded-full border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] px-2 py-1 text-[11px] text-[var(--color-semantic-info-text)]">
                           {module}
                         </span>
                       ))}
@@ -300,7 +300,7 @@ export function IntegrationHubView() {
                             <h4 className="text-sm font-semibold text-brand-navy">{integration.name}</h4>
                             <p className="mt-1 text-xs leading-5 text-text-secondary">{integration.description}</p>
                           </div>
-                          <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", integration.status === "connected" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-700")}>
+                          <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", integration.status === "connected" ? "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]" : "bg-slate-100 text-slate-700")}>
                             {integration.status}
                           </span>
                         </div>
@@ -509,7 +509,7 @@ export function IntegrationHubView() {
               <StatusIndicator tone={developerMode ? "info" : "neutral"} label={developerMode ? "Expanded" : "Summary"} />
             </div>
 
-            <div className="mt-4 rounded-2xl border border-sky-100 bg-sky-50/50 p-3 text-xs leading-5 text-text-secondary">
+            <div className="mt-4 rounded-2xl border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)]/50 p-3 text-xs leading-5 text-text-secondary">
               Providers are organized under adapters, providers, hooks, contexts, services, types, and utils. Production APIs are intentionally not invented here; mock states preserve the interaction model and adapter contract.
             </div>
 

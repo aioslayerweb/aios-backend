@@ -5,9 +5,9 @@ import { BellRing, ShieldAlert } from "lucide-react"
 import { useRoleAlerts } from "@/hooks/use-role-alerts"
 
 const priorityStyles = {
-  critical: "border-rose-200 bg-rose-50 text-rose-700",
-  high: "border-amber-200 bg-amber-50 text-amber-700",
-  medium: "border-sky-200 bg-sky-50 text-sky-700",
+  critical: "border-[var(--color-semantic-error)] bg-[var(--color-semantic-error-soft)] text-[var(--color-semantic-error-text)]",
+  high: "border-[var(--color-semantic-warning)] bg-[var(--color-semantic-warning-soft)] text-[var(--color-semantic-warning-text)]",
+  medium: "border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]",
   low: "border-slate-200 bg-slate-50 text-slate-700",
 } as const
 

@@ -9,9 +9,17 @@ export const colors = {
   },
   semantic: {
     success: "#1F9D67",
+    successSoft: "#EAF8F1",
+    successText: "#0E5A3A",
     warning: "#C88719",
+    warningSoft: "#FFF6E8",
+    warningText: "#7A4C08",
     error: "#C73E3A",
+    errorSoft: "#FDEDED",
+    errorText: "#7F1D1D",
     info: "#1C82F2",
+    infoSoft: "#EAF4FF",
+    infoText: "#124EA8",
   },
   neutral: {
     0: "#FFFFFF",
@@ -30,8 +38,8 @@ export const colors = {
 
 export const typography = {
   families: {
-    display: ["Satoshi", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
-    body: ["Satoshi", "Plus Jakarta Sans", "Inter", "system-ui", "sans-serif"],
+    display: ["Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", "Arial", "system-ui", "sans-serif"],
+    body: ["Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", "Arial", "system-ui", "sans-serif"],
     mono: ["IBM Plex Mono", "JetBrains Mono", "ui-monospace", "monospace"],
   },
   sizes: {

@@ -97,7 +97,7 @@ export function MemoryFilterBar({ filters }: { filters: MemoryFilter[] }) {
   return (
     <div className="flex flex-wrap gap-2">
       {filters.map((filter) => (
-        <Badge key={filter.id} tone="info" className="border border-sky-200 bg-sky-50 text-sky-700">
+        <Badge key={filter.id} tone="info" className="border border-[var(--color-semantic-info)] bg-[var(--color-semantic-info-soft)] text-[var(--color-semantic-info-text)]">
           {filter.label}
         </Badge>
       ))}

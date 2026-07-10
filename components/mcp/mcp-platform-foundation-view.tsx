@@ -6,7 +6,7 @@ import { useMCP, useMCPGateway, useMCPHealth, useMCPMetrics, useMCPPrompts, useM
 
 function metricCard(label: string, value: string, detail: string) {
   return (
-    <article className="rounded-2xl border border-sky-100 bg-white/90 p-4 shadow-sm">
+    <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
       <p className="text-xs uppercase tracking-wide text-text-muted">{label}</p>
       <p className="mt-2 text-3xl font-semibold text-brand-navy">{value}</p>
       <p className="mt-1 text-xs text-text-secondary">{detail}</p>
@@ -29,7 +29,7 @@ export function MCPPlatformFoundationView() {
 
   return (
     <div className="space-y-4 px-4 py-4 md:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[28px] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]" aria-label="MCP platform header">
+      <section className="overflow-hidden rounded-[28px] border border-[var(--color-semantic-info)] bg-white shadow-[0_24px_80px_rgba(28,130,242,0.10)]" aria-label="MCP platform header">
         <div className="bg-[radial-gradient(circle_at_top_left,_rgba(28,130,242,0.16),_transparent_38%),linear-gradient(135deg,#ffffff_0%,#f5f9ff_58%,#eef6ff_100%)] p-6 md:p-7">
           <p className="text-xs uppercase tracking-[0.24em] text-brand-primary">Enterprise MCP Platform</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-brand-navy md:text-[2.2rem]">AIOS MCP Host, Server, Gateway, and Registry</h1>
@@ -37,7 +37,7 @@ export function MCPPlatformFoundationView() {
             Architecture foundation for tenant-aware enterprise MCP orchestration with secure tool routing, policy enforcement, registry governance, and observability.
           </p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs">
-            <span className="rounded-full bg-sky-50 px-3 py-1 font-medium text-sky-700 ring-1 ring-sky-100">Modes: {platformModes.join(", ")}</span>
+            <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Modes: {platformModes.join(", ")}</span>
             <span className="rounded-full bg-slate-50 px-3 py-1 font-medium text-slate-700 ring-1 ring-slate-200">Pipeline stages: {gateway.pipeline.length}</span>
             <span className="rounded-full bg-slate-50 px-3 py-1 font-medium text-slate-700 ring-1 ring-slate-200">Policy rules: {registry.installedServers.length > 0 ? "Active" : "Planned"}</span>
           </div>

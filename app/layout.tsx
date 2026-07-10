@@ -1,10 +1,38 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { AppProviders } from "@/providers"
+import { brandAssets, brandTheme } from "@/components/branding"
 
 export const metadata: Metadata = {
-  title: "AIOS - Autonomous Business Operating System",
-  description: "AIOS enterprise operating system for executive intelligence and autonomous workflows.",
+  metadataBase: new URL("https://aios.layer"),
+  applicationName: brandTheme.appName,
+  title: {
+    default: brandTheme.defaultTitle,
+    template: brandTheme.titleTemplate,
+  },
+  description: brandTheme.description,
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: brandAssets.favicon, type: "image/png" }],
+    apple: [{ url: brandAssets.appleTouchIcon, type: "image/png" }],
+    shortcut: [{ url: brandAssets.favicon, type: "image/png" }],
+  },
+  openGraph: {
+    title: brandTheme.defaultTitle,
+    description: brandTheme.description,
+    type: "website",
+    images: [{ url: brandAssets.openGraph, width: 1200, height: 1200, alt: "AIOS" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: brandTheme.defaultTitle,
+    description: brandTheme.description,
+    images: [brandAssets.openGraph],
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: brandTheme.themeColor,
 }
 
 export default function RootLayout({

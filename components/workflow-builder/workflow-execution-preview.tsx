@@ -44,7 +44,7 @@ export function WorkflowExecutionPreview() {
         {execution.steps.map((step) => (
           <article
             key={step.id}
-            className={step.status === "running" ? "rounded border border-blue-300 bg-blue-50 p-2" : step.status === "completed" ? "rounded border border-emerald-300 bg-emerald-50 p-2" : "rounded border border-border bg-surface-muted p-2"}
+            className={step.status === "running" ? "rounded border border-blue-300 bg-blue-50 p-2" : step.status === "completed" ? "rounded border border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] p-2" : "rounded border border-border bg-surface-muted p-2"}
           >
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold text-text-primary">{step.nodeTitle}</p>

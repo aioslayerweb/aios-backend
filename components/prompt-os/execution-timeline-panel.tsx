@@ -16,7 +16,7 @@ export function ExecutionTimelinePanel({ timeline }: ExecutionTimelinePanelProps
           <motion.li
             key={item.id}
             layout
-            className={item.status === "current" ? "rounded-lg border border-brand-primary bg-brand-subtle px-2 py-1.5" : item.status === "completed" ? "rounded-lg border border-emerald-300 bg-emerald-50 px-2 py-1.5" : "rounded-lg border border-border bg-surface-muted px-2 py-1.5"}
+            className={item.status === "current" ? "rounded-lg border border-brand-primary bg-brand-subtle px-2 py-1.5" : item.status === "completed" ? "rounded-lg border border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)] px-2 py-1.5" : "rounded-lg border border-border bg-surface-muted px-2 py-1.5"}
           >
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-medium text-text-primary">{item.stage}</p>

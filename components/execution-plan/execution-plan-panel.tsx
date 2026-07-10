@@ -13,7 +13,7 @@ function tone(status: PromptPlanStep["status"]): string {
   }
 
   if (status === "completed") {
-    return "border-emerald-300 bg-emerald-50"
+    return "border-[var(--color-semantic-success)] bg-[var(--color-semantic-success-soft)]"
   }
 
   return "border-border bg-white"

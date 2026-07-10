@@ -18,7 +18,7 @@ export function RuntimeThroughputGraph({ metrics }: RuntimeThroughputGraphProps)
       <div className="mt-2 grid gap-2 md:grid-cols-3">
         {[
           { label: "Tasks completed", value: tasks, accent: "bg-blue-500" },
-          { label: "Success rate", value: `${success}%`, accent: "bg-emerald-500" },
+          { label: "Success rate", value: `${success}%`, accent: "bg-semantic-success" },
           { label: "Runtime throughput", value: `${throughput}/m`, accent: "bg-violet-500" },
         ].map((item) => (
           <article key={item.label} className="rounded-xl border border-border bg-surface-muted p-3">

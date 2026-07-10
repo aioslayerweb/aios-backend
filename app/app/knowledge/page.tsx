@@ -1,5 +1,5 @@
-import { BusinessKnowledgeGraphView } from "@/components/knowledge-graph"
+import { KnowledgeCenterWorkspace } from "@/components/knowledge-center"
 
 export default function AppKnowledgePage() {
-  return <BusinessKnowledgeGraphView />
+  return <KnowledgeCenterWorkspace />
 }

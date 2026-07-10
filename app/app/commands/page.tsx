@@ -1,5 +1,5 @@
-import { SearchWorkspace } from "@/components/search/search-workspace"
+import { CommandCenterWorkspace } from "@/components/command-center"
 
 export default function AppCommandsPage() {
-  return <SearchWorkspace />
+  return <CommandCenterWorkspace />
 }

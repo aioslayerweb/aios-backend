@@ -1,5 +1,5 @@
-import { DecisionEngineView } from "@/components/decision-engine"
+import { DecisionCenterWorkspace } from "@/components/decision-center"
 
 export default function AppDecisionsPage() {
-  return <DecisionEngineView />
+  return <DecisionCenterWorkspace />
 }

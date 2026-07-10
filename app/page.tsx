@@ -1,10 +1,5 @@
-import DashboardLayout from "@/components/layout/DashboardLayout";
-import DashboardContent from "@/components/dashboard/DashboardContent";
+import { PublicHomePage } from "@/components/public-site/public-home-page";
 
 export default function HomePage() {
-  return (
-    <DashboardLayout>
-      <DashboardContent />
-    </DashboardLayout>
-  );
+  return <PublicHomePage />;
 }

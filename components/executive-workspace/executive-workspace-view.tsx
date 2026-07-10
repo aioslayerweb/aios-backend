@@ -1,6 +1,7 @@
 "use client"
 
 import { useExecutiveWorkspace, useExecutiveKPIs, useNotificationCenter, useRuntimeStatus } from "@/hooks"
+import { WorkspaceGrid, WorkspaceRightPanel } from "@/components/workspace"
 import { KPICard } from "./kpi-card"
 import { BusinessHealth } from "./business-health"
 import { DecisionCenter } from "./decision-center"
@@ -46,7 +47,7 @@ export function ExecutiveWorkspaceView() {
   const { kpis } = useExecutiveKPIs()
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+    <WorkspaceGrid className="xl:grid-cols-[minmax(0,1fr)_320px]">
       <div className="space-y-4">
         <WorkspaceHero />
         <ExecutiveHeader />
@@ -78,7 +79,9 @@ export function ExecutiveWorkspaceView() {
         <QuickActions />
       </div>
 
-      <RightRail />
-    </div>
+      <WorkspaceRightPanel ariaLabel="Executive right sidebar">
+        <RightRail />
+      </WorkspaceRightPanel>
+    </WorkspaceGrid>
   )
 }

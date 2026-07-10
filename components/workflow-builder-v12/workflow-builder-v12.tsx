@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { WorkspaceGrid, WorkspaceShell } from "@/components/workspace";
 import {
   BusinessOutcomeCard,
   ExecutionTimeline,
@@ -41,10 +42,10 @@ export function WorkflowBuilderV12() {
   }
 
   return (
-    <div className="space-y-4 px-4 py-4 md:px-6 lg:px-8">
+    <WorkspaceShell>
       <WorkflowHeader actions={primaryHeaderActions} />
 
-      <div className="grid gap-4 2xl:grid-cols-[280px_minmax(0,1fr)_360px]">
+      <WorkspaceGrid className="2xl:grid-cols-[280px_minmax(0,1fr)_360px]">
         <motion.aside initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-3" aria-label="Workflow builder left sidebar">
           <SidebarSection title="Workflow Library" items={workflowBuilderData.leftLibrary} />
           <SidebarSection title="Templates" items={workflowBuilderData.templates} />
@@ -138,7 +139,7 @@ export function WorkflowBuilderV12() {
             suggestedImprovements={workflowBuilderData.suggestedImprovements}
           />
         </motion.aside>
-      </div>
-    </div>
+      </WorkspaceGrid>
+    </WorkspaceShell>
   );
 }

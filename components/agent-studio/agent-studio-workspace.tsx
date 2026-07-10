@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { WorkspaceGrid, WorkspaceShell } from "@/components/workspace";
 import {
   AgentDetailsPanel,
   AgentGrid,
@@ -56,10 +57,10 @@ export function AgentStudioWorkspace() {
   }
 
   return (
-    <div className="space-y-4 px-4 py-4 md:px-6 lg:px-8">
+    <WorkspaceShell>
       <StudioHeader />
 
-      <div className="grid gap-4 2xl:grid-cols-[280px_minmax(0,1fr)_340px]">
+      <WorkspaceGrid className="2xl:grid-cols-[280px_minmax(0,1fr)_340px]">
         <AgentStudioLeftRail
           nav={agentStudioData.leftNavigation}
           categories={agentStudioData.categories}
@@ -130,7 +131,7 @@ export function AgentStudioWorkspace() {
           events={agentStudioData.upcomingEvents}
           quickInsights={agentStudioData.quickInsights}
         />
-      </div>
-    </div>
+      </WorkspaceGrid>
+    </WorkspaceShell>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { WorkspaceGrid, WorkspaceShell } from "@/components/workspace";
 import {
   AgentStatusCard,
   CommandComposer,
@@ -36,10 +37,10 @@ export function CommandCenterWorkspace() {
   const data = commandCenterData;
 
   return (
-    <div className="px-4 py-4 md:px-6 lg:px-8">
+    <WorkspaceShell>
       <SectionKicker title="AIOS Command Center" subtitle="Enterprise Command Center v1.0" />
 
-      <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)_340px]">
+      <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_340px]">
         <motion.aside variants={fadeIn} initial="hidden" animate="show" className="space-y-3" aria-label="Command Center left sidebar">
           <LeftRailLinks title="AIOS Navigation" items={data.leftNavigation} />
           <LeftRailLinks title="Favorites" items={data.favorites} />
@@ -127,8 +128,8 @@ export function CommandCenterWorkspace() {
             <LinkList items={data.enterpriseInsights} />
           </SidebarSection>
         </motion.aside>
-      </div>
-    </div>
+      </WorkspaceGrid>
+    </WorkspaceShell>
   );
 }
 

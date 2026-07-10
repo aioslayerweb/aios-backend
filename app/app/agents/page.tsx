@@ -1,5 +1,5 @@
-import { AgentWorkspaceView } from "@/components/agent-workspace"
+import { AgentStudioWorkspace } from "@/components/agent-studio"
 
 export default function AppAgentsPage() {
-  return <AgentWorkspaceView />
+  return <AgentStudioWorkspace />
 }

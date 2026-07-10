@@ -1,0 +1,135 @@
+import type { AgentStudioData } from "./types";
+
+export const agentStudioData: AgentStudioData = {
+  metrics: [
+    { id: "m1", label: "Active Agents", value: "128", detail: "Enterprise-wide" },
+    { id: "m2", label: "Org Confidence", value: "97%", detail: "Weekly average" },
+    { id: "m3", label: "Running Workflows", value: "42", detail: "Cross-department" },
+    { id: "m4", label: "Runtime Availability", value: "99.97%", detail: "Last 30 days" },
+    { id: "m5", label: "Connected MCP Servers", value: "18", detail: "Federated" },
+    { id: "m6", label: "Pending Approvals", value: "2", detail: "Executive review" },
+    { id: "m7", label: "Knowledge Sources", value: "36", detail: "Synced" },
+    { id: "m8", label: "Memory Collections", value: "145", detail: "Operational" },
+  ],
+  agents: [
+    { id: "a1", name: "Executive Assistant", role: "Executive Operations", status: "active", confidence: 96, health: 97, team: "Leadership", objective: "Prepare board-level briefing with risk and opportunity narrative.", avatarSeed: "EA" },
+    { id: "a2", name: "Sales Agent", role: "Revenue Intelligence", status: "active", confidence: 93, health: 95, team: "Sales", objective: "Detect churn signals and trigger expansion recommendations.", avatarSeed: "SA" },
+    { id: "a3", name: "Marketing Strategist", role: "Growth Planning", status: "idle", confidence: 91, health: 92, team: "Marketing", objective: "Optimize campaign mix across enterprise segments.", avatarSeed: "MS" },
+    { id: "a4", name: "Finance Agent", role: "Forecast & Variance", status: "active", confidence: 94, health: 96, team: "Finance", objective: "Track budget variance and forecast quarterly outcomes.", avatarSeed: "FA" },
+    { id: "a5", name: "Legal Advisor", role: "Policy & Compliance", status: "attention", confidence: 88, health: 84, team: "Legal", objective: "Review regulatory obligations before workflow approvals.", avatarSeed: "LA" },
+    { id: "a6", name: "Knowledge Curator", role: "Knowledge Governance", status: "active", confidence: 95, health: 96, team: "Knowledge", objective: "Synchronize enterprise documentation and policy updates.", avatarSeed: "KC" },
+    { id: "a7", name: "Customer Success", role: "Retention Intelligence", status: "active", confidence: 92, health: 94, team: "Customer", objective: "Prioritize at-risk accounts and recovery plays.", avatarSeed: "CS" },
+    { id: "a8", name: "Operations Manager", role: "Execution Orchestration", status: "active", confidence: 94, health: 95, team: "Operations", objective: "Coordinate cross-functional workflow throughput.", avatarSeed: "OM" },
+    { id: "a9", name: "Research Agent", role: "Market & Trend Analysis", status: "idle", confidence: 90, health: 91, team: "Strategy", objective: "Surface strategic trend shifts and competitor movement.", avatarSeed: "RA" },
+    { id: "a10", name: "Compliance Officer", role: "Audit & Controls", status: "active", confidence: 93, health: 95, team: "Governance", objective: "Enforce policy adherence and traceability.", avatarSeed: "CO" },
+  ],
+  templates: [
+    { id: "t1", name: "Executive Briefing Agent", category: "Leadership", usageCount: "32 runs" },
+    { id: "t2", name: "Revenue Risk Monitor", category: "Sales", usageCount: "54 runs" },
+    { id: "t3", name: "Compliance Workflow Reviewer", category: "Legal", usageCount: "19 runs" },
+    { id: "t4", name: "Knowledge Sync Operator", category: "Knowledge", usageCount: "41 runs" },
+  ],
+  activities: [
+    { id: "ac1", title: "Sales Agent completed Q3 forecast", time: "10m ago", actor: "Sales Agent" },
+    { id: "ac2", title: "Finance Agent detected budget variance", time: "18m ago", actor: "Finance Agent" },
+    { id: "ac3", title: "Executive Assistant prepared board briefing", time: "31m ago", actor: "Executive Assistant" },
+    { id: "ac4", title: "Knowledge Curator synchronized SharePoint", time: "46m ago", actor: "Knowledge Curator" },
+    { id: "ac5", title: "Compliance Agent approved GDPR workflow", time: "57m ago", actor: "Compliance Officer" },
+    { id: "ac6", title: "Workflow Coordinator completed onboarding", time: "1h ago", actor: "Operations Manager" },
+  ],
+  capabilities: [
+    { id: "cap1", label: "Executive Brief Generation" },
+    { id: "cap2", label: "Cross-Department Orchestration" },
+    { id: "cap3", label: "Risk Prioritization" },
+    { id: "cap4", label: "Decision Support" },
+  ],
+  knowledge: [
+    { id: "k1", label: "Board Policies (12 docs)" },
+    { id: "k2", label: "Revenue Playbooks (8 docs)" },
+    { id: "k3", label: "Compliance Standards (15 docs)" },
+  ],
+  memoryCollections: [
+    { id: "mem1", label: "Executive Decisions (48 records)" },
+    { id: "mem2", label: "Risk Events (92 records)" },
+    { id: "mem3", label: "Customer Journey Signals (164 records)" },
+  ],
+  mcpTools: [
+    { id: "mcp1", name: "MCP Gateway", status: "connected" },
+    { id: "mcp2", name: "Knowledge Registry", status: "connected" },
+    { id: "mcp3", name: "Policy Toolchain", status: "degraded" },
+  ],
+  permissions: [
+    { id: "p1", label: "Read: Executive reports" },
+    { id: "p2", label: "Write: Recommendations" },
+    { id: "p3", label: "Execute: Workflow proposals" },
+  ],
+  workflows: [
+    { id: "w1", label: "Board Briefing Assembly" },
+    { id: "w2", label: "Risk Escalation Pipeline" },
+    { id: "w3", label: "QBR Intelligence Update" },
+  ],
+  executionHistory: [
+    { id: "e1", title: "Briefing draft generated", description: "Compiled executive summary with evidence links.", timestamp: "Today 09:24" },
+    { id: "e2", title: "Risk anomaly detected", description: "Flagged retention drop in enterprise accounts.", timestamp: "Today 08:52" },
+    { id: "e3", title: "Compliance check completed", description: "Validated GDPR workflow controls.", timestamp: "Today 08:11" },
+  ],
+  suggestedImprovements: [
+    { id: "si1", label: "Increase cadence for strategic memory sync to every 4 hours" },
+    { id: "si2", label: "Add legal policy source to reduce compliance false positives" },
+    { id: "si3", label: "Expand customer health weighting in churn model" },
+  ],
+  leftNavigation: [
+    { id: "ln1", label: "Agent Studio", href: "/app/agents", meta: "Current" },
+    { id: "ln2", label: "Command Center", href: "/app/commands", meta: "Workspace" },
+    { id: "ln3", label: "Executive Center", href: "/app/executive", meta: "Workspace" },
+  ],
+  categories: [
+    { id: "cat1", label: "Executive", href: "#", meta: "24" },
+    { id: "cat2", label: "Sales", href: "#", meta: "18" },
+    { id: "cat3", label: "Finance", href: "#", meta: "14" },
+    { id: "cat4", label: "Legal", href: "#", meta: "10" },
+  ],
+  favorites: [
+    { id: "fav1", label: "Executive Assistant", href: "#", meta: "Active" },
+    { id: "fav2", label: "Finance Agent", href: "#", meta: "High confidence" },
+    { id: "fav3", label: "Compliance Officer", href: "#", meta: "Monitoring" },
+  ],
+  teams: [
+    { id: "tm1", label: "Leadership", href: "#", meta: "16 agents" },
+    { id: "tm2", label: "Revenue", href: "#", meta: "29 agents" },
+    { id: "tm3", label: "Operations", href: "#", meta: "22 agents" },
+  ],
+  recentAgents: [
+    { id: "ra1", label: "Research Agent", href: "#", meta: "7m ago" },
+    { id: "ra2", label: "Operations Manager", href: "#", meta: "14m ago" },
+    { id: "ra3", label: "Knowledge Curator", href: "#", meta: "22m ago" },
+  ],
+  rightConnectedSystems: [
+    { id: "cs1", name: "Salesforce", status: "online" },
+    { id: "cs2", name: "SAP", status: "online" },
+    { id: "cs3", name: "SharePoint", status: "online" },
+    { id: "cs4", name: "Policy Engine", status: "warning" },
+  ],
+  notifications: [
+    { id: "n1", title: "2 pending approvals", detail: "Executive workflow approvals require confirmation.", tone: "warning" },
+    { id: "n2", title: "Runtime status stable", detail: "Agent execution latency remains within threshold.", tone: "info" },
+    { id: "n3", title: "Policy mismatch detected", detail: "Legal Advisor requires updated policy mapping.", tone: "critical" },
+  ],
+  upcomingEvents: [
+    { id: "ue1", title: "Executive Ops Review", schedule: "11:00" },
+    { id: "ue2", title: "Board Briefing Rehearsal", schedule: "14:30" },
+    { id: "ue3", title: "Compliance Council", schedule: "16:00" },
+  ],
+  quickInsights: [
+    { id: "qi1", label: "Agent confidence increased 2.1% week-over-week" },
+    { id: "qi2", label: "Workflow completion time improved by 11%" },
+    { id: "qi3", label: "Knowledge sync freshness reached 99.2%" },
+  ],
+  collaboration: [
+    { id: "cl1", from: "Executive Assistant", to: "Finance Agent", type: "delegation" },
+    { id: "cl2", from: "Finance Agent", to: "Compliance Officer", type: "decision" },
+    { id: "cl3", from: "Sales Agent", to: "Knowledge Curator", type: "knowledge" },
+    { id: "cl4", from: "Operations Manager", to: "Customer Success", type: "workflow" },
+    { id: "cl5", from: "Research Agent", to: "Marketing Strategist", type: "knowledge" },
+  ],
+};

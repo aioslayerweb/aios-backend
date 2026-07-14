@@ -1,6 +1,7 @@
 export type WorkspaceKey =
   | "home"
   | "executive"
+  | "commands"
   | "corporate"
   | "sales"
   | "knowledge"
@@ -9,6 +10,8 @@ export type WorkspaceKey =
   | "governance"
   | "integrations"
   | "decisions"
+  | "intelligence"
+  | "activity"
   | "prompt-os"
   | "workflows"
   | "orchestrator"
@@ -23,6 +26,8 @@ export type WorkspaceKey =
   | "mcp-prompts"
   | "mcp-health"
   | "mcp-gateway"
+  | "runtime-center"
+  | "developer-center"
   | "security"
   | "organizations"
   | "users"
@@ -37,16 +42,22 @@ export type WorkspaceItem = {
   title: string
   href: string
   shortcut: string
+  status?: "active" | "placeholder" | "future"
+  badgeLabel?: string
   icon:
     | "home"
     | "executive"
+    | "commands"
     | "corporate"
     | "sales"
     | "knowledge"
     | "memory"
     | "agents"
     | "governance"
+    | "integrations"
     | "decisions"
+    | "intelligence"
+    | "activity"
     | "prompt"
     | "workflow"
     | "orchestrator"
@@ -61,6 +72,8 @@ export type WorkspaceItem = {
     | "mcp-prompts"
     | "mcp-health"
     | "mcp-gateway"
+    | "runtime-center"
+    | "developer-center"
     | "security"
     | "organizations"
     | "users"

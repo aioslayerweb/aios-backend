@@ -2,9 +2,11 @@
 
 import { type ReactNode, useMemo, useState } from "react"
 import {
+  Activity,
   Bot,
   Brain,
   Building2,
+  Command,
   Database,
   Home,
   Lightbulb,
@@ -32,6 +34,8 @@ import {
   FileText,
   HeartPulse,
   Route,
+  Cpu,
+  Code2,
 } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
@@ -58,13 +62,17 @@ import { BrandLogo } from "@/components/branding"
 const iconByKey = {
   home: Home,
   executive: Sparkles,
+  commands: Command,
   corporate: Building2,
   sales: WalletCards,
   knowledge: Brain,
   memory: Database,
   agents: Bot,
   governance: ShieldCheck,
+  integrations: PlugZap,
   decisions: BrainCircuit,
+  intelligence: LineChart,
+  activity: Activity,
   prompt: Sparkles,
   workflow: Workflow,
   orchestrator: Network,
@@ -79,6 +87,8 @@ const iconByKey = {
   "mcp-prompts": FileText,
   "mcp-health": HeartPulse,
   "mcp-gateway": Route,
+  "runtime-center": Cpu,
+  "developer-center": Code2,
   security: ShieldCheck,
   organizations: Users,
   users: User,
@@ -89,36 +99,65 @@ const iconByKey = {
   "api-keys": KeyRound,
 } as const
 
-function titleFromPath(pathname: string): string {
-  if (pathname === "/app") {
-    return "Home"
+const workspaceLabels: Record<string, string> = {
+  "/app": "Dashboard",
+  "/app/executive": "Executive Center",
+  "/app/commands": "Command Center",
+  "/app/agents": "Agent Studio",
+  "/app/workflows": "Workflow Builder",
+  "/app/memory": "Memory Center",
+  "/app/knowledge": "Knowledge Center",
+  "/app/decisions": "Decision Center",
+  "/app/intelligence": "Intelligence Center",
+  "/app/corporate": "Organization Center",
+  "/app/integrations": "Integrations",
+  "/app/activity": "Activity",
+  "/app/reports": "Reports",
+  "/app/planning": "Planning",
+  "/app/governance": "Governance",
+  "/app/mcp": "MCP",
+  "/app/mcp/registry": "MCP Registry",
+  "/app/mcp/tools": "MCP Tools",
+  "/app/mcp/resources": "MCP Resources",
+  "/app/mcp/prompts": "MCP Prompts",
+  "/app/mcp/health": "MCP Health",
+  "/app/mcp/gateway": "MCP Gateway",
+  "/app/prompt-os": "Prompt OS",
+  "/app/security": "Security",
+  "/app/settings": "Settings",
+  "/app/organizations": "Organizations",
+  "/app/users": "Users",
+  "/app/teams": "Teams",
+  "/app/roles": "Roles",
+  "/app/permissions": "Permissions",
+  "/app/audit": "Audit",
+  "/app/api-keys": "API Keys",
+  "/app/runtime-center": "Runtime Center",
+  "/app/developer-center": "Developer Center",
+}
+
+function resolveWorkspaceLabel(pathname: string): string {
+  if (workspaceLabels[pathname]) {
+    return workspaceLabels[pathname]
   }
 
   const segments = pathname.split("/").filter(Boolean)
   const last = segments[segments.length - 1] ?? "workspace"
-  return last.charAt(0).toUpperCase() + last.slice(1)
+  return last
+    .split("-")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ")
+}
+
+function titleFromPath(pathname: string): string {
+  return resolveWorkspaceLabel(pathname)
 }
 
 function breadcrumbItems(pathname: string): Array<{ label: string; href?: string }> {
-  const segments = pathname.split("/").filter(Boolean)
-  if (segments.length === 0) {
-    return [{ label: "Home", href: "/" }]
-  }
-
-  const items: Array<{ label: string; href?: string }> = [{ label: "AIOS", href: "/app" }]
-  let href = ""
-
-  for (let index = 0; index < segments.length; index += 1) {
-    href += `/${segments[index]}`
-    const raw = segments[index]
-    const label = raw.charAt(0).toUpperCase() + raw.slice(1)
-    items.push({
-      label,
-      href: index === segments.length - 1 ? undefined : href,
-    })
-  }
-
-  return items
+  return [
+    { label: "Home", href: "/app" },
+    { label: resolveWorkspaceLabel(pathname) },
+  ]
 }
 
 function WorkspaceHeader() {
@@ -203,7 +242,7 @@ function ShellTopBar() {
           <div className="ml-auto flex items-center gap-2">
             <Dropdown label="Quick Actions" items={quickActions} icon={<Lightbulb className="h-4 w-4" />} className="hidden md:block" />
 
-            <NotificationBell unreadCount={unreadCount} onClick={toggleDrawer} />
+            <NotificationBell unreadCount={unreadCount} onClick={toggleDrawer} open={drawerOpen} />
 
             <div className="hidden items-center gap-1 md:flex">
               <StatusIndicator tone={isRunning ? "warning" : "success"} label={`AI ${aiStatus}`} />
@@ -245,7 +284,7 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
   return (
     <nav className="flex-1 space-y-1 p-2" aria-label="Workspace modules">
       {workspaceItems.map((item) => {
-        const Icon = iconByKey[item.icon]
+        const Icon = iconByKey[item.icon as keyof typeof iconByKey] ?? Sparkles
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
 
         return (
@@ -268,6 +307,17 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
             >
               <Icon className="h-4 w-4" aria-hidden />
               <span className={cn(compact && "sr-only")}>{item.title}</span>
+              {item.status === "future" ? (
+                <span
+                  className={cn(
+                    "rounded border border-border px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-text-muted",
+                    compact && "sr-only"
+                  )}
+                  aria-label={`${item.title} is a roadmap module`}
+                >
+                  {item.badgeLabel ?? "Roadmap"}
+                </span>
+              ) : null}
               <span className={cn("ml-auto rounded px-1.5 py-0.5 text-[10px] text-text-muted", compact && "sr-only")}>{item.shortcut}</span>
             </Link>
           </motion.div>
@@ -376,11 +426,16 @@ type ApplicationLayoutProps = {
 export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const { open, close } = useCommandPalette()
   const { open: aiPanelOpen, setOpen: setAIPanelOpen } = useAIAssistant()
-  const { isMobile } = useBreakpoint()
+  const { drawerOpen, setDrawerOpen } = useNotificationCenter()
+  const { isDesktop, isMobile } = useBreakpoint()
 
   useKeyboardShortcuts({
     "mod+k": open,
-    escape: close,
+    escape: () => {
+      close()
+      setDrawerOpen(false)
+    },
+    n: () => setDrawerOpen(true),
   })
 
   return (
@@ -388,7 +443,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
       <div className="flex min-h-screen">
         <ShellSidebar />
 
-        <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+        <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col", drawerOpen && isDesktop && "pr-[360px]") }>
           <ShellTopBar />
           <WorkspaceHeader />
           <motion.main

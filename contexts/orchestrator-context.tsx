@@ -11,7 +11,6 @@ import {
 } from "react"
 import { useActivityFeedContext } from "@/contexts/activity-feed-context"
 import { useMemoryContext } from "@/contexts/memory-context"
-import { useNotificationContext } from "@/contexts/notification-context"
 import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
 import { useAgentWorkspaceContext } from "@/contexts/agent-workspace-context"
@@ -126,7 +125,6 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
   const runtimeStatus = useRuntimeStatusContext()
   const { addActivity } = useActivityFeedContext()
   const { addEntry } = useMemoryContext()
-  const { notify } = useNotificationContext()
   const { agents: workspaceAgents } = useAgentWorkspaceContext()
 
   const [agents, setAgents] = useState(defaults.agents)
@@ -246,25 +244,6 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
 
     return () => window.clearInterval(timer)
   }, [addEntry, liveMode, selectedAgentId, workspaceAgents])
-
-  useEffect(() => {
-    if (!runtimeLive.events.length) {
-      return
-    }
-
-    const latest = runtimeLive.events[0]
-    if (latest.priority === "critical") {
-      notify({
-        title: latest.title,
-        description: latest.summary,
-        category: "SYSTEM",
-        priority: "HIGH",
-        level: "WARNING",
-        toast: true,
-        autoDismissMs: 5000,
-      })
-    }
-  }, [notify, runtimeLive.events])
 
   const selectedAgent = useMemo(
     () => agents.find((item) => item.id === selectedAgentId) ?? null,

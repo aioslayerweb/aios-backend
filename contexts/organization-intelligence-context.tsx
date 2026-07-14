@@ -15,14 +15,13 @@ import { useDecisionEngineContext } from "@/contexts/decision-engine-context"
 import { useExecutiveReportsContext } from "@/contexts/executive-reports-context"
 import { useKnowledgeGraphContext } from "@/contexts/knowledge-graph-context"
 import { useMemoryContext } from "@/contexts/memory-context"
-import { useNotificationContext } from "@/contexts/notification-context"
 import { usePlanningEngineContext } from "@/contexts/planning-engine-context"
 import { useRoleIntelligenceContext } from "@/contexts/role-intelligence-context"
 import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useWorkflowBuilderContext } from "@/contexts/workflow-builder-context"
 import { useIntegrationContext } from "@/contexts/integration-context"
 import { useSecurityContext } from "@/contexts/security-context"
-import type { ActivityItem, NotificationCreateInput, OrgIntelligenceContextState, OrgIntelligenceSnapshot, OrgStructureItem } from "@/types"
+import type { ActivityItem, OrgIntelligenceContextState, OrgIntelligenceSnapshot, OrgStructureItem } from "@/types"
 import { buildOrganizationSnapshot, createOrganizationIntelligenceDefaults, filterOrgItems, selectOrganizationItem } from "@/utils/organization-intelligence"
 
 type OrganizationIntelligenceContextValue = OrgIntelligenceContextState & {
@@ -66,7 +65,6 @@ export function OrganizationIntelligenceProvider({ children }: { children: React
   const integrations = useIntegrationContext()
   const { addEntry } = useMemoryContext()
   const { addActivity } = useActivityFeedContext()
-  const { notify } = useNotificationContext()
 
   const [organizations] = useState(defaults.organizations)
   const [businessUnits] = useState(defaults.businessUnits)
@@ -150,19 +148,6 @@ export function OrganizationIntelligenceProvider({ children }: { children: React
 
     addActivity(createOrgActivity(`${selectedDepartment.label} selected`, selectedDepartment.summary, selectedDepartment.id))
 
-    const notification: NotificationCreateInput = {
-      title: `${selectedDepartment.label} department inspected`,
-      description: selectedDepartment.summary,
-      level: "INFO",
-      category: "AI",
-      priority: "MEDIUM",
-      source: "Organization Intelligence",
-      toast: true,
-      autoDismissMs: 3200,
-    }
-
-    notify(notification)
-
     setTimeline((previous) => [
       {
         id: `timeline-${selectedDepartment.id}-${Date.now()}`,
@@ -173,7 +158,7 @@ export function OrganizationIntelligenceProvider({ children }: { children: React
       },
       ...previous,
     ].slice(0, 24))
-  }, [addActivity, addEntry, notify, selectedDepartment])
+  }, [addActivity, addEntry, selectedDepartment])
 
   const updateQuery = useCallback((nextQuery: string) => {
     setQuery(nextQuery)

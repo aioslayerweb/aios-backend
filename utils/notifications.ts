@@ -1,21 +1,43 @@
 import type {
   NotificationCategory,
+  NotificationExecutiveSummary,
+  NotificationFilterPreset,
   NotificationFilters,
   NotificationHistoryGroups,
   NotificationItem,
   NotificationLevel,
+  NotificationPriorityGroups,
   NotificationPriority,
   NotificationTone,
 } from "@/types"
 
 export const notificationCategories: NotificationCategory[] = [
+  "AI_DECISION",
+  "WORKFLOW",
+  "INTEGRATION",
+  "AGENT",
+  "SECURITY",
+  "MEMORY",
+  "KNOWLEDGE",
+  "PLANNING",
+  "EXECUTIVE",
+  "CUSTOMER",
+  "FINANCE",
+  "SALES",
   "SYSTEM",
   "AI",
-  "MEMORY",
-  "AGENT",
   "CRM",
   "REPORT",
-  "INTEGRATION",
+]
+
+export const notificationFilterPresets: NotificationFilterPreset[] = [
+  "all",
+  "critical",
+  "unread",
+  "assigned",
+  "today",
+  "week",
+  "ai-decisions",
 ]
 
 export const notificationPriorities: NotificationPriority[] = [
@@ -30,6 +52,13 @@ const priorityScore: Record<NotificationPriority, number> = {
   MEDIUM: 2,
   HIGH: 3,
   CRITICAL: 4,
+}
+
+export const priorityColorClass: Record<NotificationPriority, string> = {
+  CRITICAL: "text-red-600",
+  HIGH: "text-orange-600",
+  MEDIUM: "text-blue-600",
+  LOW: "text-slate-500",
 }
 
 const toneToLevelMap: Record<NotificationTone, NotificationLevel> = {
@@ -90,7 +119,15 @@ export function filterNotifications(
   items: NotificationItem[],
   filters: NotificationFilters
 ): NotificationItem[] {
+  const now = Date.now()
+  const oneDayMs = 24 * 60 * 60 * 1000
+  const oneWeekMs = 7 * oneDayMs
+
   return items.filter((item) => {
+    if (item.archived) {
+      return false
+    }
+
     if (!matchesQuery(item, filters.query)) {
       return false
     }
@@ -107,8 +144,95 @@ export function filterNotifications(
       return false
     }
 
+    if (filters.preset === "critical" && item.priority !== "CRITICAL") {
+      return false
+    }
+
+    if (filters.preset === "unread" && item.read) {
+      return false
+    }
+
+    if (filters.preset === "assigned" && !item.assignedToMe) {
+      return false
+    }
+
+    if (filters.preset === "today" && now - item.createdAt > oneDayMs) {
+      return false
+    }
+
+    if (filters.preset === "week" && now - item.createdAt > oneWeekMs) {
+      return false
+    }
+
+    if (filters.preset === "ai-decisions" && item.category !== "AI_DECISION") {
+      return false
+    }
+
     return true
   })
+}
+
+export function groupByPriority(items: NotificationItem[]): NotificationPriorityGroups {
+  return items.reduce<NotificationPriorityGroups>(
+    (accumulator, item) => {
+      accumulator[item.priority].push(item)
+      return accumulator
+    },
+    {
+      CRITICAL: [],
+      HIGH: [],
+      MEDIUM: [],
+      LOW: [],
+    }
+  )
+}
+
+export function autoExpireMs(priority: NotificationPriority): number | null {
+  if (priority === "LOW") {
+    return 20_000
+  }
+
+  if (priority === "MEDIUM") {
+    return 60_000
+  }
+
+  return null
+}
+
+export function buildExecutiveSummary(items: NotificationItem[]): NotificationExecutiveSummary {
+  return items.reduce<NotificationExecutiveSummary>(
+    (accumulator, item) => {
+      if (item.priority === "CRITICAL" && item.category === "AI_DECISION") {
+        accumulator.criticalDecisions += 1
+      }
+
+      if (
+        item.category === "WORKFLOW" &&
+        (item.title.toLowerCase().includes("completed") || item.title.toLowerCase().includes("completion"))
+      ) {
+        accumulator.workflowsCompleted += 1
+      }
+
+      if (
+        item.category === "INTEGRATION" &&
+        (item.title.toLowerCase().includes("failed") || item.title.toLowerCase().includes("lost"))
+      ) {
+        accumulator.integrationFailures += 1
+      }
+
+      if (item.title.toLowerCase().includes("opportunit")) {
+        accumulator.newOpportunities += 1
+      }
+
+      return accumulator
+    },
+    {
+      criticalDecisions: 0,
+      workflowsCompleted: 0,
+      integrationFailures: 0,
+      newOpportunities: 0,
+    }
+  )
 }
 
 function isSameDate(left: Date, right: Date): boolean {

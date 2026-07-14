@@ -7,7 +7,6 @@ import { useGovernanceContext } from "@/contexts/governance-context"
 import { useIntegrationContext } from "@/contexts/integration-context"
 import { useKnowledgeGraphContext } from "@/contexts/knowledge-graph-context"
 import { useMemoryContext } from "@/contexts/memory-context"
-import { useNotificationContext } from "@/contexts/notification-context"
 import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useWorkflowBuilderContext } from "@/contexts/workflow-builder-context"
 import type {
@@ -37,7 +36,6 @@ export function ExecutiveReportsProvider({ children }: { children: ReactNode }) 
   const runtimeLive = useRuntimeLiveContext()
   const workflowBuilder = useWorkflowBuilderContext()
   const { addEntry } = useMemoryContext()
-  const { notify } = useNotificationContext()
 
   const [overview, setOverview] = useState(defaults.overview)
   const [strategicKPIs, setStrategicKPIs] = useState(defaults.strategicKPIs)
@@ -188,16 +186,7 @@ export function ExecutiveReportsProvider({ children }: { children: ReactNode }) 
       summary: `Board report template inspected: ${selectedReport.name}`,
       createdAt: Date.now(),
     })
-    notify({
-      title: "Board report ready",
-      description: `${selectedReport.name} architecture is available for review.`,
-      category: "AI",
-      priority: "LOW",
-      level: "INFO",
-      toast: true,
-      autoDismissMs: 2000,
-    })
-  }, [addEntry, notify, selectedReport?.id])
+  }, [addEntry, selectedReport?.id])
 
   const value = useMemo<ExecutiveReportsContextValue>(
     () => ({

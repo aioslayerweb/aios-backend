@@ -5,8 +5,10 @@ import { useBreakpoint, useNotificationCenter } from "@/hooks"
 import { NotificationToast } from "./notification-toast"
 
 export function NotificationToastHost() {
-  const { isMobile } = useBreakpoint()
-  const { toasts, dismissToast, pauseToast, resumeToast } = useNotificationCenter()
+  const { isMobile, isTablet } = useBreakpoint()
+  const { dismissToast, getVisibleToasts, pauseToast, resumeToast } = useNotificationCenter()
+  const maxVisible = isMobile ? 1 : isTablet ? 2 : 3
+  const toasts = getVisibleToasts(maxVisible)
 
   if (toasts.length === 0) {
     return null

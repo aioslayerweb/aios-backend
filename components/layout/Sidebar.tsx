@@ -13,11 +13,11 @@ import {
 import { BrandLogo, brandIcons } from "@/components/branding";
 
 const navItems = [
-  { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Insights", href: "/insights", icon: Lightbulb },
-  { label: "AI Agents", href: "/agents", icon: Bot },
-  { label: "Activity Log", href: "/activity", icon: Activity },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Dashboard", href: "/app", icon: LayoutDashboard },
+  { label: "Executive Center", href: "/app/executive", icon: Lightbulb },
+  { label: "Agent Studio", href: "/app/agents", icon: Bot },
+  { label: "Activity", href: "/app/activity", icon: Activity },
+  { label: "Settings", href: "/app/settings", icon: Settings },
 ];
 
 export default function Sidebar() {

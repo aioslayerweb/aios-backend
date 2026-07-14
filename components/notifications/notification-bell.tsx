@@ -5,10 +5,11 @@ import { NotificationBadge } from "./notification-badge"
 type NotificationBellProps = {
   unreadCount: number
   onClick: () => void
+  open?: boolean
   className?: string
 }
 
-export function NotificationBell({ unreadCount, onClick, className }: NotificationBellProps) {
+export function NotificationBell({ unreadCount, onClick, open = false, className }: NotificationBellProps) {
   return (
     <button
       type="button"
@@ -19,6 +20,8 @@ export function NotificationBell({ unreadCount, onClick, className }: Notificati
       )}
       aria-label="Open notification center"
       aria-haspopup="dialog"
+      aria-expanded={open}
+      aria-controls="aios-notification-drawer"
     >
       <Bell className="h-4 w-4" />
       <NotificationBadge count={unreadCount} className="absolute -right-1 -top-1" />

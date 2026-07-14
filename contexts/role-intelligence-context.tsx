@@ -16,12 +16,11 @@ import { useExecutiveReportsContext } from "@/contexts/executive-reports-context
 import { useGovernanceContext } from "@/contexts/governance-context"
 import { useKnowledgeGraphContext } from "@/contexts/knowledge-graph-context"
 import { useMemoryContext } from "@/contexts/memory-context"
-import { useNotificationContext } from "@/contexts/notification-context"
 import { usePlanningEngineContext } from "@/contexts/planning-engine-context"
 import { usePromptOSContext } from "@/contexts/prompt-os-context"
 import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useWorkflowBuilderContext } from "@/contexts/workflow-builder-context"
-import type { ActivityItem, NotificationCreateInput, RoleContextState, RoleId, RoleProfile, RoleSnapshot } from "@/types"
+import type { ActivityItem, RoleContextState, RoleId, RoleProfile, RoleSnapshot } from "@/types"
 import { buildRoleDashboard, createRoleIntelligenceDefaults, roleOrder, roleProfiles } from "@/utils/role-intelligence"
 
 type RoleIntelligenceContextValue = RoleContextState & {
@@ -74,7 +73,6 @@ export function RoleIntelligenceProvider({ children }: { children: ReactNode }) 
   const prompt = usePromptOSContext()
   const { addEntry } = useMemoryContext()
   const { addActivity } = useActivityFeedContext()
-  const { notify } = useNotificationContext()
 
   const [currentRoleId, setCurrentRoleIdState] = useState<RoleId>(defaults.currentRoleId)
   const [previewRoleId, setPreviewRoleIdState] = useState<RoleId | null>(defaults.previewRoleId)
@@ -127,19 +125,7 @@ export function RoleIntelligenceProvider({ children }: { children: ReactNode }) 
 
     addActivity(createRoleActivity(effectiveRole))
 
-    const notification: NotificationCreateInput = {
-      title: `${effectiveRole.label} intelligence active`,
-      description: `AIOS now prioritizes ${effectiveRole.currentPriorities[0] ?? "the current role context"}.`,
-      level: "INFO",
-      category: "AI",
-      priority: "MEDIUM",
-      source: "Role Intelligence",
-      toast: true,
-      autoDismissMs: 3600,
-    }
-
-    notify(notification)
-  }, [addActivity, addEntry, effectiveRole, notify])
+  }, [addActivity, addEntry, effectiveRole])
 
   useEffect(() => {
     if (!simulationEnabled) {

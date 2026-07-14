@@ -26,7 +26,7 @@ export function NotificationToast({
       initial={{ opacity: 0, y: 16, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.98 }}
-      transition={{ duration: 0.2 }}
+      transition={{ type: "spring", stiffness: 290, damping: 28, mass: 0.82 }}
       onMouseEnter={() => onPause(item.id)}
       onMouseLeave={() => onResume(item.id)}
       className="pointer-events-auto rounded-lg border border-border bg-surface-canvas p-3 shadow-lg"
@@ -42,6 +42,9 @@ export function NotificationToast({
           {item.description ? <p className="text-xs text-text-secondary">{item.description}</p> : null}
           <p className="text-[11px] text-text-muted">
             {item.category} · {item.priority}
+          </p>
+          <p className="text-[11px] text-text-muted">
+            Impact {item.impact}% · Confidence {item.confidence}%
           </p>
         </div>
 

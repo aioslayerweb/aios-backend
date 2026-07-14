@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from "react"
 import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
-import { useNotificationContext } from "@/contexts/notification-context"
 import { useRuntimeContext } from "@/contexts/runtime-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
 import { loadRuntimeLiveSnapshot } from "@/lib/runtime"
@@ -58,7 +57,6 @@ function toExecutionStatus(status: ExecutionQueueItem["status"]): "queued" | "ru
 export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
   const runtime = useRuntimeContext()
   const runtimeStatus = useRuntimeStatusContext()
-  const { notify } = useNotificationContext()
   const {
     setAgentStatuses,
     setExecutionTimeline,
@@ -158,17 +156,6 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
           description: snapshot.source === "fallback" ? "Backend data is unavailable; using fallback state." : "Backend runtime data is connected.",
         })
 
-        if (snapshot.events[0]?.priority === "critical") {
-          notify({
-            title: snapshot.events[0].title,
-            description: snapshot.events[0].summary,
-            category: "SYSTEM",
-            priority: "HIGH",
-            level: "WARNING",
-            toast: true,
-            autoDismissMs: 6000,
-          })
-        }
       } catch {
         if (!active) {
           return
@@ -185,7 +172,7 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
       active = false
       window.clearInterval(timer)
     }
-  }, [notify, runtime, runtimeStatus, setAgentStatuses, setExecutionTimeline, setMemoryEntries])
+  }, [runtime, runtimeStatus, setAgentStatuses, setExecutionTimeline, setMemoryEntries])
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length
   const pendingTasks = executions.filter((item) => item.status === "queued" || item.status === "waiting" || item.status === "retrying").length

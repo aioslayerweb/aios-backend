@@ -142,7 +142,7 @@ export function CommandPalette() {
           break
         }
         setRuntimeExpanded(true)
-        router.push("/activity")
+        router.push("/app/activity")
         publishActivity(item.title, item.description, "executions")
         break
       case "memory":
@@ -160,7 +160,7 @@ export function CommandPalette() {
         publishActivity(item.title, item.description, "knowledge")
         break
       case "activity":
-        router.push("/activity")
+        router.push("/app/activity")
         publishActivity(item.title, item.description, "activity")
         break
       case "action":

@@ -1,5 +1,5 @@
 import type { NotificationCategory, NotificationFilters, NotificationPriority } from "@/types"
-import { notificationCategories, notificationPriorities } from "@/utils/notifications"
+import { notificationCategories, notificationFilterPresets, notificationPriorities } from "@/utils/notifications"
 import { cn } from "@/utils"
 
 type NotificationFilterProps = {
@@ -40,8 +40,32 @@ function Chip({
 }
 
 export function NotificationFilter({ filters, onChange, onReset }: NotificationFilterProps) {
+  const presetLabels: Record<(typeof notificationFilterPresets)[number], string> = {
+    all: "All",
+    critical: "Critical",
+    unread: "Unread",
+    assigned: "Assigned to me",
+    today: "Today",
+    week: "This week",
+    "ai-decisions": "AI Decisions",
+  }
+
   return (
     <div className="space-y-3 rounded-lg border border-border bg-surface-canvas p-3">
+      <div className="space-y-2">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">Quick Filters</p>
+        <div className="flex flex-wrap gap-1">
+          {notificationFilterPresets.map((preset) => (
+            <Chip
+              key={preset}
+              label={presetLabels[preset]}
+              active={filters.preset === preset}
+              onClick={() => onChange({ preset })}
+            />
+          ))}
+        </div>
+      </div>
+
       <div className="flex items-center gap-2">
         <input
           value={filters.query}

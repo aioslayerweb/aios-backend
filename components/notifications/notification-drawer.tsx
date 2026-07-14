@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { X } from "lucide-react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { drawerVariants } from "@/theme"
+import { useBreakpoint } from "@/hooks"
 import { Button } from "@/components/ui"
 import { NotificationCenterPanel } from "./notification-center-panel"
 
@@ -26,6 +27,7 @@ function focusableElements(container: HTMLElement | null): HTMLElement[] {
 
 export function NotificationDrawer({ open, onClose }: NotificationDrawerProps) {
   const reduceMotion = useReducedMotion()
+  const { isDesktop } = useBreakpoint()
   const panelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -71,6 +73,36 @@ export function NotificationDrawer({ open, onClose }: NotificationDrawerProps) {
     return () => window.removeEventListener("keydown", onKeyDown)
   }, [onClose, open])
 
+  if (isDesktop) {
+    return (
+      <AnimatePresence>
+        {open ? (
+          <motion.aside
+            variants={reduceMotion ? undefined : drawerVariants}
+            initial={reduceMotion ? false : "initial"}
+            animate={reduceMotion ? undefined : "animate"}
+            exit={reduceMotion ? undefined : "exit"}
+            transition={reduceMotion ? undefined : { type: "spring", stiffness: 280, damping: 30, mass: 0.8 }}
+            className="fixed inset-y-0 right-0 z-[var(--z-drawer)] flex h-full w-full max-w-[360px] flex-col border-l border-border bg-surface-canvas shadow-lg"
+            aria-label="Notification center drawer"
+            role="dialog"
+            aria-modal="false"
+            id="aios-notification-drawer"
+            ref={panelRef}
+          >
+            <div className="flex items-center justify-end border-b border-border px-3 py-2">
+              <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close notification center">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <NotificationCenterPanel />
+          </motion.aside>
+        ) : null}
+      </AnimatePresence>
+    )
+  }
+
   return (
     <AnimatePresence>
       {open ? (
@@ -80,11 +112,13 @@ export function NotificationDrawer({ open, onClose }: NotificationDrawerProps) {
             initial={reduceMotion ? false : "initial"}
             animate={reduceMotion ? undefined : "animate"}
             exit={reduceMotion ? undefined : "exit"}
-            className="ml-auto flex h-full w-full max-w-[100vw] flex-col border-l border-border bg-surface-canvas shadow-lg sm:max-w-xl"
+            transition={reduceMotion ? undefined : { type: "spring", stiffness: 280, damping: 30, mass: 0.8 }}
+            className="ml-auto flex h-full w-full max-w-[100vw] flex-col border-l border-border bg-surface-canvas shadow-lg sm:max-w-[360px]"
             onClick={(event) => event.stopPropagation()}
             aria-label="Notification center drawer"
             role="dialog"
             aria-modal="true"
+            id="aios-notification-drawer"
             ref={panelRef}
           >
             <div className="flex items-center justify-end border-b border-border px-3 py-2">

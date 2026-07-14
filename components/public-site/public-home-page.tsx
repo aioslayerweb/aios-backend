@@ -19,7 +19,8 @@ import {
   Workflow,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { BrandLogo } from "@/components/branding";
+import { PublicSiteFooter } from "@/components/public-site/public-site-footer";
+import { PublicSiteNav } from "@/components/public-site/public-site-nav";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28, filter: "blur(8px)" },
@@ -122,16 +123,6 @@ const operators = [
 
 const architecture = ["Data", "Memory", "Intelligence", "Decision Engine", "Agents", "Workflows", "Business Outcomes"];
 
-const navItems = [
-  { label: "Platform", href: "#platform" },
-  { label: "Architecture", href: "#architecture" },
-  { label: "Modules", href: "#modules" },
-  { label: "Products", href: "/products" },
-  { label: "Resources", href: "/legal" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
-];
-
 function MagneticButton({ href, children, primary = false }: { href: string; children: React.ReactNode; primary?: boolean }) {
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
@@ -163,36 +154,6 @@ function MagneticButton({ href, children, primary = false }: { href: string; chi
         {children}
       </Link>
     </motion.div>
-  );
-}
-
-function TopNav() {
-  return (
-    <header className="sticky top-0 z-header border-b border-[#E6ECF7]/80 bg-white/85 backdrop-blur-xl">
-      <nav className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-6 lg:px-10" aria-label="Top navigation">
-        <Link href="/" className="flex items-center" aria-label="AIOS home">
-          <BrandLogo width={144} height={34} priority />
-        </Link>
-
-        <div className="hidden items-center gap-6 lg:flex">
-          {navItems.map((item) => (
-            <Link key={item.label} href={item.href} className="text-sm font-medium text-[#2D3A68] transition hover:text-[#1976FF]">
-              {item.label}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link href="/app" className="hidden rounded-full border border-[#D7DEED] px-4 py-2 text-sm font-semibold text-[#07133D] transition hover:border-[#1976FF]/40 md:inline-flex">
-            Login
-          </Link>
-          <Link href="/contact" className="inline-flex items-center gap-2 rounded-full bg-[#07133D] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#0B1D56]">
-            Book Demo
-            <ArrowRight size={15} />
-          </Link>
-        </div>
-      </nav>
-    </header>
   );
 }
 
@@ -605,7 +566,7 @@ export function PublicHomePage() {
         ))}
       </div>
 
-      <TopNav />
+      <PublicSiteNav />
 
       <main>
         <section className="relative px-6 pb-14 pt-20 lg:px-10 lg:pt-24">
@@ -654,24 +615,7 @@ export function PublicHomePage() {
         </div>
       </main>
 
-      <footer className="border-t border-[#E3EAF8] bg-white px-6 py-10 lg:px-10">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <BrandLogo width={118} height={28} />
-            <span className="text-sm text-[#5D6C95]">Operating system for autonomous businesses</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-4 text-sm font-medium text-[#4A5A88]">
-            <Link href="/about" className="transition hover:text-[#1976FF]">About</Link>
-            <Link href="/products" className="transition hover:text-[#1976FF]">Products</Link>
-            <Link href="/contact" className="transition hover:text-[#1976FF]">Contact</Link>
-            <Link href="/legal" className="transition hover:text-[#1976FF]">Legal</Link>
-            <Link href="/app" className="inline-flex items-center gap-1 font-semibold text-[#1976FF]">
-              Launch AIOS
-              <Sparkles size={14} />
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <PublicSiteFooter />
     </div>
   );
 }

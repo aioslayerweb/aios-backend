@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react"
 
 export type MemoryEntry = {
   id: string
@@ -19,14 +19,17 @@ const MemoryContext = createContext<MemoryContextValue | null>(null)
 
 export function MemoryProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<MemoryEntry[]>([])
+  const addEntry = useCallback((entry: MemoryEntry) => {
+    setEntries((prev) => [entry, ...prev])
+  }, [])
 
   const value = useMemo(
     () => ({
       entries,
       setEntries,
-      addEntry: (entry: MemoryEntry) => setEntries((prev) => [entry, ...prev]),
+      addEntry,
     }),
-    [entries]
+    [addEntry, entries]
   )
 
   return <MemoryContext.Provider value={value}>{children}</MemoryContext.Provider>

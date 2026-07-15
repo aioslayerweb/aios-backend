@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react"
 import { useSecurityContext } from "@/contexts/security-context"
 import type { TenantProfile } from "@/types/security-foundation"
 import { createTenantProfile } from "@/utils/security-foundation"
@@ -17,11 +17,6 @@ export function TenantProvider({ children }: { children: ReactNode }) {
   const security = useSecurityContext()
   const [selectedTenantId, setSelectedTenantId] = useState(security.selectedOrganizationId)
   const [settings, setSettings] = useState(() => createTenantProfile(security).settings)
-
-  useEffect(() => {
-    setSelectedTenantId(security.selectedOrganizationId)
-    setSettings(createTenantProfile(security).settings)
-  }, [security])
 
   const tenant = useMemo(() => createTenantProfile({ ...security, selectedOrganizationId: selectedTenantId }), [security, selectedTenantId])
 

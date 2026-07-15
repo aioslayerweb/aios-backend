@@ -55,8 +55,8 @@ function toExecutionStatus(status: ExecutionQueueItem["status"]): "queued" | "ru
 }
 
 export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
-  const runtime = useRuntimeContext()
-  const runtimeStatus = useRuntimeStatusContext()
+  const { setAiStatus, setMemoryStatus, setConnectionStatus } = useRuntimeContext()
+  const { setWebsocketState, setConnectionState, updateModuleStatus } = useRuntimeStatusContext()
   const {
     setAgentStatuses,
     setExecutionTimeline,
@@ -121,36 +121,36 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
           return [...next, ...previous].slice(0, 12)
         })
 
-        runtime.setAiStatus(snapshot.runningAgents > 0 ? "running" : "idle")
-        runtime.setMemoryStatus(snapshot.memoryUpdates.length > 0 ? "syncing" : "synced")
-        runtime.setConnectionStatus(snapshot.source === "fallback" ? "disconnected" : "connected")
+        setAiStatus(snapshot.runningAgents > 0 ? "running" : "idle")
+        setMemoryStatus(snapshot.memoryUpdates.length > 0 ? "syncing" : "synced")
+        setConnectionStatus(snapshot.source === "fallback" ? "disconnected" : "connected")
 
-        runtimeStatus.setWebsocketState({
+        setWebsocketState({
           mode: snapshot.source === "fallback" ? "connecting" : "connected",
           enabled: snapshot.source !== "fallback",
         })
-        runtimeStatus.setConnectionState(snapshot.source === "fallback" ? "reconnecting" : "connected")
-        runtimeStatus.updateModuleStatus("ai-runtime", {
+        setConnectionState(snapshot.source === "fallback" ? "reconnecting" : "connected")
+        updateModuleStatus("ai-runtime", {
           status: snapshot.runningAgents > 0 ? "active" : "healthy",
           label: `${snapshot.runningAgents} running`,
           description: snapshot.events[0]?.summary ?? "Live runtime snapshot synced from backend.",
         })
-        runtimeStatus.updateModuleStatus("agents", {
+        updateModuleStatus("agents", {
           status: snapshot.runningAgents > 0 ? "active" : "healthy",
           label: `${snapshot.runningAgents} Active`,
           description: "Agent runtime state is synced from backend data.",
         })
-        runtimeStatus.updateModuleStatus("memory", {
+        updateModuleStatus("memory", {
           status: snapshot.memoryUpdates.length > 0 ? "synchronizing" : "healthy",
           label: `${snapshot.memoryUpdates.length} updates`,
           description: "Live memory stream and replay data are synchronized.",
         })
-        runtimeStatus.updateModuleStatus("automation", {
+        updateModuleStatus("automation", {
           status: snapshot.queueDepth > 0 ? "active" : "healthy",
           label: `${snapshot.businessMetrics.workflowCount} workflows`,
           description: "Workflow state now reflects backend runtime signals.",
         })
-        runtimeStatus.updateModuleStatus("supabase", {
+        updateModuleStatus("supabase", {
           status: snapshot.source === "fallback" ? "degraded" : "healthy",
           label: snapshot.source === "fallback" ? "Fallback" : "Connected",
           description: snapshot.source === "fallback" ? "Backend data is unavailable; using fallback state." : "Backend runtime data is connected.",
@@ -172,7 +172,17 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
       active = false
       window.clearInterval(timer)
     }
-  }, [runtime, runtimeStatus, setAgentStatuses, setExecutionTimeline, setMemoryEntries])
+  }, [
+    setAgentStatuses,
+    setExecutionTimeline,
+    setMemoryEntries,
+    setAiStatus,
+    setMemoryStatus,
+    setConnectionStatus,
+    setWebsocketState,
+    setConnectionState,
+    updateModuleStatus,
+  ])
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length
   const pendingTasks = executions.filter((item) => item.status === "queued" || item.status === "waiting" || item.status === "retrying").length

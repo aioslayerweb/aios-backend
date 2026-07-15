@@ -100,7 +100,26 @@ export function ExecutiveReportsProvider({ children }: { children: ReactNode }) 
             : item
       )
     )
-  }, [decisionEngine.selectedConfidence, executive.businessScore, executive.health, integrations.connectedSystems.length, integrations.healthSummary.length, knowledgeGraph.visibleEdges.length, knowledgeGraph.visibleNodes.length, runtimeLive.events.length, runtimeLive.memoryUpdates.length, runtimeLive.pendingTasks, runtimeLive.queueDepth, runtimeLive.runningAgents, workflowBuilder.execution.running, workflowBuilder.execution.steps.length, workflowBuilder.selectedWorkflow, defaults.operationalSummary.workflows])
+  }, [
+    decisionEngine.selectedConfidence?.score,
+    decisionEngine.selectedConfidence?.level,
+    executive.businessScore,
+    executive.health[0]?.delta,
+    executive.health[0]?.trend,
+    integrations.connectedSystems.length,
+    integrations.healthSummary.length,
+    knowledgeGraph.visibleEdges.length,
+    knowledgeGraph.visibleNodes.length,
+    runtimeLive.events.length,
+    runtimeLive.memoryUpdates.length,
+    runtimeLive.pendingTasks,
+    runtimeLive.queueDepth,
+    runtimeLive.runningAgents,
+    workflowBuilder.execution.running,
+    workflowBuilder.execution.steps.length,
+    workflowBuilder.selectedWorkflow?.name,
+    defaults.operationalSummary.workflows,
+  ])
 
   useEffect(() => {
     const decision = decisionEngine.selectedDecision
@@ -132,7 +151,7 @@ export function ExecutiveReportsProvider({ children }: { children: ReactNode }) 
       },
       ...previous,
     ].slice(0, 12))
-  }, [decisionEngine.selectedActions, decisionEngine.selectedDecision])
+  }, [decisionEngine.selectedActions[0]?.title, decisionEngine.selectedDecision?.id, decisionEngine.selectedDecision?.title, decisionEngine.selectedDecision?.summary, decisionEngine.selectedDecision?.businessImpact, decisionEngine.selectedDecision?.confidence, decisionEngine.selectedDecision?.riskLevel, decisionEngine.selectedDecision?.estimatedROI])
 
   useEffect(() => {
     if (!liveMode) {
@@ -166,7 +185,7 @@ export function ExecutiveReportsProvider({ children }: { children: ReactNode }) 
         return item
       })
     )
-  }, [governance.selectedRisk, governance.summary.complianceAttention])
+  }, [governance.selectedRisk?.businessRisk, governance.selectedRisk?.trend, governance.summary.complianceAttention])
 
   useEffect(() => {
     setBoardReports((previous) => previous.map((report) => report.id === "report-quarterly" ? { ...report, status: governance.summary.explainabilityCoverage > 90 ? "ready" : "draft" } : report))

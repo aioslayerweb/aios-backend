@@ -554,7 +554,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const dismissToast = useCallback((id: string) => {
     setNotifications((prev) =>
       prev.map((item) =>
-        item.id === id && (item.priority !== "CRITICAL" || item.acknowledged)
+        item.id === id
           ? {
               ...item,
               toastDismissed: true,

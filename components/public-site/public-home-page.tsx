@@ -22,7 +22,6 @@ import {
   PublicFeatureGrid,
   PublicFooterCta,
   PublicHero,
-  PublicLogoMarquee,
   PublicOrbitVisual,
   PublicPageShell,
   PublicSection,
@@ -40,19 +39,6 @@ const ecosystemNodes = [
   { title: "Agent Studio", x: "62%", y: "77%" },
   { title: "Developer Center", x: "42%", y: "8%" },
   { title: "Runtime Center", x: "44%", y: "90%" },
-]
-
-const trustedLogos = [
-  "NOVA Systems",
-  "Northline",
-  "Aurelia",
-  "Vector Dynamics",
-  "Arcbridge",
-  "HelioWorks",
-  "Peak Grid",
-  "Quantive",
-  "Aster Core",
-  "Foundry One",
 ]
 
 const signalSources = ["CRM", "Email", "ERP", "Slack", "Teams", "Support", "Knowledge", "Finance", "HR"]
@@ -177,13 +163,6 @@ export function PublicHomePage() {
         ]}
         visual={<PublicOrbitVisual label="AIOS Core" title="Intelligence Layer" nodes={ecosystemNodes} />}
       />
-
-      <PublicSection tight>
-        <PublicContainer>
-          <p className="public-eyebrow mb-8 justify-center text-center">Trusted by modern businesses</p>
-          <PublicLogoMarquee items={trustedLogos} />
-        </PublicContainer>
-      </PublicSection>
 
       <PublicSection id="platform">
         <PublicContainer>

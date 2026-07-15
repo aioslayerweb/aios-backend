@@ -1,7 +1,7 @@
 "use client"
 
 import { type ReactNode } from "react"
-import { ThemeProvider } from "@/contexts/theme-context"
+import { AIOSThemeProvider } from "@/src/components/aios/providers"
 import { RuntimeProvider } from "@/contexts/runtime-context"
 import { AgentWorkspaceProvider } from "@/contexts/agent-workspace-context"
 import { MemoryProvider } from "@/contexts/memory-context"
@@ -37,7 +37,7 @@ import { InfrastructureProvider } from "@/contexts/infrastructure-context"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider>
+    <AIOSThemeProvider>
       <RuntimeProvider>
         <SupabaseProvider>
           <MemoryProvider>
@@ -101,6 +101,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
           </MemoryProvider>
         </SupabaseProvider>
       </RuntimeProvider>
-    </ThemeProvider>
+    </AIOSThemeProvider>
   )
 }

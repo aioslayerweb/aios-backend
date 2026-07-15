@@ -28,6 +28,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const next = mode === "system" ? resolveSystemMode() : mode
     setResolvedMode(next)
     document.documentElement.dataset.theme = next
+    document.documentElement.dataset.aiosTheme = next
+    document.documentElement.style.colorScheme = next
   }, [mode])
 
   const value = useMemo(
@@ -46,3 +48,5 @@ export function useThemeContext(): ThemeContextValue {
 
   return context
 }
+
+export const AIOSThemeProvider = ThemeProvider

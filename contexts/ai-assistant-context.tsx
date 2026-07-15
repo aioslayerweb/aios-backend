@@ -55,7 +55,7 @@ type AIAssistantContextValue = AIAssistantState & {
 const AIAssistantContext = createContext<AIAssistantContextValue | null>(null)
 
 export function AIAssistantProvider({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [width, setWidthState] = useState(AI_PANEL_DEFAULT_WIDTH)
   const [selectedTab, setSelectedTab] = useState<AIAssistantTab>("context")

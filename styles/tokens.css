@@ -1,10 +1,73 @@
 :root {
-  --color-brand-primary: #1C82F2;
-  --color-brand-primary-hover: #176EEA;
-  --color-brand-primary-active: #125CC7;
-  --color-brand-navy: #02154A;
-  --color-brand-soft: #4DA1FB;
-  --color-brand-subtle: #EAF4FF;
+  --aios-platform-color-brand-primary: #1C82F2;
+  --aios-platform-color-brand-primary-hover: #176EEA;
+  --aios-platform-color-brand-primary-active: #125CC7;
+  --aios-platform-color-brand-navy: #02154A;
+  --aios-platform-color-brand-soft: #4DA1FB;
+  --aios-platform-color-brand-subtle: #EAF4FF;
+
+  --aios-public-color-primary: #1976FF;
+  --aios-public-color-primary-hover: #0F68EE;
+  --aios-public-color-primary-active: #0A58D1;
+  --aios-public-color-navy: #07133D;
+  --aios-public-color-text: #1E2E5A;
+  --aios-public-color-text-muted: #5F6F97;
+  --aios-public-color-text-soft: #7E8FB7;
+  --aios-public-color-bg: #FFFFFF;
+  --aios-public-color-bg-secondary: #F7F9FC;
+  --aios-public-color-surface: rgba(255, 255, 255, 0.94);
+  --aios-public-color-surface-strong: #FFFFFF;
+  --aios-public-color-surface-glass: rgba(255, 255, 255, 0.72);
+  --aios-public-color-border: #DCE5F6;
+  --aios-public-color-border-strong: #C8D6F1;
+  --aios-public-color-muted: #EAF2FF;
+  --aios-public-color-hover: #EDF4FF;
+  --aios-public-color-active: #DDEBFF;
+
+  --aios-semantic-success: #12A15A;
+  --aios-semantic-warning: #D38A17;
+  --aios-semantic-danger: #E25B52;
+  --aios-semantic-neutral: #8D9AB9;
+
+  --aios-platform-font-sans: "Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --aios-platform-font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  --aios-public-font-sans: Inter, "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
+
+  --aios-radius-sm: 8px;
+  --aios-radius-md: 12px;
+  --aios-radius-lg: 16px;
+  --aios-radius-xl: 24px;
+
+  --aios-shadow-sm: 0 1px 2px rgba(2, 21, 74, 0.06);
+  --aios-shadow-md: 0 6px 16px rgba(2, 21, 74, 0.08);
+  --aios-shadow-lg: 0 12px 32px rgba(2, 21, 74, 0.12);
+
+  --aios-space-1: 4px;
+  --aios-space-2: 8px;
+  --aios-space-3: 12px;
+  --aios-space-4: 16px;
+  --aios-space-5: 24px;
+  --aios-space-6: 32px;
+  --aios-space-7: 40px;
+  --aios-space-8: 48px;
+  --aios-space-9: 64px;
+  --aios-space-10: 80px;
+
+  --aios-z-base: 0;
+  --aios-z-header: 40;
+  --aios-z-sidebar: 45;
+  --aios-z-floating: 60;
+  --aios-z-notification: 70;
+  --aios-z-drawer: 80;
+  --aios-z-command: 90;
+  --aios-z-modal: 100;
+
+  --color-brand-primary: var(--aios-platform-color-brand-primary);
+  --color-brand-primary-hover: var(--aios-platform-color-brand-primary-hover);
+  --color-brand-primary-active: var(--aios-platform-color-brand-primary-active);
+  --color-brand-navy: var(--aios-platform-color-brand-navy);
+  --color-brand-soft: var(--aios-platform-color-brand-soft);
+  --color-brand-subtle: var(--aios-platform-color-brand-subtle);
 
   --color-semantic-success: #1F9D67;
   --color-semantic-success-soft: #EAF8F1;
@@ -33,37 +96,98 @@
   --color-text-muted: #6B7280;
   --color-text-inverse: #FFFFFF;
 
-  --font-sans: "Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: var(--aios-platform-font-sans);
+  --font-mono: var(--aios-platform-font-mono);
 
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-sm: var(--aios-radius-sm);
+  --radius-md: var(--aios-radius-md);
+  --radius-lg: var(--aios-radius-lg);
+  --radius-xl: var(--aios-radius-xl);
 
-  --shadow-sm: 0 1px 2px rgba(2, 21, 74, 0.06);
-  --shadow-md: 0 6px 16px rgba(2, 21, 74, 0.08);
-  --shadow-lg: 0 12px 32px rgba(2, 21, 74, 0.12);
+  --shadow-sm: var(--aios-shadow-sm);
+  --shadow-md: var(--aios-shadow-md);
+  --shadow-lg: var(--aios-shadow-lg);
 
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 40px;
-  --space-8: 48px;
-  --space-9: 64px;
-  --space-10: 80px;
+  --space-1: var(--aios-space-1);
+  --space-2: var(--aios-space-2);
+  --space-3: var(--aios-space-3);
+  --space-4: var(--aios-space-4);
+  --space-5: var(--aios-space-5);
+  --space-6: var(--aios-space-6);
+  --space-7: var(--aios-space-7);
+  --space-8: var(--aios-space-8);
+  --space-9: var(--aios-space-9);
+  --space-10: var(--aios-space-10);
 
-  --z-base: 0;
-  --z-header: 40;
-  --z-sidebar: 45;
-  --z-floating: 60;
-  --z-notification: 70;
-  --z-drawer: 80;
-  --z-command: 90;
-  --z-modal: 100;
+  --z-base: var(--aios-z-base);
+  --z-header: var(--aios-z-header);
+  --z-sidebar: var(--aios-z-sidebar);
+  --z-floating: var(--aios-z-floating);
+  --z-notification: var(--aios-z-notification);
+  --z-drawer: var(--aios-z-drawer);
+  --z-command: var(--aios-z-command);
+  --z-modal: var(--aios-z-modal);
+
+  --public-font-sans: var(--aios-public-font-sans);
+
+  --public-color-primary: var(--aios-public-color-primary);
+  --public-color-primary-hover: var(--aios-public-color-primary-hover);
+  --public-color-primary-active: var(--aios-public-color-primary-active);
+  --public-color-navy: var(--aios-public-color-navy);
+  --public-color-text: var(--aios-public-color-text);
+  --public-color-text-muted: var(--aios-public-color-text-muted);
+  --public-color-text-soft: var(--aios-public-color-text-soft);
+  --public-color-bg: var(--aios-public-color-bg);
+  --public-color-bg-secondary: var(--aios-public-color-bg-secondary);
+  --public-color-surface: var(--aios-public-color-surface);
+  --public-color-surface-strong: var(--aios-public-color-surface-strong);
+  --public-color-surface-glass: var(--aios-public-color-surface-glass);
+  --public-color-border: var(--aios-public-color-border);
+  --public-color-border-strong: var(--aios-public-color-border-strong);
+  --public-color-muted: var(--aios-public-color-muted);
+  --public-color-hover: var(--aios-public-color-hover);
+  --public-color-active: var(--aios-public-color-active);
+  --public-color-success: var(--aios-semantic-success);
+  --public-color-warning: var(--aios-semantic-warning);
+  --public-color-danger: var(--aios-semantic-danger);
+  --public-color-neutral: var(--aios-semantic-neutral);
+
+  --public-shadow-soft: 0 18px 45px rgba(7, 19, 61, 0.06);
+  --public-shadow-card: 0 24px 70px rgba(7, 19, 61, 0.08);
+  --public-shadow-float: 0 32px 90px rgba(25, 118, 255, 0.14);
+  --public-shadow-glass: 0 22px 60px rgba(7, 19, 61, 0.07);
+
+  --public-radius-sm: 16px;
+  --public-radius-md: 22px;
+  --public-radius-lg: 30px;
+  --public-radius-xl: 40px;
+
+  --public-space-4: 4px;
+  --public-space-8: 8px;
+  --public-space-12: 12px;
+  --public-space-16: 16px;
+  --public-space-24: 24px;
+  --public-space-32: 32px;
+  --public-space-40: 40px;
+  --public-space-48: 48px;
+  --public-space-64: 64px;
+  --public-space-80: 80px;
+  --public-space-96: 96px;
+  --public-space-128: 128px;
+
+  --public-content-width: 1200px;
+  --public-content-width-lg: 1340px;
+
+  --public-type-display-xl: clamp(3.5rem, 6vw, 6.5rem);
+  --public-type-display-lg: clamp(3rem, 5vw, 5.25rem);
+  --public-type-h1: clamp(2.5rem, 4vw, 4.25rem);
+  --public-type-h2: clamp(2rem, 3vw, 3.25rem);
+  --public-type-h3: clamp(1.5rem, 2.2vw, 2.25rem);
+  --public-type-h4: clamp(1.25rem, 1.6vw, 1.5rem);
+  --public-type-body-lg: clamp(1.0625rem, 1.25vw, 1.25rem);
+  --public-type-body: 1rem;
+  --public-type-small: 0.9375rem;
+  --public-type-caption: 0.75rem;
 }
 
 :root[data-theme="dark"] {

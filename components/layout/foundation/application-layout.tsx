@@ -40,6 +40,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { AIOSCaption, AIOSH4, AIOSSmall } from "@/src/components/aios"
 import {
   useAIStatus,
   useAIAssistant,
@@ -166,8 +167,8 @@ function WorkspaceHeader() {
 
   return (
     <div className="border-b border-border bg-surface-canvas px-4 py-4 md:px-6 lg:px-8">
-      <p className="text-xs font-medium uppercase tracking-wide text-text-muted">Workspace</p>
-      <h1 className="mt-1 text-2xl font-semibold text-brand-navy">{title}</h1>
+      <AIOSCaption className="font-medium uppercase tracking-wide text-text-muted">Workspace</AIOSCaption>
+      <AIOSH4 className="mt-1 text-brand-navy">{title}</AIOSH4>
       <div className="mt-3">
         <Breadcrumb items={breadcrumbItems(pathname)} />
       </div>
@@ -221,8 +222,8 @@ function ShellTopBar() {
           ) : null}
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-brand-navy">AIOS Workspace</p>
-            <p className="truncate text-xs text-text-muted">{currentWorkspaceTitle}</p>
+            <AIOSSmall className="truncate font-semibold text-brand-navy">AIOS Workspace</AIOSSmall>
+            <AIOSCaption className="truncate text-text-muted">{currentWorkspaceTitle}</AIOSCaption>
             <div className="hidden lg:block">
               <Breadcrumb items={breadcrumbs} />
             </div>

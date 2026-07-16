@@ -23,6 +23,15 @@ import {
   PublicSectionHeader,
   PublicTabbedPanel,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicConversionRailSection,
+  PublicExecutiveRoleSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+} from "@/components/public-site/storytelling-sections"
 
 const modules = [
   {
@@ -107,9 +116,47 @@ const modules = [
   },
 ]
 
+const modulesProblemCards = [
+  { title: "Fragmented products", body: "Point tools force teams to switch systems and lose context." },
+  { title: "Inconsistent UX", body: "Different modules feel unrelated, slowing enterprise adoption." },
+  { title: "Duplicate logic", body: "Independent stacks repeat memory, governance, and execution code." },
+  { title: "Weak cross-module flow", body: "Outcomes in one module rarely improve another module's decisions." },
+]
+
+const modulesSolutionCards = [
+  { title: "One operating system", body: "Modules are specialized products on one shared intelligence core." },
+  { title: "Reusable design system", body: "Every module uses the same visual language and interaction patterns." },
+  { title: "Shared memory and runtime", body: "Context, policies, and workflows remain unified across modules." },
+  { title: "Compounding value", body: "Insights in one module strengthen the full enterprise system." },
+]
+
+const modulesHowItWorks = [
+  { label: "Phase 1", title: "Module context", body: "Each module captures role-specific business context and intent." },
+  { label: "Phase 2", title: "Shared intelligence", body: "Memory and reasoning layers synchronize across all modules." },
+  { label: "Phase 3", title: "Governed actions", body: "Decisions route through policy-aware execution contracts." },
+  { label: "Phase 4", title: "Cross-module learning", body: "Outcomes feed memory and improve recommendations system-wide." },
+]
+
+const modulesBenefits = [
+  { title: "Faster rollout", body: "New module adoption accelerates because language and controls are consistent." },
+  { title: "Lower cognitive load", body: "Teams navigate one operating model, not disconnected product silos." },
+  { title: "Higher reliability", body: "Shared runtime and governance reduce module drift and execution risk." },
+]
+
+const modulesOutcomes = [
+  { label: "Adoption velocity", value: "+35%", detail: "Teams onboard new modules faster with shared patterns." },
+  { label: "Context retention", value: "3.1x", detail: "Business context continuity across module boundaries." },
+  { label: "Execution consistency", value: "96%", detail: "Governed workflows remain stable across module surfaces." },
+]
+
 export default function ModulesPage() {
   return (
     <PublicPageShell activeHref="/modules">
+      <PublicStructuredData
+        name="AIOS Modules"
+        description="Explore AIOS modules as connected products inside one enterprise operating system with shared memory, governance, and runtime."
+        path="/modules"
+      />
       <PublicHero
         eyebrow="AIOS Modules"
         title="One operating surface, specialized intelligence modules"
@@ -129,6 +176,21 @@ export default function ModulesPage() {
           { label: "Shared runtime", value: "1", detail: "Execution, governance, and memory stay unified" },
           { label: "Role views", value: "Adaptive", detail: "Context changes without breaking consistency" },
         ]}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Most module ecosystems feel like disconnected products"
+        problemBody="They look consistent at first glance but diverge in data model, UX, and operational logic over time."
+        problemItems={modulesProblemCards}
+        solutionTitle="AIOS modules are products inside one operating system"
+        solutionBody="Executive Center, Knowledge Center, Memory Center, Workflow Builder, Organization, Developer, Security, and Runtime all share one core."
+        solutionItems={modulesSolutionCards}
+      />
+
+      <PublicHowItWorksSection
+        title="How AIOS modules stay connected"
+        body="AIOS modules are independent in function but unified in intelligence, memory, and execution behavior."
+        steps={modulesHowItWorks}
       />
 
       <PublicSection>
@@ -173,6 +235,19 @@ export default function ModulesPage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="Module-level benefits with system-level outcomes"
+        body="The more modules your organization activates, the stronger your business intelligence layer becomes."
+        benefits={modulesBenefits}
+        outcomes={modulesOutcomes}
+      />
+
+      <PublicExecutiveRoleSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Module Walkthrough"

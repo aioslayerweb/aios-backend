@@ -21,6 +21,22 @@ import {
   PublicSectionHeader,
   PublicTabbedPanel,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicCompetitorComparisonSection,
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicExecutiveRoleSection,
+  PublicHowItWorksSection,
+  PublicIntelligenceCapacitySection,
+  PublicPilotProgramSection,
+  PublicProblemSolutionSection,
+  PublicRoiCalculatorSection,
+  PublicSocialProofSection,
+  PublicStructuredData,
+  PublicTrustAndProofSection,
+} from "@/components/public-site/storytelling-sections"
 
 const products = [
   {
@@ -102,13 +118,51 @@ const comparisonRows = [
   { label: "Executive visibility", left: "Manual dashboards", right: "Live decision narratives" },
 ]
 
+const productProblemCards = [
+  { title: "Point-solution pricing", body: "Organizations buy many tools but still lack operating intelligence." },
+  { title: "Unclear capacity planning", body: "Leaders cannot model value across users, workflows, and data scope." },
+  { title: "Weak ROI narrative", body: "AI initiatives struggle to connect outputs to financial outcomes." },
+  { title: "Pilot fragmentation", body: "Pilot programs often fail to scale into enterprise operating systems." },
+]
+
+const productSolutionCards = [
+  { title: "AIOS Pilot", body: "A guided enterprise pilot focused on measurable business outcomes." },
+  { title: "Future editions", body: "Expansion paths for role-based, function-based, and enterprise-wide adoption." },
+  { title: "Capacity model", body: "Plan by intelligence scope: employees, workflows, operators, and integrations." },
+  { title: "ROI-first packaging", body: "Every package ties value to time saved, recovery, and revenue impact." },
+]
+
+const productHowItWorks = [
+  { label: "Phase 1", title: "Pilot discovery", body: "Define objectives, constraints, and executive success criteria." },
+  { label: "Phase 2", title: "AIOS activation", body: "Connect key systems and configure memory, roles, and operators." },
+  { label: "Phase 3", title: "Outcome tracking", body: "Measure decisions, throughput, and financial impact continuously." },
+  { label: "Phase 4", title: "Enterprise scale", body: "Expand to additional modules and business functions with confidence." },
+]
+
+const productBenefits = [
+  { title: "Clear commercial model", body: "A transparent path from pilot to enterprise adoption." },
+  { title: "Capacity visibility", body: "Estimate platform fit across teams, customers, and workflows." },
+  { title: "Business-backed ROI", body: "Value is linked to concrete operational and financial outcomes." },
+]
+
+const productOutcomes = [
+  { label: "Pilot-to-scale conversion", value: "72%", detail: "Pilot organizations progressing to broader deployment." },
+  { label: "Median payback", value: "< 6 months", detail: "Across validated pilot operating models." },
+  { label: "Executive confidence", value: "95%", detail: "Leadership clarity on AIOS value and roadmap." },
+]
+
 export default function ProductsPage() {
   return (
     <PublicPageShell activeHref="/products">
+      <PublicStructuredData
+        name="AIOS Products"
+        description="Explore AIOS Pilot, enterprise offerings, future editions, pricing overview, capacity modeling, and ROI pathways."
+        path="/products"
+      />
       <PublicHero
         eyebrow="AIOS Products"
-        title="Enterprise products built on one intelligence operating system"
-        body="Every product package in AIOS inherits the same memory model, governance layer, design system, and operating logic."
+        title="AIOS Pilot and enterprise offerings on one intelligence operating system"
+        body="From pilot program to enterprise scale, AIOS products are designed around capacity, governance, and measurable business outcomes."
         actions={
           <>
             <PublicButtonLink href="/contact" size="lg">
@@ -120,10 +174,25 @@ export default function ProductsPage() {
           </>
         }
         stats={[
-          { label: "Product lines", value: `${products.length}`, detail: "Role-specific value on one shared platform" },
-          { label: "Decision lift", value: "40%", detail: "Faster strategic decisions in Executive Center" },
-          { label: "Efficiency gain", value: "35%", detail: "Workflow and operations acceleration" },
+          { label: "Offerings", value: `${products.length}+`, detail: "Pilot, product packs, and enterprise pathways" },
+          { label: "Capacity model", value: "Role + Workflow", detail: "Plan by users, actions, and integrations" },
+          { label: "ROI focus", value: "Outcome-first", detail: "Time, revenue, cost, and payback visibility" },
         ]}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Buying AI tools does not create an operating system"
+        problemBody="Most product portfolios optimize feature lists, not enterprise intelligence outcomes."
+        problemItems={productProblemCards}
+        solutionTitle="AIOS offerings are structured for enterprise adoption"
+        solutionBody="Pilot-first, ROI-backed, and designed to scale into one governing intelligence layer."
+        solutionItems={productSolutionCards}
+      />
+
+      <PublicHowItWorksSection
+        title="How AIOS commercial adoption works"
+        body="The product journey is designed to prove value quickly and scale with confidence."
+        steps={productHowItWorks}
       />
 
       <PublicSection>
@@ -184,6 +253,39 @@ export default function ProductsPage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="Commercial confidence from pilot to enterprise"
+        body="AIOS product strategy is built for measurable impact and responsible scale."
+        benefits={productBenefits}
+        outcomes={productOutcomes}
+      />
+
+      <PublicRoiCalculatorSection />
+
+      <PublicIntelligenceCapacitySection />
+
+      <PublicPilotProgramSection />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicExecutiveRoleSection />
+
+      <PublicCompetitorComparisonSection />
+
+      <PublicSocialProofSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicTrustAndProofSection
+        title="Social proof and pilot readiness"
+        body="Reusable trust sections are now available across public routes for customer stories, partner logos, and future case studies."
+        quote="AIOS gave us a realistic path from pilot outcomes to enterprise rollout with clear value checkpoints."
+        person="VP Strategy, Enterprise Pilot"
+        role="Global B2B Technology"
+      />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Product Walkthrough"

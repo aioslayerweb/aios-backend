@@ -29,6 +29,19 @@ import {
   PublicTabbedPanel,
   PublicTimeline,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicCompetitorComparisonSection,
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicExecutiveRoleSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicRoiCalculatorSection,
+  PublicStructuredData,
+  PublicTrustAndProofSection,
+} from "@/components/public-site/storytelling-sections"
 
 const ecosystemNodes = [
   { title: "Executive Center", x: "14%", y: "20%" },
@@ -139,9 +152,47 @@ const timelineItems = memoryTimeline.map((title, index) => ({
         : "Context compounds as intelligence is interpreted, connected, and prepared for action.",
 }))
 
+const homeProblemCards = [
+  { title: "Fragmented visibility", body: "Critical signals live across CRM, ERP, support, and collaboration tools." },
+  { title: "Delayed decisions", body: "Leadership decisions depend on stale dashboards and manual synthesis." },
+  { title: "Shallow automation", body: "Rule triggers execute tasks without strategic understanding." },
+  { title: "Memory loss", body: "Teams repeat mistakes because context and outcomes are not retained." },
+]
+
+const homeSolutionCards = [
+  { title: "Business intelligence layer", body: "AIOS continuously interprets business state and prioritizes what matters now." },
+  { title: "Business memory", body: "Every signal, decision, and outcome compounds into reusable institutional memory." },
+  { title: "AI operators", body: "Specialized operators coordinate around shared context and governed execution." },
+  { title: "Executive support", body: "Leaders receive explainable recommendations with confidence and expected outcomes." },
+]
+
+const homeHowItWorks = [
+  { label: "Step 1", title: "Signal ingestion", body: "AIOS ingests events from business systems without disrupting existing workflows." },
+  { label: "Step 2", title: "Memory and knowledge", body: "Signals are grounded in persistent memory and linked knowledge context." },
+  { label: "Step 3", title: "Reasoning and decisions", body: "AI reasoning generates confidence-scored recommendations for each role." },
+  { label: "Step 4", title: "Governed execution", body: "Approved actions run through policy-aware workflows and operator runtime." },
+]
+
+const homeBenefitCards = [
+  { title: "Faster decisions", body: "Leadership teams move from reporting lag to live executive intelligence." },
+  { title: "Higher confidence", body: "Recommendations include evidence, rationale, and expected business impact." },
+  { title: "Safer automation", body: "Humans remain in control through policy gates, approvals, and traceability." },
+]
+
+const homeOutcomeStats = [
+  { label: "Decision latency", value: "-41%", detail: "Faster executive response to cross-functional changes." },
+  { label: "Opportunity recovery", value: "+19%", detail: "Earlier detection of revenue and retention risk." },
+  { label: "Workflow throughput", value: "+34%", detail: "Governed automation across priority operations." },
+]
+
 export function PublicHomePage() {
   return (
     <PublicPageShell activeHref="/">
+      <PublicStructuredData
+        name="AIOS Home"
+        description="AIOS is the AI Operating System for Businesses, connecting business intelligence, memory, operators, and governed automation."
+        path="/"
+      />
       <PublicHero
         eyebrow="AIOS Home"
         title="One intelligence layer. One business memory. One operating system."
@@ -162,6 +213,28 @@ export function PublicHomePage() {
           { label: "Operator confidence", value: "94%", detail: "Explainable recommendations with memory feedback" },
         ]}
         visual={<PublicOrbitVisual label="AIOS Core" title="Intelligence Layer" nodes={ecosystemNodes} />}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Most businesses run with disconnected intelligence"
+        problemBody="Teams have systems of record and automation tools, but no unified operating intelligence to interpret context and guide decisions."
+        problemItems={homeProblemCards}
+        solutionTitle="AIOS adds one operating layer above your stack"
+        solutionBody="AIOS connects people, systems, data, workflows, and AI into one explainable, enterprise-ready intelligence system."
+        solutionItems={homeSolutionCards}
+      />
+
+      <PublicHowItWorksSection
+        title="From business signals to measurable business outcomes"
+        body="AIOS follows a continuous loop that learns, improves, and keeps humans in control at every critical decision point."
+        steps={homeHowItWorks}
+      />
+
+      <PublicBenefitsOutcomesSection
+        title="Enterprise outcomes that compound over time"
+        body="As memory quality improves, recommendations become stronger and workflow execution becomes more reliable."
+        benefits={homeBenefitCards}
+        outcomes={homeOutcomeStats}
       />
 
       <PublicSection id="platform">
@@ -254,6 +327,26 @@ export function PublicHomePage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicRoiCalculatorSection />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicExecutiveRoleSection />
+
+      <PublicCompetitorComparisonSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicTrustAndProofSection
+        title="Built for enterprise confidence"
+        body="AIOS public experience mirrors product reality: governed automation, role-based clarity, and measurable business impact."
+        quote="AIOS changed how our executive team understands operations. We now act on live intelligence, not delayed reporting."
+        person="Head of Strategy, Pilot Customer"
+        role="Global Enterprise Pilot Program"
+      />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Ready To See AIOS"

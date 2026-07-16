@@ -26,6 +26,10 @@ export function AIOSNoiseTexture() {
 
 export function AIOSFloatingParticles({ count = 14 }: { count?: number }) {
   const reduceMotion = useReducedMotion()
+  if (reduceMotion) {
+    return null
+  }
+
   const particles = Array.from({ length: count }, (_, id) => ({
     id,
     left: `${8 + (id * 6.1) % 84}%`,
@@ -40,9 +44,9 @@ export function AIOSFloatingParticles({ count = 14 }: { count?: number }) {
           key={particle.id}
           style={{ left: particle.left }}
           initial={{ y: "110vh", opacity: 0 }}
-          animate={reduceMotion ? { opacity: 0.35, y: 0 } : { y: "-10vh", opacity: [0, 0.8, 0] }}
+          animate={{ y: "-10vh", opacity: [0, 0.8, 0] }}
           transition={{ duration: particle.duration, delay: particle.delay, repeat: Infinity, ease: "linear" }}
-          className="absolute h-1.5 w-1.5 rounded-full bg-[#5AA8FF] shadow-[0_0_14px_rgba(85,167,255,0.65)]"
+          className="absolute h-1.5 w-1.5 rounded-full bg-[#5AA8FF] shadow-[0_0_14px_rgba(85,167,255,0.65)] will-change-transform"
         />
       ))}
     </div>

@@ -20,6 +20,15 @@ import {
   PublicSectionHeader,
   PublicTimeline,
 } from "@/components/aios"
+import {
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicExecutiveRoleSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+  PublicTrustAndProofSection,
+} from "@/components/public-site/storytelling-sections"
 
 const storyCards = [
   {
@@ -69,9 +78,35 @@ const timeline = [
   { label: "2027", title: "Enterprise Scale", body: "Expanding enterprise architecture, integrations, and global intelligence operations." },
 ]
 
+const aboutProblems = [
+  { title: "Dashboard fatigue", body: "Executives are overloaded with data but under-supported on decisions." },
+  { title: "Category confusion", body: "AI tools solve tasks, not whole-business intelligence coordination." },
+  { title: "Weak memory", body: "Organizations lose context between teams, systems, and time horizons." },
+  { title: "Unclear control", body: "Automation without governance undermines trust and adoption." },
+]
+
+const aboutSolutions = [
+  { title: "AI Operating System thesis", body: "AIOS was created to connect intelligence, memory, and execution as one layer." },
+  { title: "Executive-first design", body: "Every product decision aims to reduce cognitive load for leaders." },
+  { title: "Compounding business memory", body: "The platform learns from outcomes and continuously improves recommendations." },
+  { title: "Governed autonomy", body: "Humans remain in control through explainability and policy-aware workflows." },
+]
+
+const aboutHowItWorks = [
+  { label: "Principle 1", title: "Observe", body: "AIOS observes meaningful business signals across systems and teams." },
+  { label: "Principle 2", title: "Understand", body: "Memory and knowledge layers translate data into decision context." },
+  { label: "Principle 3", title: "Recommend", body: "AI reasoning surfaces explainable recommendations with confidence." },
+  { label: "Principle 4", title: "Learn", body: "Execution outcomes reinforce memory and improve future intelligence." },
+]
+
 export default function AboutPage() {
   return (
     <PublicPageShell activeHref="/about">
+      <PublicStructuredData
+        name="About AIOS"
+        description="Learn why AIOS exists, the mission behind the AI Operating System category, and the roadmap for enterprise intelligence."
+        path="/about"
+      />
       <PublicHero
         eyebrow="About AIOS"
         title="A new software category for autonomous businesses"
@@ -92,6 +127,25 @@ export default function AboutPage() {
           { label: "Audience", value: "Executives", detail: "Lower cognitive load and faster decisions" },
         ]}
       />
+
+      <PublicProblemSolutionSection
+        problemTitle="Why AIOS exists"
+        problemBody="Businesses need more than another AI assistant. They need an operating system for intelligence, decisions, and execution."
+        problemItems={aboutProblems}
+        solutionTitle="The AIOS vision"
+        solutionBody="AIOS is designed as the intelligence operating layer that helps leaders understand faster and act with confidence."
+        solutionItems={aboutSolutions}
+      />
+
+      <PublicHowItWorksSection
+        title="The operating principles behind AIOS"
+        body="The company mission maps directly to how the product works and how value is created."
+        steps={aboutHowItWorks}
+      />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicExecutiveRoleSection />
 
       <PublicSection>
         <PublicContainer>
@@ -131,6 +185,16 @@ export default function AboutPage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicTrustAndProofSection
+        title="A mission built for enterprise trust"
+        body="AIOS combines deep architecture discipline with executive-grade clarity and responsible autonomy."
+        quote="AIOS provides the first coherent answer to the gap between analytics, decision support, and autonomous execution."
+        person="Enterprise Advisor"
+        role="AIOS Strategy Council"
+      />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Talk To AIOS"

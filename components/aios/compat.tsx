@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import type { LucideIcon } from "lucide-react"
 import { BrandLogo } from "@/components/branding"
 import { AIOSArchitectureOrbit } from "@/components/aios/architecture"
@@ -38,30 +38,55 @@ export function AIOSComparisonCard({ rows, leftLabel, rightLabel }: { rows: Arra
 
 export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: string; label: string; title: string; body: string; bullets: string[]; icon?: LucideIcon }>; initialKey?: string }) {
   const [activeKey, setActiveKey] = useState(initialKey ?? items[0]?.key ?? "")
+  const reduceMotion = useReducedMotion()
   const active = items.find((item) => item.key === activeKey) ?? items[0]
   const ActiveIcon = active?.icon
 
   return (
     <div className="grid gap-5 lg:grid-cols-[0.7fr_1.3fr]">
-      <div className="flex flex-wrap gap-3 lg:flex-col">
+      <div className="flex flex-wrap gap-3 lg:flex-col" role="tablist" aria-label="Feature panels">
         {items.map((item) => (
-          <button key={item.key} type="button" onClick={() => setActiveKey(item.key)} className="public-chip text-left" data-active={item.key === activeKey} aria-pressed={item.key === activeKey}>
+          <button
+            key={item.key}
+            id={`${item.key}-tab`}
+            type="button"
+            role="tab"
+            aria-selected={item.key === activeKey}
+            aria-controls={`${item.key}-panel`}
+            tabIndex={item.key === activeKey ? 0 : -1}
+            onClick={() => setActiveKey(item.key)}
+            className="public-chip text-left"
+            data-active={item.key === activeKey}
+          >
             {item.label}
           </button>
         ))}
       </div>
-      {active ? (
-        <AIOSFloatingCard className="overflow-hidden">
-          {ActiveIcon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]"><ActiveIcon size={18} /></span> : null}
-          <h3 className="public-h3">{active.title}</h3>
-          <p className="public-body-lg mt-4">{active.body}</p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {active.bullets.map((bullet) => (
-              <div key={bullet} className="rounded-2xl border border-[var(--public-color-border)] bg-[rgba(247,249,252,0.7)] px-4 py-3 text-sm font-medium text-[color:var(--public-color-text)]">{bullet}</div>
-            ))}
-          </div>
-        </AIOSFloatingCard>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {active ? (
+          <motion.div
+            key={active.key}
+            initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
+            transition={{ duration: reduceMotion ? 0.01 : 0.24 }}
+            role="tabpanel"
+            id={`${active.key}-panel`}
+            aria-labelledby={`${active.key}-tab`}
+          >
+            <AIOSFloatingCard className="overflow-hidden">
+              {ActiveIcon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]"><ActiveIcon size={18} /></span> : null}
+              <h3 className="public-h3">{active.title}</h3>
+              <p className="public-body-lg mt-4">{active.body}</p>
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {active.bullets.map((bullet) => (
+                  <div key={bullet} className="rounded-2xl border border-[var(--public-color-border)] bg-[rgba(247,249,252,0.7)] px-4 py-3 text-sm font-medium text-[color:var(--public-color-text)]">{bullet}</div>
+                ))}
+              </div>
+            </AIOSFloatingCard>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   )
 }

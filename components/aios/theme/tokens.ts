@@ -131,6 +131,15 @@ export const aiosFooterGroups = [
     ],
   },
   {
+    title: "Trust",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Security", href: "/security" },
+      { label: "Pilot Program", href: "/pilot" },
+    ],
+  },
+  {
     title: "Connect",
     links: [
       { label: "Book Demo", href: "/contact" },

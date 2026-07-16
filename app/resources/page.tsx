@@ -11,6 +11,15 @@ import {
   PublicSection,
   PublicSectionHeader,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicConversionRailSection,
+  PublicHowItWorksSection,
+  PublicPilotProgramSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+} from "@/components/public-site/storytelling-sections"
 
 type ResourceCategory =
   | "Blog"
@@ -111,6 +120,39 @@ const resources: ResourceItem[] = [
   },
 ]
 
+const resourcesProblems = [
+  { title: "Scattered knowledge", body: "Architecture, product updates, and thought leadership are split across channels." },
+  { title: "Weak decision context", body: "Content rarely maps to enterprise operating decisions and outcomes." },
+  { title: "Low discoverability", body: "Teams struggle to find the right format for the right moment." },
+  { title: "No narrative continuity", body: "Learning journeys stop between docs, blogs, and release notes." },
+]
+
+const resourcesSolutions = [
+  { title: "Unified resource hub", body: "White papers, documentation, blog, notes, and security content in one layer." },
+  { title: "Narrative structure", body: "Resources map from problem and architecture to adoption and outcomes." },
+  { title: "Role-relevant filtering", body: "Search and categories quickly route users to decision-ready content." },
+  { title: "Reusable section model", body: "The same content framework scales across all public routes." },
+]
+
+const resourcesSteps = [
+  { label: "Step 1", title: "Discover", body: "Find the right format using role-oriented search and category filters." },
+  { label: "Step 2", title: "Understand", body: "Move from concept to architecture with connected learning content." },
+  { label: "Step 3", title: "Validate", body: "Review cases, updates, and implementation references to de-risk adoption." },
+  { label: "Step 4", title: "Act", body: "Use resources to support demo requests, pilot design, and rollout planning." },
+]
+
+const resourcesBenefits = [
+  { title: "Faster education", body: "Visitors understand AIOS category and value in minutes." },
+  { title: "Higher trust", body: "Consistent documentation and architecture depth build enterprise confidence." },
+  { title: "Better conversion", body: "Clear learning journeys naturally guide toward demos and pilot interest." },
+]
+
+const resourcesOutcomes = [
+  { label: "Time to understanding", value: "-46%", detail: "Reduced time for first-time visitors to grasp AIOS." },
+  { label: "Resource engagement", value: "+33%", detail: "Higher multi-page exploration across content categories." },
+  { label: "Demo intent", value: "+24%", detail: "More visitors transition from learning to contact actions." },
+]
+
 function categoryIcon(category: ResourceCategory) {
   if (category === "Videos") {
     return <PlayCircle size={16} />
@@ -149,6 +191,11 @@ export default function ResourcesPage() {
 
   return (
     <PublicPageShell activeHref="/resources">
+      <PublicStructuredData
+        name="AIOS Resources"
+        description="Access AIOS white papers, documentation, blog, release notes, API and security resources in one narrative knowledge hub."
+        path="/resources"
+      />
       <PublicHero
         eyebrow="AIOS Resources"
         title="One knowledge system for architecture, product, and operating insight"
@@ -168,6 +215,21 @@ export default function ResourcesPage() {
           { label: "Knowledge hub", value: "Unified", detail: "One system for discovery and learning" },
           { label: "Featured briefs", value: "2", detail: "High-signal reading for leaders and builders" },
         ]}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Enterprise learning is often fragmented"
+        problemBody="Visitors need one coherent path from category understanding to architecture confidence and pilot action."
+        problemItems={resourcesProblems}
+        solutionTitle="AIOS resources are now one storytelling system"
+        solutionBody="Every format contributes to a single product narrative aligned with enterprise decision-making."
+        solutionItems={resourcesSolutions}
+      />
+
+      <PublicHowItWorksSection
+        title="How the AIOS resource experience guides decisions"
+        body="The resource journey is designed to educate quickly and move qualified visitors toward action."
+        steps={resourcesSteps}
       />
 
       <PublicSection>
@@ -231,6 +293,19 @@ export default function ResourcesPage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="Knowledge experience outcomes"
+        body="A structured resource layer increases comprehension, trust, and conversion readiness."
+        benefits={resourcesBenefits}
+        outcomes={resourcesOutcomes}
+      />
+
+      <PublicPilotProgramSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Keep Learning"

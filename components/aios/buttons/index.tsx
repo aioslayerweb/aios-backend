@@ -5,6 +5,7 @@ import type { ReactNode } from "react"
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { cx } from "@/components/aios/layout/utils"
+import { aiosSpring } from "@/components/aios/animations"
 
 type AIOSButtonProps = {
   href: string
@@ -14,14 +15,47 @@ type AIOSButtonProps = {
   size?: "sm" | "md" | "lg"
   variant?: "primary" | "secondary" | "outline" | "ghost" | "text"
   ariaLabel?: string
+  analyticsEvent?: string
 }
 
-export function AIOSButtonLink({ href, children, icon, className, size = "md", variant = "primary", ariaLabel }: AIOSButtonProps) {
+function inferAnalyticsEvent(href: string, label: string) {
+  const normalized = label.toLowerCase()
+
+  if (normalized.includes("book demo") || href.includes("/contact")) {
+    return normalized.includes("pilot") ? "pilot_click" : "demo_click"
+  }
+
+  if (normalized.includes("join pilot")) {
+    return "pilot_application_click"
+  }
+
+  if (normalized.includes("request pricing")) {
+    return "pricing_request_click"
+  }
+
+  if (normalized.includes("schedule discovery")) {
+    return "discovery_click"
+  }
+
+  if (normalized.includes("download")) {
+    return "download_click"
+  }
+
+  if (href.startsWith("/")) {
+    return "navigation_click"
+  }
+
+  return undefined
+}
+
+export function AIOSButtonLink({ href, children, icon, className, size = "md", variant = "primary", ariaLabel, analyticsEvent }: AIOSButtonProps) {
   const reduceMotion = useReducedMotion()
   const offsetX = useMotionValue(0)
   const offsetY = useMotionValue(0)
-  const x = useSpring(offsetX, { stiffness: 160, damping: 18, mass: 0.45 })
-  const y = useSpring(offsetY, { stiffness: 160, damping: 18, mass: 0.45 })
+  const x = useSpring(offsetX, aiosSpring)
+  const y = useSpring(offsetY, aiosSpring)
+  const text = typeof children === "string" ? children : ariaLabel ?? href
+  const resolvedAnalyticsEvent = analyticsEvent ?? inferAnalyticsEvent(href, text)
 
   const sizeClass = size === "lg" ? "px-7 py-4 text-base" : size === "sm" ? "px-4 py-2.5 text-sm" : "px-6 py-3 text-sm"
 
@@ -29,6 +63,7 @@ export function AIOSButtonLink({ href, children, icon, className, size = "md", v
     <motion.div
       className="inline-flex"
       style={reduceMotion ? undefined : { x, y }}
+      whileTap={reduceMotion ? undefined : { scale: 0.985 }}
       onMouseMove={(event) => {
         if (reduceMotion) {
           return
@@ -42,7 +77,7 @@ export function AIOSButtonLink({ href, children, icon, className, size = "md", v
         offsetY.set(0)
       }}
     >
-      <Link href={href} aria-label={ariaLabel} className={cx("public-button", `public-button-${variant}`, sizeClass, className)}>
+      <Link href={href} aria-label={ariaLabel} data-analytics-event={resolvedAnalyticsEvent} className={cx("public-button", `public-button-${variant}`, sizeClass, className)}>
         <span>{children}</span>
         {icon ?? (variant === "primary" ? <ArrowRight size={16} /> : null)}
       </Link>

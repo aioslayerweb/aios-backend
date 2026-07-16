@@ -22,6 +22,15 @@ import {
   PublicSectionHeader,
   PublicTimeline,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicCompetitorComparisonSection,
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+} from "@/components/public-site/storytelling-sections"
 
 const architectureLayers = [
   { title: "Data Layer", subtitle: "Signals from CRM, ERP, support, collaboration, and finance systems.", icon: Database },
@@ -51,6 +60,39 @@ const roleBlocks = ["CTO", "Enterprise Architect", "Finance Leadership", "Operat
 
 const integrationBlocks = ["CRM", "ERP", "Email", "Slack", "Teams", "Support", "Finance", "HRIS", "Warehouse", "Custom APIs"]
 
+const architectureProblems = [
+  { title: "Siloed data paths", body: "Data pipelines, AI, and execution controls are often disconnected." },
+  { title: "Opaque AI reasoning", body: "Architecture reviews struggle to trace why recommendations appear." },
+  { title: "Governance gaps", body: "RBAC and policy controls are bolted on rather than core to design." },
+  { title: "Weak API cohesion", body: "Integrations lack a business-oriented capability model." },
+]
+
+const architectureSolutions = [
+  { title: "Layered intelligence design", body: "Signals, memory, knowledge, AI, and execution are architected as one chain." },
+  { title: "Explainable decision engine", body: "Recommendations are linked to evidence, confidence, and ownership." },
+  { title: "Built-in enterprise controls", body: "Security, RBAC, and approvals are first-class platform capabilities." },
+  { title: "Capability-driven APIs", body: "APIs expose business capabilities instead of internal table structures." },
+]
+
+const architectureHowItWorks = [
+  { label: "Stage 1", title: "Data sources to memory", body: "Enterprise data sources become business signals and durable memory objects." },
+  { label: "Stage 2", title: "Knowledge and AI layers", body: "Knowledge graph and reasoning layers add explainable context." },
+  { label: "Stage 3", title: "RBI and operators", body: "Role-Based Intelligence and operators tailor decisions by stakeholder." },
+  { label: "Stage 4", title: "Executive outputs", body: "Decisions, workflows, and outcomes are delivered with governance and traceability." },
+]
+
+const architectureBenefits = [
+  { title: "Architectural clarity", body: "CTOs and executives can reason about the same model with different depth." },
+  { title: "Security by design", body: "RBAC, policy checks, and auditability are integrated across layers." },
+  { title: "Faster integration", body: "Business capability APIs reduce implementation ambiguity and drift." },
+]
+
+const architectureOutcomes = [
+  { label: "Integration speed", value: "+27%", detail: "Faster onboarding of critical business systems." },
+  { label: "Audit readiness", value: "98%", detail: "Traceable decisions and execution records by default." },
+  { label: "Architecture confidence", value: "93%", detail: "Stakeholders report clearer understanding of system operation." },
+]
+
 const timelineItems = posterSteps.map((title, index) => ({
   label: `Stage ${index + 1}`,
   title,
@@ -65,6 +107,11 @@ const timelineItems = posterSteps.map((title, index) => ({
 export default function ArchitecturePage() {
   return (
     <PublicPageShell activeHref="/architecture">
+      <PublicStructuredData
+        name="AIOS Architecture"
+        description="Review AIOS architecture layers including data, memory, knowledge, AI, RBI, operators, executive outputs, security, RBAC, and APIs."
+        path="/architecture"
+      />
       <PublicHero
         eyebrow="AIOS Architecture"
         title="Enterprise architecture for autonomous business operations"
@@ -84,6 +131,21 @@ export default function ArchitecturePage() {
           { label: "Enterprise roles", value: `${roleBlocks.length}`, detail: "Architecture stays legible for technical and business leaders" },
           { label: "Integration surfaces", value: `${integrationBlocks.length}+`, detail: "APIs, systems, runtime, and workflow endpoints" },
         ]}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Enterprise AI architecture is often fragmented"
+        problemBody="Organizations stitch together data, AI, workflow, and governance into brittle patterns that are hard to explain and scale."
+        problemItems={architectureProblems}
+        solutionTitle="AIOS provides one coherent architecture chain"
+        solutionBody="From data sources to executive outputs, every architectural layer is connected, governed, and explainable."
+        solutionItems={architectureSolutions}
+      />
+
+      <PublicHowItWorksSection
+        title="How architectural layers translate into business outcomes"
+        body="AIOS architecture moves from raw signals to governed decisions without breaking context across layers."
+        steps={architectureHowItWorks}
       />
 
       <PublicSection>
@@ -136,6 +198,19 @@ export default function ArchitecturePage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="Architecture that supports enterprise adoption"
+        body="The AIOS architecture model is designed to satisfy technical rigor and executive clarity at the same time."
+        benefits={architectureBenefits}
+        outcomes={architectureOutcomes}
+      />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicCompetitorComparisonSection />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Architecture Review"

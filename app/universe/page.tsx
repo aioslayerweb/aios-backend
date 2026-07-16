@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   title: "AIOS Universe | The AI Operating System for Businesses",
   description:
     "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
+  alternates: {
+    canonical: "https://aios.layer/universe",
+  },
   openGraph: {
     title: "AIOS Universe | The AI Operating System for Businesses",
     description:

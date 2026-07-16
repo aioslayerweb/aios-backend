@@ -27,6 +27,17 @@ import {
   PublicTabbedPanel,
   PublicTimeline,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicSocialProofSection,
+  PublicStructuredData,
+  PublicTrustAndProofSection,
+} from "@/components/public-site/storytelling-sections"
 
 const districts = [
   { title: "Executive Center", href: "/app/executive", icon: Building2, x: "18%", y: "14%" },
@@ -117,9 +128,47 @@ const timelineItems = signalFlow.map((title, index) => ({
         : "Each layer adds context, explainability, and governed execution to the same intelligence chain.",
 }))
 
+const universeProblemCards = [
+  { title: "Disconnected modules", body: "Enterprise tools operate as islands without shared intelligence." },
+  { title: "Static architecture diagrams", body: "Most platform maps fail to show live information movement." },
+  { title: "Siloed operators", body: "AI agents often act without shared memory and governance." },
+  { title: "Role blind spots", body: "Teams miss cross-functional dependencies and compounding risks." },
+]
+
+const universeSolutionCards = [
+  { title: "Interactive ecosystem", body: "Universe visualizes AIOS as one connected enterprise operating map." },
+  { title: "Clickable nodes", body: "Modules, operators, and layers can be explored as living system components." },
+  { title: "Animated intelligence flow", body: "Signal-to-outcome pathways are visible and explainable to every role." },
+  { title: "Unified control", body: "Humans, operators, and workflows coordinate in one governed runtime." },
+]
+
+const universeHowItWorks = [
+  { label: "Layer 1", title: "Core AIOS", body: "The AIOS core coordinates context, memory, and orchestration contracts." },
+  { label: "Layer 2", title: "Connected modules", body: "Every module contributes data and decisions to the same operating layer." },
+  { label: "Layer 3", title: "Operator collaboration", body: "Operators share memory and reasoning before execution." },
+  { label: "Layer 4", title: "Workflow outcomes", body: "Governed workflows execute actions and feed outcomes back into memory." },
+]
+
+const universeBenefits = [
+  { title: "Faster understanding", body: "Teams understand system relationships and intelligence flow within minutes." },
+  { title: "Better coordination", body: "Operators and modules work with shared context instead of isolated tasks." },
+  { title: "Enterprise confidence", body: "Architecture remains explainable across technical and executive stakeholders." },
+]
+
+const universeOutcomes = [
+  { label: "System visibility", value: "+63%", detail: "Improvement in architecture comprehension for pilot teams." },
+  { label: "Cross-team alignment", value: "+28%", detail: "Shared understanding of dependencies and decision pathways." },
+  { label: "Execution confidence", value: "91%", detail: "Teams can trace what happened, why, and what should happen next." },
+]
+
 export default function UniversePageClient() {
   return (
     <PublicPageShell activeHref="/universe">
+      <PublicStructuredData
+        name="AIOS Universe"
+        description="Explore the AIOS ecosystem: core intelligence, modules, operators, memory, workflows, and governed enterprise outcomes."
+        path="/universe"
+      />
       <PublicHero
         eyebrow="AIOS Universe"
         title="The connected operating map for the autonomous enterprise"
@@ -140,6 +189,21 @@ export default function UniversePageClient() {
           { label: "Enterprise integrations", value: "12+", detail: "Cross-system context without fragmentation" },
         ]}
         visual={<PublicOrbitVisual label="AIOS Core" title="Operating Universe" nodes={districts} />}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Most enterprise ecosystems are not truly connected"
+        problemBody="Architecture views are static, operators are fragmented, and module relationships are hard to understand in real time."
+        problemItems={universeProblemCards}
+        solutionTitle="Universe turns AIOS into a navigable intelligence map"
+        solutionBody="The ecosystem is visual, interactive, and continuously tied to how AIOS reasons, decides, and executes."
+        solutionItems={universeSolutionCards}
+      />
+
+      <PublicHowItWorksSection
+        title="How intelligence moves across the AIOS universe"
+        body="Each ecosystem layer is connected to memory, role-based context, and workflow execution."
+        steps={universeHowItWorks}
       />
 
       <PublicSection>
@@ -187,6 +251,29 @@ export default function UniversePageClient() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="A connected map leads to better enterprise decisions"
+        body="Universe helps leaders and builders align quickly on what the system is doing and where value is created."
+        benefits={universeBenefits}
+        outcomes={universeOutcomes}
+      />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicSocialProofSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicTrustAndProofSection
+        title="Designed for technical depth and executive clarity"
+        body="Universe supports enterprise storytelling, architecture reviews, and pilot onboarding from one consistent model."
+        quote="Universe helped us align architecture and operations in one session. Everyone saw the same system reality."
+        person="Enterprise Architect, Pilot Program"
+        role="Global Financial Services"
+      />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="See The Universe In Context"

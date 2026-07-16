@@ -22,7 +22,7 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
 
   return (
     <motion.div
-      className="relative mx-auto aspect-[1.08/1] w-full max-w-[640px]"
+      className="relative mx-auto aspect-[1.08/1] w-full max-w-[640px] [transform-style:preserve-3d]"
       style={reduceMotion ? undefined : { rotateX, rotateY, transformPerspective: 1200 }}
       onMouseMove={(event) => {
         if (reduceMotion) {
@@ -39,8 +39,8 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
         rotateYRaw.set(0)
       }}
     >
-      <motion.div animate={reduceMotion ? undefined : { rotate: 360 }} transition={{ duration: 72, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[74%] w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(200,214,241,0.9)]" />
-      <motion.div animate={reduceMotion ? undefined : { rotate: -360 }} transition={{ duration: 90, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[56%] w-[56%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[rgba(184,201,237,0.88)]" />
+      <motion.div animate={reduceMotion ? undefined : { rotate: 360 }} transition={{ duration: 72, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[74%] w-[74%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[rgba(200,214,241,0.9)] will-change-transform" />
+      <motion.div animate={reduceMotion ? undefined : { rotate: -360 }} transition={{ duration: 90, repeat: Infinity, ease: "linear" }} className="absolute left-1/2 top-1/2 h-[56%] w-[56%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[rgba(184,201,237,0.88)] will-change-transform" />
 
       <div className="absolute left-1/2 top-1/2 z-20 w-[220px] -translate-x-1/2 -translate-y-1/2 rounded-[32px] border border-white/80 bg-[linear-gradient(135deg,#1976FF,#66B5FF)] px-6 py-8 text-white shadow-[0_28px_70px_rgba(25,118,255,0.26)] sm:w-[248px]">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-blue-100">{label}</p>
@@ -57,7 +57,7 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
         )
 
         return (
-          <motion.div key={node.title} style={{ left: node.x, top: node.y }} initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: reduceMotion ? 0 : [0, index % 2 === 0 ? -8 : -5, 0], scale: 1 }} transition={{ delay: index * 0.05, y: { duration: 4 + index * 0.2, repeat: Infinity, ease: "easeInOut" } }} className="absolute -translate-x-1/2 -translate-y-1/2">
+          <motion.div key={node.title} style={{ left: node.x, top: node.y }} initial={{ opacity: 0, y: 12, scale: 0.96 }} animate={{ opacity: 1, y: reduceMotion ? 0 : [0, index % 2 === 0 ? -8 : -5, 0], scale: 1 }} transition={reduceMotion ? { delay: index * 0.02, duration: 0.18 } : { delay: index * 0.05, y: { duration: 4 + index * 0.2, repeat: Infinity, ease: "easeInOut" } }} className="absolute -translate-x-1/2 -translate-y-1/2 will-change-transform">
             {node.href ? <Link href={node.href} className="public-card public-card-glass public-card-hover block px-4 py-3 text-center">{content}</Link> : <AIOSCard variant="glass" className="px-4 py-3 text-center">{content}</AIOSCard>}
           </motion.div>
         )
@@ -69,7 +69,7 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
         const angle = Math.atan2(numericY - 50, numericX - 50)
         const length = Math.hypot(numericX - 50, numericY - 50)
 
-        return <motion.span key={`${node.title}-line`} className="pointer-events-none absolute left-1/2 top-1/2 block h-px origin-left bg-gradient-to-r from-[rgba(127,177,255,0.78)] to-transparent" style={{ width: `${length * 0.7}%`, rotate: `${(angle * 180) / Math.PI}deg` }} animate={reduceMotion ? undefined : { opacity: [0.18, 0.82, 0.18] }} transition={{ duration: 2 + index * 0.16, repeat: Infinity }} />
+        return <motion.span key={`${node.title}-line`} className="pointer-events-none absolute left-1/2 top-1/2 block h-px origin-left bg-gradient-to-r from-[rgba(127,177,255,0.78)] to-transparent" style={{ width: `${length * 0.7}%`, rotate: `${(angle * 180) / Math.PI}deg` }} animate={reduceMotion ? { opacity: 0.36 } : { opacity: [0.18, 0.82, 0.18] }} transition={{ duration: 2 + index * 0.16, repeat: reduceMotion ? 0 : Infinity }} />
       })}
     </motion.div>
   )

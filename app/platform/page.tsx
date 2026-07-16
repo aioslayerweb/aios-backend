@@ -22,6 +22,15 @@ import {
   PublicSection,
   PublicSectionHeader,
 } from "@/components/aios"
+import {
+  PublicBenefitsOutcomesSection,
+  PublicBuyerJourneySection,
+  PublicConversionRailSection,
+  PublicEnterpriseTrustMatrixSection,
+  PublicHowItWorksSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+} from "@/components/public-site/storytelling-sections"
 
 const orbitNodes = [
   { title: "Signals", x: "14%", y: "18%", icon: Database },
@@ -51,9 +60,47 @@ const platformRows = [
   { label: "Learning", left: "Institutional memory loss", right: "Compounding business memory" },
 ]
 
+const platformProblems = [
+  { title: "Tool-first operations", body: "Teams manage software categories instead of one business intelligence system." },
+  { title: "Low explainability", body: "AI output is often detached from evidence and governance context." },
+  { title: "Weak human control", body: "Automation can outpace policy and ownership requirements." },
+  { title: "Broken learning loop", body: "Outcomes rarely improve future decision quality in a structured way." },
+]
+
+const platformSolutions = [
+  { title: "Unified operating layer", body: "AIOS connects signals, memory, decisions, and workflows in one platform." },
+  { title: "Explainable reasoning", body: "Recommendations include observations, evidence, and confidence." },
+  { title: "Human-in-the-loop controls", body: "Policy gates and approvals keep leaders in control of execution." },
+  { title: "Continuous learning", body: "Every outcome feeds memory and improves future recommendations." },
+]
+
+const platformSteps = [
+  { label: "Flow 1", title: "Information enters", body: "Signals are ingested from enterprise systems and normalized." },
+  { label: "Flow 2", title: "Information is understood", body: "Memory and knowledge layers build explainable business context." },
+  { label: "Flow 3", title: "Decisions are prepared", body: "AI reasoning produces role-aware recommendations with confidence." },
+  { label: "Flow 4", title: "Actions are governed", body: "Humans approve and workflows execute with policy-aware controls." },
+]
+
+const platformBenefits = [
+  { title: "Operational clarity", body: "Everyone sees what changed, why it matters, and what to do next." },
+  { title: "Decision speed", body: "Leaders move from periodic reporting to continuous assisted decisions." },
+  { title: "Governed automation", body: "Execution stays safe, traceable, and aligned with enterprise policy." },
+]
+
+const platformOutcomes = [
+  { label: "Decision cycle", value: "-38%", detail: "Reduced lag from signal to action." },
+  { label: "Execution quality", value: "+31%", detail: "Higher reliability in governed workflows." },
+  { label: "Policy compliance", value: "99.2%", detail: "Automations remain aligned with approval logic." },
+]
+
 export default function PlatformPage() {
   return (
     <PublicPageShell activeHref="/platform">
+      <PublicStructuredData
+        name="AIOS Platform"
+        description="Understand how AIOS operates: information flow, decision logic, AI assistance, and human governance in one platform layer."
+        path="/platform"
+      />
       <PublicHero
         eyebrow="AIOS Platform"
         title="The public platform system for one connected AI Operating System"
@@ -74,6 +121,21 @@ export default function PlatformPage() {
           { label: "Accessibility goal", value: "WCAG AA", detail: "Keyboard support, contrast, focus, reduced motion" },
         ]}
         visual={<PublicOrbitVisual label="Platform" title="Connected Intelligence" nodes={orbitNodes} />}
+      />
+
+      <PublicProblemSolutionSection
+        problemTitle="Most AI platforms are layered on top of disconnected systems"
+        problemBody="They assist tasks, but rarely provide one coherent operating model for decision-making and governed execution."
+        problemItems={platformProblems}
+        solutionTitle="AIOS operates as the intelligence layer above the business"
+        solutionBody="The platform continuously understands, recommends, and executes while keeping humans in control."
+        solutionItems={platformSolutions}
+      />
+
+      <PublicHowItWorksSection
+        title="How AIOS platform operations actually flow"
+        body="From ingestion to governed execution, each step is designed to be explainable and policy-aware."
+        steps={platformSteps}
       />
 
       <PublicSection>
@@ -101,6 +163,19 @@ export default function PlatformPage() {
           </div>
         </PublicContainer>
       </PublicSection>
+
+      <PublicBenefitsOutcomesSection
+        title="Platform benefits that scale across every module"
+        body="Because platform capabilities are shared, value compounds as new teams and workflows come online."
+        benefits={platformBenefits}
+        outcomes={platformOutcomes}
+      />
+
+      <PublicEnterpriseTrustMatrixSection />
+
+      <PublicBuyerJourneySection />
+
+      <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="Adopt The Platform"

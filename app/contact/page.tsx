@@ -9,6 +9,15 @@ import {
   PublicSection,
   PublicSectionHeader,
 } from "@/components/aios"
+import {
+  PublicConversionRailSection,
+  PublicHowItWorksSection,
+  PublicIntelligenceCapacitySection,
+  PublicPilotProgramSection,
+  PublicProblemSolutionSection,
+  PublicStructuredData,
+  PublicTrustAndProofSection,
+} from "@/components/public-site/storytelling-sections"
 
 const contactTracks = [
   {
@@ -52,9 +61,35 @@ const orbitNodes = [
   { title: "Policy Guardrails", x: "61%", y: "78%" },
 ]
 
+const contactProblems = [
+  { title: "Generic inquiry paths", body: "Enterprise prospects are routed through forms with little context handling." },
+  { title: "Slow qualification", body: "Sales and solutions teams spend cycles on incomplete discovery details." },
+  { title: "Weak architecture framing", body: "Conversations start with features instead of operating model outcomes." },
+  { title: "Disconnected stakeholders", body: "Sales, support, and partners often work from separate narratives." },
+]
+
+const contactSolutions = [
+  { title: "Enterprise-focused routing", body: "Contact tracks route by demo, sales, support, partners, and investors." },
+  { title: "Narrative-first intake", body: "Requests map to architecture, workflows, and executive outcomes from the start." },
+  { title: "One operating story", body: "Every team aligns to the same AIOS system narrative and value model." },
+  { title: "Pilot-ready handoff", body: "Initial contact can transition directly into discovery and pilot scoping." },
+]
+
+const contactHowItWorks = [
+  { label: "Step 1", title: "Share context", body: "Describe your business model, priorities, and current system landscape." },
+  { label: "Step 2", title: "Route to experts", body: "AIOS routes your inquiry to the right enterprise path and team." },
+  { label: "Step 3", title: "Align on architecture", body: "Review operating model fit, governance needs, and implementation scope." },
+  { label: "Step 4", title: "Start pilot plan", body: "Define success criteria and pilot milestones for measurable outcomes." },
+]
+
 export default function ContactPage() {
   return (
     <PublicPageShell activeHref="/contact">
+      <PublicStructuredData
+        name="Contact AIOS"
+        description="Book an enterprise AIOS demo, contact sales or support, and discuss partnerships, investors, and pilot program planning."
+        path="/contact"
+      />
       <PublicHero
         eyebrow="Contact AIOS"
         title="Let’s build the autonomous enterprise together"
@@ -76,6 +111,25 @@ export default function ContactPage() {
         ]}
         visual={<PublicOrbitVisual label="AIOS" title="Global Intelligence" nodes={orbitNodes} />}
       />
+
+      <PublicProblemSolutionSection
+        problemTitle="Enterprise buying journeys need context-rich engagement"
+        problemBody="Organizations evaluating AIOS need architecture clarity, governance confidence, and measurable value pathways from first contact."
+        problemItems={contactProblems}
+        solutionTitle="Contact AIOS through one enterprise narrative"
+        solutionBody="Every contact path supports a consistent conversation from discovery through pilot and rollout."
+        solutionItems={contactSolutions}
+      />
+
+      <PublicHowItWorksSection
+        title="How AIOS engagement works from first conversation"
+        body="The contact experience is designed to move quickly from inquiry to validated business outcomes."
+        steps={contactHowItWorks}
+      />
+
+      <PublicIntelligenceCapacitySection />
+
+      <PublicPilotProgramSection />
 
       <PublicSection>
         <PublicContainer>
@@ -133,6 +187,16 @@ export default function ContactPage() {
            </div>
          </PublicContainer>
        </PublicSection>
+
+      <PublicTrustAndProofSection
+        title="Enterprise-ready from the first meeting"
+        body="Security, governance, and measurable ROI are core to every AIOS sales and pilot conversation."
+        quote="The intake quality was exceptional. We moved from contact to a concrete pilot scope in one week."
+        person="Transformation Lead"
+        role="Fortune 500 Pilot Customer"
+      />
+
+      <PublicConversionRailSection />
  
        <PublicFooterCta
          eyebrow="Meet AIOS"

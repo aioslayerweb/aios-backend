@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>AIOS Resources | White Papers, Docs, Blog, Notes, API</title>
-      <link rel="canonical" href="https://aios.layer/resources" />
+      <link rel="canonical" href="https://aiospilot.com/resources" />
       <meta
         name="description"
         content="Access AIOS resources including white papers, documentation, blog, release notes, API guidance, security references, architecture, and FAQ content."

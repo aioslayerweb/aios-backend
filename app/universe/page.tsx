@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
   alternates: {
-    canonical: "https://aios.layer/universe",
+    canonical: "https://aiospilot.com/universe",
   },
   openGraph: {
     title: "AIOS Universe | The AI Operating System for Businesses",
@@ -28,18 +28,18 @@ const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebPage",
   name: "AIOS Universe",
-  url: "https://aios.layer/universe",
+  url: "https://aiospilot.com/universe",
   description:
     "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
   isPartOf: {
     "@type": "WebSite",
     name: "AIOS",
-    url: "https://aios.layer",
+    url: "https://aiospilot.com",
   },
   publisher: {
     "@type": "Organization",
     name: "AIOS",
-    url: "https://aios.layer",
+    url: "https://aiospilot.com",
   },
 };
 

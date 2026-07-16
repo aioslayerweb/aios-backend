@@ -667,7 +667,7 @@ export function PublicStructuredData({
   description: string
   path: string
 }) {
-  const websiteUrl = "https://aios.layer"
+  const websiteUrl = "https://aiospilot.com"
   const pageUrl = `${websiteUrl}${path}`
   const segments = path === "/" ? [] : path.split("/").filter(Boolean)
 

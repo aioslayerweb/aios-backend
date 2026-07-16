@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>About AIOS | Why The AI Operating System Exists</title>
-      <link rel="canonical" href="https://aios.layer/about" />
+      <link rel="canonical" href="https://aiospilot.com/about" />
       <meta
         name="description"
         content="Learn the AIOS mission, why the category exists, future roadmap, and vision for enterprise business intelligence and autonomous operations."

@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>AIOS Products | Pilot Program, Enterprise Editions, ROI</title>
-      <link rel="canonical" href="https://aios.layer/products" />
+      <link rel="canonical" href="https://aiospilot.com/products" />
       <meta
         name="description"
         content="Explore AIOS offerings including AIOS Pilot, future editions, enterprise pathways, pricing overview, capacity model, and ROI framing."

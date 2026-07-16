@@ -1,3 +1,9 @@
+const PUBLIC_SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiospilot.com"
+
+function publicUrl(path: string) {
+  return new URL(path, PUBLIC_SITE_ORIGIN).toString()
+}
+
 export const aiosTheme = {
   colors: {
     primary: "#1976FF",
@@ -100,50 +106,50 @@ export const aiosTheme = {
 } as const
 
 export const aiosNavigationItems = [
-  { label: "Home", href: "/" },
-  { label: "Universe", href: "/universe" },
-  { label: "Platform", href: "/platform" },
-  { label: "Architecture", href: "/architecture" },
-  { label: "Modules", href: "/modules" },
-  { label: "Products", href: "/products" },
-  { label: "Resources", href: "/resources" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Home", href: publicUrl("/") },
+  { label: "Universe", href: publicUrl("/universe") },
+  { label: "Platform", href: publicUrl("/platform") },
+  { label: "Architecture", href: publicUrl("/architecture") },
+  { label: "Modules", href: publicUrl("/modules") },
+  { label: "Products", href: publicUrl("/products") },
+  { label: "Resources", href: publicUrl("/resources") },
+  { label: "About", href: publicUrl("/about") },
+  { label: "Contact", href: publicUrl("/contact") },
 ] as const
 
 export const aiosFooterGroups = [
   {
     title: "Platform",
     links: [
-      { label: "Universe", href: "/universe" },
-      { label: "Platform", href: "/platform" },
-      { label: "Architecture", href: "/architecture" },
-      { label: "Modules", href: "/modules" },
+      { label: "Universe", href: publicUrl("/universe") },
+      { label: "Platform", href: publicUrl("/platform") },
+      { label: "Architecture", href: publicUrl("/architecture") },
+      { label: "Modules", href: publicUrl("/modules") },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Products", href: "/products" },
-      { label: "Resources", href: "/resources" },
-      { label: "About", href: "/about" },
-      { label: "Legal", href: "/legal" },
+      { label: "Products", href: publicUrl("/products") },
+      { label: "Resources", href: publicUrl("/resources") },
+      { label: "About", href: publicUrl("/about") },
+      { label: "Legal", href: publicUrl("/legal") },
     ],
   },
   {
     title: "Trust",
     links: [
-      { label: "Privacy", href: "/privacy" },
-      { label: "Terms", href: "/terms" },
-      { label: "Security", href: "/security" },
-      { label: "Pilot Program", href: "/pilot" },
+      { label: "Privacy", href: publicUrl("/privacy") },
+      { label: "Terms", href: publicUrl("/terms") },
+      { label: "Security", href: publicUrl("/security") },
+      { label: "Pilot Program", href: publicUrl("/pilot") },
     ],
   },
   {
     title: "Connect",
     links: [
-      { label: "Book Demo", href: "/contact" },
-      { label: "Launch AIOS", href: "/app" },
+      { label: "Book Demo", href: publicUrl("/contact") },
+      { label: "Launch AIOS", href: publicUrl("/app") },
     ],
   },
 ] as const

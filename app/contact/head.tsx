@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>Contact AIOS | Book Enterprise Demo, Sales, Support</title>
-      <link rel="canonical" href="https://aios.layer/contact" />
+      <link rel="canonical" href="https://aiospilot.com/contact" />
       <meta
         name="description"
         content="Contact AIOS for enterprise demos, sales, support, partnerships, investor conversations, and pilot program planning."

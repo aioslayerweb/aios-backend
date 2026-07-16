@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://aios.layer/sitemap.xml",
-    host: "https://aios.layer",
+    sitemap: "https://aiospilot.com/sitemap.xml",
+    host: "https://aiospilot.com",
   }
 }

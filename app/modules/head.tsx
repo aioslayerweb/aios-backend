@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>AIOS Modules | One Operating System, Multiple Products</title>
-      <link rel="canonical" href="https://aios.layer/modules" />
+      <link rel="canonical" href="https://aiospilot.com/modules" />
       <meta
         name="description"
         content="Discover AIOS modules including Executive Center, Knowledge Center, Memory Center, Workflow Builder, Organization, Developer, Security, and Runtime."

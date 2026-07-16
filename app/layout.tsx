@@ -11,7 +11,7 @@ const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATIO
 const MICROSOFT_SITE_VERIFICATION = process.env.NEXT_PUBLIC_MICROSOFT_SITE_VERIFICATION ?? ""
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aios.layer"),
+  metadataBase: new URL("https://aiospilot.com"),
   applicationName: brandTheme.appName,
   title: {
     default: brandTheme.defaultTitle,
@@ -55,21 +55,21 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: brandTheme.appName,
-    url: "https://aios.layer",
-    logo: `${"https://aios.layer"}${brandAssets.openGraph}`,
-    sameAs: ["https://aios.layer"],
+    url: "https://aiospilot.com",
+    logo: `${"https://aiospilot.com"}${brandAssets.openGraph}`,
+    sameAs: ["https://aiospilot.com"],
   }
 
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: brandTheme.appName,
-    url: "https://aios.layer",
+    url: "https://aiospilot.com",
     description: brandTheme.description,
     publisher: {
       "@type": "Organization",
       name: brandTheme.appName,
-      url: "https://aios.layer",
+      url: "https://aiospilot.com",
     },
   }
 

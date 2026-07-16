@@ -53,7 +53,7 @@ function inferClickEvent(target: HTMLElement) {
     return "download_click"
   }
 
-  if (href.startsWith("/") && !href.startsWith("/app")) {
+  if (href.startsWith("/") || href.startsWith(window.location.origin)) {
     return "navigation_click"
   }
 

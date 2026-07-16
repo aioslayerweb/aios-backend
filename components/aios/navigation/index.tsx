@@ -12,7 +12,9 @@ import { cx } from "@/components/aios/layout/utils"
 import { aiosNavigationItems, aiosTheme } from "@/components/aios/theme/tokens"
 
 function isActive(currentHref: string, itemHref: string) {
-  return itemHref === "/" ? currentHref === "/" : currentHref === itemHref
+  const currentPath = currentHref.startsWith("http") ? new URL(currentHref).pathname : currentHref
+  const itemPath = itemHref.startsWith("http") ? new URL(itemHref).pathname : itemHref
+  return itemPath === "/" ? currentPath === "/" : currentPath === itemPath
 }
 
 export function AIOSNavbar({ activeHref, ctaHref = "/contact", ctaLabel = "Book Demo" }: { activeHref?: string; ctaHref?: string; ctaLabel?: string }) {

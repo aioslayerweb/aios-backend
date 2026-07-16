@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>AIOS Platform | How The AI Operating System Works</title>
-      <link rel="canonical" href="https://aios.layer/platform" />
+      <link rel="canonical" href="https://aiospilot.com/platform" />
       <meta
         name="description"
         content="Learn how AIOS operates: information flow, business memory, decision intelligence, AI operators, governed workflows, and human control."

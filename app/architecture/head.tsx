@@ -2,7 +2,7 @@ export default function Head() {
   return (
     <>
       <title>AIOS Architecture | Enterprise Intelligence Layers</title>
-      <link rel="canonical" href="https://aios.layer/architecture" />
+      <link rel="canonical" href="https://aiospilot.com/architecture" />
       <meta
         name="description"
         content="Explore AIOS architecture: data sources, business memory, knowledge, AI layer, role-based intelligence, operators, outputs, security, RBAC, and APIs."

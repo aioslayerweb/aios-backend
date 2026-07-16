@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description:
     "AIOS connects people, systems, data, workflows, and AI into one enterprise intelligence operating layer.",
   alternates: {
-    canonical: "https://aios.layer/",
+    canonical: "https://aiospilot.com/",
   },
   openGraph: {
     title: "AIOS | The AI Operating System for Businesses",

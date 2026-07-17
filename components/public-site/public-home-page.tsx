@@ -344,6 +344,7 @@ export function PublicHomePage() {
         quote="AIOS changed how our executive team understands operations. We now act on live intelligence, not delayed reporting."
         person="Head of Strategy, Pilot Customer"
         role="Global Enterprise Pilot Program"
+        logos={[]}
       />
 
       <PublicConversionRailSection />

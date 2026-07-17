@@ -173,9 +173,11 @@ export function PublicTrustAndProofSection({
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader eyebrow="Enterprise Trust" title={title} body={body} />
-        <div className="mt-12">
-          <PublicLogoMarquee items={logos} />
-        </div>
+        {logos.length ? (
+          <div className="mt-12">
+            <PublicLogoMarquee items={logos} />
+          </div>
+        ) : null}
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           <PublicCard variant="feature" hover>
             <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">

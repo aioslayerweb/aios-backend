@@ -21,6 +21,7 @@ import { PublicButtonLink, PublicCard, PublicContainer, PublicPageShell, PublicS
 import { BrandLogo } from "@/components/branding"
 import { Drawer } from "@/components/ui/drawer"
 import { Modal } from "@/components/ui/modal"
+import { workspaceItems } from "@/utils/navigation"
 
 type DatasetStatus = "healthy" | "attention" | "processing" | "draft"
 type DatasetCategory = "Revenue" | "Operations" | "Customer" | "Finance" | "Compliance"
@@ -81,6 +82,8 @@ function statValue(datasets: DemoDataset[], status: DatasetStatus): number {
   return datasets.filter((dataset) => dataset.status === status).length
 }
 
+const demoBackendMobileNavItems = workspaceItems.map((item) => ({ href: item.href, label: item.title }))
+
 export function DemoPlatformPage() {
   const reduceMotion = useReducedMotion()
   const [datasets, setDatasets] = useState(initialDatasets)
@@ -131,7 +134,12 @@ export function DemoPlatformPage() {
   }
 
   return (
-    <PublicPageShell activeHref="/demo-platform" includeFooter={false} includeNewsletter={false}>
+    <PublicPageShell
+      activeHref="/demo-platform"
+      includeFooter={false}
+      includeNewsletter={false}
+      mobileNavigationItems={demoBackendMobileNavItems}
+    >
       <PublicSection>
         <PublicContainer>
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -248,24 +256,24 @@ export function DemoPlatformPage() {
                         transition={{ delay: reduceMotion ? 0 : index * 0.02, duration: 0.22 }}
                         onClick={() => setSelectedDatasetId(dataset.id)}
                         onDoubleClick={() => setDetailOpen(true)}
-                        className={`rounded-3xl border p-4 text-left transition ${isActive ? "border-blue-300 bg-blue-50/70 shadow-md" : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"}`}
+                        className={`min-w-0 rounded-3xl border p-4 text-left transition ${isActive ? "border-blue-300 bg-blue-50/70 shadow-md" : "border-slate-200 bg-white hover:border-blue-200 hover:bg-slate-50"}`}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-semibold text-slate-800">{dataset.name}</p>
-                            <p className="mt-1 text-xs text-slate-500">{dataset.category} · {dataset.api}</p>
+                          <div className="min-w-0">
+                            <p className="break-words text-sm font-semibold text-slate-800">{dataset.name}</p>
+                            <p className="mt-1 break-all text-xs text-slate-500">{dataset.category} · {dataset.api}</p>
                           </div>
-                          <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase ${statusStyles[dataset.status]}`}>
+                          <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase ${statusStyles[dataset.status]}`}>
                             {dataset.status}
                           </span>
                         </div>
-                        <p className="mt-3 text-xs text-slate-600">{dataset.summary}</p>
+                        <p className="mt-3 break-words text-xs text-slate-600">{dataset.summary}</p>
                         <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
                           <span>{dataset.records.toLocaleString()} records</span>
                           <span>{dataset.lastSync}</span>
                         </div>
-                        <div className="mt-3 flex items-center justify-between">
-                          <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold uppercase text-slate-600">{dataset.priority}</span>
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold uppercase text-slate-600">{dataset.priority}</span>
                           <span className="text-xs font-medium text-blue-700">Open</span>
                         </div>
                       </motion.button>
@@ -278,10 +286,10 @@ export function DemoPlatformPage() {
                 {selectedDataset ? (
                   <>
                     <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Selected dataset</p>
-                        <h2 className="mt-1 text-2xl font-semibold text-slate-800">{selectedDataset.name}</h2>
-                        <p className="mt-2 text-sm text-slate-600">{selectedDataset.summary}</p>
+                        <h2 className="mt-1 break-words text-2xl font-semibold text-slate-800">{selectedDataset.name}</h2>
+                        <p className="mt-2 break-words text-sm text-slate-600">{selectedDataset.summary}</p>
                       </div>
                       <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase ${statusStyles[selectedDataset.status]}`}>
                         {selectedDataset.status}
@@ -289,21 +297,21 @@ export function DemoPlatformPage() {
                     </div>
 
                     <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                      <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Owner</p>
-                        <p className="mt-2 text-sm font-medium text-slate-700">{selectedDataset.owner}</p>
+                        <p className="mt-2 break-words text-sm font-medium text-slate-700">{selectedDataset.owner}</p>
                       </div>
-                      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                      <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Workflow</p>
-                        <p className="mt-2 text-sm font-medium text-slate-700">{selectedDataset.workflow}</p>
+                        <p className="mt-2 break-words text-sm font-medium text-slate-700">{selectedDataset.workflow}</p>
                       </div>
-                      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                      <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Records</p>
                         <p className="mt-2 text-sm font-medium text-slate-700">{selectedDataset.records.toLocaleString()}</p>
                       </div>
-                      <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                      <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recommended action</p>
-                        <p className="mt-2 text-sm font-medium text-slate-700">{selectedDataset.recommendedAction}</p>
+                        <p className="mt-2 break-words text-sm font-medium text-slate-700">{selectedDataset.recommendedAction}</p>
                       </div>
                     </div>
 
@@ -330,7 +338,7 @@ export function DemoPlatformPage() {
                       <ul className="mt-3 space-y-2 text-sm text-slate-600">
                         {relatedLogs.length ? relatedLogs.map((entry) => (
                           <li key={entry.id} className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
-                            <p>{entry.message}</p>
+                            <p className="break-words">{entry.message}</p>
                             <p className="mt-1 text-xs text-slate-500">{entry.at}</p>
                           </li>
                         )) : <li className="text-sm text-slate-500">No actions yet.</li>}
@@ -365,13 +373,13 @@ export function DemoPlatformPage() {
         {selectedDataset ? (
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm font-medium text-slate-700">{selectedDataset.summary}</p>
+              <p className="break-words text-sm font-medium text-slate-700">{selectedDataset.summary}</p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">API</p><p className="mt-1 text-sm font-semibold text-slate-800">{selectedDataset.api}</p></div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Owner</p><p className="mt-1 text-sm font-semibold text-slate-800">{selectedDataset.owner}</p></div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Status</p><p className="mt-1 text-sm font-semibold text-slate-800">{selectedDataset.status}</p></div>
-              <div className="rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Last sync</p><p className="mt-1 text-sm font-semibold text-slate-800">{selectedDataset.lastSync}</p></div>
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">API</p><p className="mt-1 break-all text-sm font-semibold text-slate-800">{selectedDataset.api}</p></div>
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Owner</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.owner}</p></div>
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Status</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.status}</p></div>
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Last sync</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.lastSync}</p></div>
             </div>
             <div className="grid gap-3">
               <button type="button" className="public-button public-button-primary justify-center" onClick={() => runAction("Demo launch", "processing")}>

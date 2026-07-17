@@ -6,9 +6,24 @@ import { aiosMotion } from "@/components/aios/animations"
 import { AIOSFloatingParticles, AIOSLightBackground } from "@/components/aios/backgrounds"
 import { AIOSFooter } from "@/components/aios/footer"
 import { AIOSNavbar } from "@/components/aios/navigation"
+import type { AIOSNavItem } from "@/components/aios/navigation"
 import { AIOSPage } from "@/components/aios/layout"
 
-export function AIOSPageShell({ activeHref, children, includeFooter = true, includeNewsletter = true }: { activeHref: string; children: ReactNode; includeFooter?: boolean; includeNewsletter?: boolean }) {
+export function AIOSPageShell({
+  activeHref,
+  children,
+  includeFooter = true,
+  includeNewsletter = true,
+  desktopNavigationItems,
+  mobileNavigationItems,
+}: {
+  activeHref: string
+  children: ReactNode
+  includeFooter?: boolean
+  includeNewsletter?: boolean
+  desktopNavigationItems?: readonly AIOSNavItem[]
+  mobileNavigationItems?: readonly AIOSNavItem[]
+}) {
   const reduceMotion = useReducedMotion()
 
   return (
@@ -16,7 +31,7 @@ export function AIOSPageShell({ activeHref, children, includeFooter = true, incl
       <a href="#main-content" className="public-skip-link">Skip to main content</a>
       <AIOSLightBackground />
       <AIOSFloatingParticles />
-      <AIOSNavbar activeHref={activeHref} />
+      <AIOSNavbar activeHref={activeHref} desktopNavigationItems={desktopNavigationItems} mobileNavigationItems={mobileNavigationItems} />
       <motion.main
         id="main-content"
         initial={reduceMotion ? "animate" : "initial"}

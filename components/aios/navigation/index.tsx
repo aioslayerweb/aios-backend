@@ -11,17 +11,35 @@ import { AIOSContainer } from "@/components/aios/layout"
 import { cx } from "@/components/aios/layout/utils"
 import { aiosNavigationItems, aiosTheme } from "@/components/aios/theme/tokens"
 
+export type AIOSNavItem = {
+  readonly href: string
+  readonly label: string
+}
+
 function isActive(currentHref: string, itemHref: string) {
   const currentPath = currentHref.startsWith("http") ? new URL(currentHref).pathname : currentHref
   const itemPath = itemHref.startsWith("http") ? new URL(itemHref).pathname : itemHref
   return itemPath === "/" ? currentPath === "/" : currentPath === itemPath
 }
 
-export function AIOSNavbar({ activeHref, ctaHref = "/contact", ctaLabel = "Book Demo" }: { activeHref?: string; ctaHref?: string; ctaLabel?: string }) {
+export function AIOSNavbar({
+  activeHref,
+  ctaHref = "/contact",
+  ctaLabel = "Book Demo",
+  desktopNavigationItems = aiosNavigationItems,
+  mobileNavigationItems,
+}: {
+  activeHref?: string
+  ctaHref?: string
+  ctaLabel?: string
+  desktopNavigationItems?: readonly AIOSNavItem[]
+  mobileNavigationItems?: readonly AIOSNavItem[]
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
   const reduceMotion = useReducedMotion()
   const menuPanelRef = useRef<HTMLDivElement | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
+  const resolvedMobileNavigationItems = mobileNavigationItems ?? desktopNavigationItems
 
   useEffect(() => {
     if (!menuOpen) {
@@ -116,7 +134,7 @@ export function AIOSNavbar({ activeHref, ctaHref = "/contact", ctaLabel = "Book 
           </Link>
 
           <nav className="hidden items-center gap-6 lg:flex" aria-label="Global navigation">
-            {aiosNavigationItems.map((item) => {
+            {desktopNavigationItems.map((item) => {
               const active = isActive(activeHref ?? "", item.href)
               return (
                 <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cx("public-link relative py-2 text-sm font-medium transition-colors duration-200", active ? "text-[color:var(--public-color-primary)]" : "text-[color:var(--public-color-text)] hover:text-[color:var(--public-color-primary)]")}>
@@ -156,8 +174,8 @@ export function AIOSNavbar({ activeHref, ctaHref = "/contact", ctaLabel = "Book 
                 </button>
               </div>
 
-              <div className="mt-10 grid gap-3">
-                {aiosNavigationItems.map((item, index) => {
+              <div className="mt-10 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1">
+                {resolvedMobileNavigationItems.map((item, index) => {
                   const active = isActive(activeHref ?? "", item.href)
                   return (
                     <motion.div key={item.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: aiosTheme.motion.state }}>

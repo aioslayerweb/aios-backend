@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { auth } from "@/auth"
-import { PublicContainer, PublicPageShell, PublicSection } from "@/components/aios"
+import { PublicButtonLink, PublicContainer, PublicPageShell, PublicSection } from "@/components/aios"
 import { BrandLogo } from "@/components/branding"
 import { LoginCard } from "@/components/auth/login-card"
 
@@ -44,6 +44,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   <p className="text-xs font-semibold uppercase tracking-wide text-[color:var(--public-color-text-soft)]">Future Ready</p>
                   <p className="mt-2 text-sm">Prepared for Google OAuth, Microsoft Entra ID, email login, magic links, organizations, and RBAC.</p>
                 </div>
+              </div>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <PublicButtonLink href="/demo-platform" variant="secondary" size="lg">Open Demo Platform</PublicButtonLink>
               </div>
             </section>
             <LoginCard />

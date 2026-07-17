@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { AlertCircle, Lock, Mail } from "lucide-react"
 import { useMemo, useState } from "react"
+import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { AuthenticationLoading } from "@/components/auth/auth-loading"
 import { AuthenticationButton } from "@/components/auth/auth-button"
@@ -104,6 +105,14 @@ export function LoginCard() {
           <p className="text-xs text-[color:var(--public-color-text-soft)]">
             Callback destination: <span className="font-semibold">{callbackUrl}</span>
           </p>
+
+          <div className="rounded-2xl border border-blue-200 bg-blue-50/70 px-4 py-3 text-sm text-blue-900">
+            <p className="font-semibold">Need a guided walkthrough first?</p>
+            <p className="mt-1 text-xs text-blue-800/80">Open the fully interactive demo platform with 15 dummy datasets, editing controls, and backend-style actions.</p>
+            <Link href="/demo-platform" className="mt-3 inline-flex items-center font-semibold text-blue-700 hover:text-blue-900">
+              Launch demo platform
+            </Link>
+          </div>
         </form>
       </div>
     </motion.div>

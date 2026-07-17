@@ -1,46 +1,105 @@
 "use client"
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react"
+import { signOut, useSession } from "next-auth/react"
 import { useSecurityContext } from "@/contexts/security-context"
-import type { AuthenticationMethod } from "@/types/security-foundation"
-import { createAuthenticatedIdentity } from "@/utils/security-foundation"
+import type { SessionRecord, UserRecord } from "@/types"
+import type { AuthenticatedIdentity, AuthenticationMethod } from "@/types/security-foundation"
 
-type AuthContextValue = ReturnType<typeof createAuthenticatedIdentity> & {
+type AuthContextValue = AuthenticatedIdentity & {
+  authenticationStatus: "loading" | "authenticated" | "unauthenticated"
   signInAs: (userId: string, method?: AuthenticationMethod) => void
   signOut: () => void
   refreshIdentity: () => void
+}
+
+function mapSessionUserToUserRecord(sessionUser: { id?: string; name?: string | null; email?: string | null }, security: ReturnType<typeof useSecurityContext>, activeUserId: string | null): UserRecord | null {
+  const byId = activeUserId ? security.users.find((item) => item.id === activeUserId) : undefined
+  if (byId) {
+    return byId
+  }
+
+  const email = typeof sessionUser.email === "string" ? sessionUser.email.toLowerCase() : ""
+  const byEmail = security.users.find((item) => item.email.toLowerCase() === email)
+  if (byEmail) {
+    return byEmail
+  }
+
+  if (!email) {
+    return null
+  }
+
+  const fallbackOrganization = security.organizations[0]?.id ?? "org-default"
+  const fallbackWorkspace = security.workspaces[0]?.id ?? "workspace-default"
+  const fallbackDepartment = security.departments[0]?.id ?? "department-default"
+  const fallbackTeam = security.teams[0]?.id
+  const fallbackRole = security.roles[0]?.id ?? "role-default"
+
+  return {
+    id: sessionUser.id ?? `user-${email.split("@")[0]}`,
+    organizationId: fallbackOrganization,
+    workspaceId: fallbackWorkspace,
+    departmentId: fallbackDepartment,
+    teamIds: fallbackTeam ? [fallbackTeam] : [],
+    name: sessionUser.name ?? "AIOS User",
+    email,
+    department: "executive",
+    roleId: fallbackRole,
+    status: "active",
+    lastLogin: new Date().toISOString(),
+    assignedAgents: [],
+    assignedWorkflows: [],
+    serviceAccount: false,
+  }
+}
+
+function mapUserToSessionRecord(user: UserRecord | null, sessions: ReadonlyArray<SessionRecord>): SessionRecord | null {
+  if (!user) {
+    return null
+  }
+
+  return sessions.find((item) => item.userId === user.id) ?? sessions.find((item) => item.current) ?? null
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const security = useSecurityContext()
-  const [method, setMethod] = useState<AuthenticationMethod>("passwordless")
-  const [activeUserId, setActiveUserId] = useState<string | null>(security.users.find((item) => item.status === "active")?.id ?? security.users[0]?.id ?? null)
-  const [isAuthenticated, setIsAuthenticated] = useState(true)
+  const { data: session, status, update } = useSession()
+  const [method, setMethod] = useState<AuthenticationMethod>("email")
+  const [activeUserId, setActiveUserId] = useState<string | null>(null)
 
-  const baseIdentity = useMemo(() => createAuthenticatedIdentity(security, method), [method, security])
-  const user = useMemo(() => security.users.find((item) => item.id === activeUserId) ?? baseIdentity.user, [activeUserId, baseIdentity.user, security.users])
+  const user = useMemo(
+    () => mapSessionUserToUserRecord(session?.user ?? {}, security, activeUserId),
+    [activeUserId, security, session?.user],
+  )
+
+  const sessionRecord = useMemo(() => mapUserToSessionRecord(user, security.sessions), [security.sessions, user])
+  const isAuthenticated = status === "authenticated" && Boolean(session?.user)
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      ...baseIdentity,
       user,
-      isAuthenticated: isAuthenticated && Boolean(user),
+      session: sessionRecord,
+      isAuthenticated,
+      authenticationStatus: status,
       authenticationMethod: method,
+      authenticatedAt: Date.now(),
+      mfaEnabled: true,
+      serviceAccount: false,
+      externalUser: user?.roleId === "role-guest",
       signInAs: (userId: string, nextMethod: AuthenticationMethod = method) => {
         setActiveUserId(userId)
         setMethod(nextMethod)
-        setIsAuthenticated(true)
       },
       signOut: () => {
-        setIsAuthenticated(false)
+        void signOut({ callbackUrl: "/login" })
       },
       refreshIdentity: () => {
-        setIsAuthenticated(Boolean(user))
+        void update()
       },
     }),
-    [baseIdentity, isAuthenticated, method, user]
+    [isAuthenticated, method, sessionRecord, status, update, user]
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

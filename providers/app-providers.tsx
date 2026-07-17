@@ -34,10 +34,12 @@ import { SidebarProvider } from "@/contexts/sidebar-context"
 import { MCPPlatformProvider } from "@/contexts/mcp-platform-context"
 import { RuntimePlatformProvider } from "@/contexts/runtime-platform-context"
 import { InfrastructureProvider } from "@/contexts/infrastructure-context"
+import { AuthSessionProvider } from "@/providers/auth-session-provider"
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <AIOSThemeProvider>
+    <AuthSessionProvider>
+      <AIOSThemeProvider>
       <RuntimeProvider>
         <SupabaseProvider>
           <MemoryProvider>
@@ -101,6 +103,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
           </MemoryProvider>
         </SupabaseProvider>
       </RuntimeProvider>
-    </AIOSThemeProvider>
+      </AIOSThemeProvider>
+    </AuthSessionProvider>
   )
 }

@@ -130,8 +130,8 @@ export const mockTimeline: ExecutiveTimelineItem[] = [
 ]
 
 export const mockExecutiveKPIs: ExecutiveKPI[] = [
-  { id: "k1", label: "Revenue", value: "$4.8M", target: "$5.0M", delta: "+8.2%", trend: "up" },
-  { id: "k2", label: "Pipeline", value: "$12.6M", target: "$11.8M", delta: "+6.4%", trend: "up" },
+  { id: "k1", label: "Revenue", value: "€4.8M", target: "€5.0M", delta: "+8.2%", trend: "up" },
+  { id: "k2", label: "Pipeline", value: "€12.6M", target: "€11.8M", delta: "+6.4%", trend: "up" },
   { id: "k3", label: "Open Deals", value: "43", target: "40", delta: "+3", trend: "up" },
   { id: "k4", label: "Tasks", value: "126", target: "120", delta: "+4", trend: "up" },
   { id: "k5", label: "Customers", value: "312", target: "305", delta: "+7", trend: "up" },

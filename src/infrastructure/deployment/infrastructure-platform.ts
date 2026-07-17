@@ -258,14 +258,14 @@ export class InfrastructurePlatform {
         { metric: "mcp-connectivity", environment, timestamp: isoNow(), value: 96, unit: "percent" },
         { metric: "agent-health", environment, timestamp: isoNow(), value: 95, unit: "percent" },
         { metric: "workflow-execution", environment, timestamp: isoNow(), value: 94, unit: "percent" },
-        { metric: "cost-model-usage", environment, timestamp: isoNow(), value: 2500, unit: "usd" },
-        { metric: "cost-infrastructure-usage", environment, timestamp: isoNow(), value: 1800, unit: "usd" },
-        { metric: "cost-storage", environment, timestamp: isoNow(), value: 430, unit: "usd" },
-        { metric: "cost-memory", environment, timestamp: isoNow(), value: 220, unit: "usd" },
-        { metric: "cost-database", environment, timestamp: isoNow(), value: 610, unit: "usd" },
-        { metric: "cost-mcp-traffic", environment, timestamp: isoNow(), value: 310, unit: "usd" },
-        { metric: "cost-workflow-execution", environment, timestamp: isoNow(), value: 520, unit: "usd" },
-        { metric: "cost-agent-execution", environment, timestamp: isoNow(), value: 780, unit: "usd" },
+        { metric: "cost-model-usage", environment, timestamp: isoNow(), value: 2500, unit: "eur" },
+        { metric: "cost-infrastructure-usage", environment, timestamp: isoNow(), value: 1800, unit: "eur" },
+        { metric: "cost-storage", environment, timestamp: isoNow(), value: 430, unit: "eur" },
+        { metric: "cost-memory", environment, timestamp: isoNow(), value: 220, unit: "eur" },
+        { metric: "cost-database", environment, timestamp: isoNow(), value: 610, unit: "eur" },
+        { metric: "cost-mcp-traffic", environment, timestamp: isoNow(), value: 310, unit: "eur" },
+        { metric: "cost-workflow-execution", environment, timestamp: isoNow(), value: 520, unit: "eur" },
+        { metric: "cost-agent-execution", environment, timestamp: isoNow(), value: 780, unit: "eur" },
       ]
       monitoringPoints.forEach((point) => {
         this.monitoring.record(point)

@@ -58,7 +58,7 @@ const PlanningEngineContext = createContext<PlanningEngineContextValue | null>(n
 export function PlanningEngineProvider({ children }: { children: ReactNode }) {
   const defaults = useMemo(() => createPlanningEngineDefaults(), [])
   const runtimeLive = useRuntimeLiveContext()
-  const runtimeStatus = useRuntimeStatusContext()
+  const { updateModuleStatus } = useRuntimeStatusContext()
   const { addActivity } = useActivityFeedContext()
   const { addEntry } = useMemoryContext()
   const { notify } = useNotificationContext()
@@ -104,17 +104,17 @@ export function PlanningEngineProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const summary = buildPlanningSummary(goals, plans)
-    runtimeStatus.updateModuleStatus("automation", {
+    updateModuleStatus("automation", {
       status: "active",
       label: "Planning",
       description: summary,
     })
-    runtimeStatus.updateModuleStatus("search", {
+    updateModuleStatus("search", {
       status: "active",
       label: "Planning",
       description: "Planning engine is continuously evaluating cross-system signals.",
     })
-  }, [goals, plans, runtimeStatus])
+  }, [goals, plans, updateModuleStatus])
 
   useEffect(() => {
     const latestOrchestrator = orchestrator.messages[0]

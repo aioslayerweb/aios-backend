@@ -44,6 +44,7 @@ export default function PilotPage() {
       <PublicSection>
         <PublicContainer>
           <div className="flex flex-wrap gap-4">
+            <PublicButtonLink href="/pilot/discovery" variant="secondary" size="lg">Start Business Discovery</PublicButtonLink>
             <PublicButtonLink href="/contact" size="lg">Book Pilot</PublicButtonLink>
             <PublicButtonLink href="/products" variant="secondary" size="lg">Review Products</PublicButtonLink>
           </div>

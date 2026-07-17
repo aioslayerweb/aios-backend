@@ -22,14 +22,14 @@ export const intelligenceKpis: IntelligenceKpi[] = [
   { id: "k4", label: "Forecast Accuracy", value: "94%", detail: "Rolling forecast confidence", tone: "success" },
   { id: "k5", label: "Automation Coverage", value: "71%", detail: "Decisions and workflows automated", tone: "success" },
   { id: "k6", label: "AI Confidence", value: "95%", detail: "Model confidence on active intelligence", tone: "success" },
-  { id: "k7", label: "Revenue Opportunity", value: "$8.4M", detail: "Identified quarterly opportunity pool", tone: "warning" },
+  { id: "k7", label: "Revenue Opportunity", value: "€8.4M", detail: "Identified quarterly opportunity pool", tone: "warning" },
   { id: "k8", label: "Operational Efficiency", value: "+14%", detail: "Process efficiency improvement", tone: "success" },
 ];
 
 export const intelligenceRibbon: IntelligenceRibbonItem[] = [
   { id: "r1", label: "Critical Alerts", value: "4", status: "Escalated", trend: "+1", tone: "critical" },
   { id: "r2", label: "Emerging Opportunities", value: "12", status: "Tracking", trend: "+3", tone: "success" },
-  { id: "r3", label: "Revenue Forecast", value: "$24.6M", status: "This quarter", trend: "+12.4%", tone: "success" },
+  { id: "r3", label: "Revenue Forecast", value: "€24.6M", status: "This quarter", trend: "+12.4%", tone: "success" },
   { id: "r4", label: "Risk Alerts", value: "7", status: "Active", trend: "+2", tone: "warning" },
   { id: "r5", label: "Departments Requiring Attention", value: "3", status: "Monitor", trend: "-1", tone: "warning" },
   { id: "r6", label: "Confidence Level", value: "95%", status: "Stable", trend: "+1%", tone: "success" },
@@ -37,7 +37,7 @@ export const intelligenceRibbon: IntelligenceRibbonItem[] = [
 ];
 
 export const intelligenceSignals: IntelligenceSignal[] = [
-  { id: "s1", label: "Revenue expected to increase by 12.4%", source: "Executive KPIs", value: "$24.6M", trend: "+12.4%", detail: "Demand growth and pricing uplift are driving forecast expansion." },
+  { id: "s1", label: "Revenue expected to increase by 12.4%", source: "Executive KPIs", value: "€24.6M", trend: "+12.4%", detail: "Demand growth and pricing uplift are driving forecast expansion." },
   { id: "s2", label: "Customer churn predicted in Germany", source: "Customer Signals", value: "8.2%", trend: "+1.3%", detail: "Renewal risk is concentrated in EMEA enterprise accounts." },
   { id: "s3", label: "Knowledge quality increased 18%", source: "Knowledge Center", value: "98%", trend: "+18%", detail: "Policy alignment and reference depth improved after governance review." },
   { id: "s4", label: "AI adoption reached 71%", source: "Agent Studio", value: "71%", trend: "+6%", detail: "Role-based assistants are now used across sales, finance, and operations." },
@@ -53,7 +53,7 @@ export const intelligenceCards: IntelligenceCardRecord[] = [
     title: "Revenue acceleration in North America enterprise accounts",
     executiveSummary: "Executive pipeline momentum and pricing stability point to an upsell opportunity.",
     aiAnalysis: "Forecast confidence is high because renewal risk is low and conversion velocity improved in the last two cycles.",
-    businessImpact: "Potential quarterly uplift of $2.4M with limited implementation overhead.",
+    businessImpact: "Potential quarterly uplift of €2.4M with limited implementation overhead.",
     priority: "critical",
     confidence: 96,
     supportingEvidence: [
@@ -72,7 +72,7 @@ export const intelligenceCards: IntelligenceCardRecord[] = [
     title: "Germany churn risk requires intervention",
     executiveSummary: "A narrow set of accounts in Germany is showing elevated churn indicators.",
     aiAnalysis: "The model correlates delayed support resolution, lower product adoption, and reduced executive engagement.",
-    businessImpact: "At-risk revenue exposure is $1.1M unless retention actions are taken.",
+    businessImpact: "At-risk revenue exposure is €1.1M unless retention actions are taken.",
     priority: "high",
     confidence: 93,
     supportingEvidence: [
@@ -200,7 +200,7 @@ export const intelligenceGraphEdges: IntelligenceGraphEdge[] = [
 ];
 
 export const intelligenceInsights: IntelligenceInsight[] = [
-  { id: "i1", title: "Revenue Trends", detail: "Revenue is expected to increase by 12.4% with pricing and retention support.", confidence: 96, impact: "+$8.4M opportunity" },
+  { id: "i1", title: "Revenue Trends", detail: "Revenue is expected to increase by 12.4% with pricing and retention support.", confidence: 96, impact: "+€8.4M opportunity" },
   { id: "i2", title: "Customer Behaviour", detail: "Germany churn risk is concentrated in top enterprise accounts.", confidence: 93, impact: "Retention intervention required" },
   { id: "i3", title: "Workflow Performance", detail: "Warehouse and approval workflows are nearing capacity thresholds.", confidence: 95, impact: "Automation and expansion needed" },
   { id: "i4", title: "Knowledge Growth", detail: "Knowledge quality increased 18% after recent governance updates.", confidence: 94, impact: "Better retrieval and reasoning" },
@@ -216,7 +216,7 @@ export const intelligenceRecommendations: IntelligenceRecommendation[] = [
     recommendation: "Approve enterprise pricing expansion",
     reasoning: "Pricing elasticity is favorable and strategic accounts remain stable.",
     evidence: ["Expansion pipeline covers the new price point", "Churn risk remains low in core segments", "Margin uplift is material"],
-    expectedROI: "$5.1M annual margin impact",
+    expectedROI: "€5.1M annual margin impact",
     implementationEffort: "Medium",
     confidence: 92,
     priority: "critical",
@@ -227,7 +227,7 @@ export const intelligenceRecommendations: IntelligenceRecommendation[] = [
     recommendation: "Delegate Germany churn mitigation",
     reasoning: "Retention risk is localized and requires targeted execution.",
     evidence: ["Support response time degraded", "Customer sentiment dropped", "Renewal risk increased"],
-    expectedROI: "$1.1M protected revenue",
+    expectedROI: "€1.1M protected revenue",
     implementationEffort: "Low",
     confidence: 93,
     priority: "high",
@@ -238,7 +238,7 @@ export const intelligenceRecommendations: IntelligenceRecommendation[] = [
     recommendation: "Create warehouse overflow workflow",
     reasoning: "Capacity approaches saturation; additional routing is needed before peak demand.",
     evidence: ["Capacity forecast at 95%", "Queue times are trending up", "Overtime costs are increasing"],
-    expectedROI: "$3.2M network benefit",
+    expectedROI: "€3.2M network benefit",
     implementationEffort: "Medium",
     confidence: 95,
     priority: "high",
@@ -249,7 +249,7 @@ export const intelligenceRecommendations: IntelligenceRecommendation[] = [
     recommendation: "Schedule finance automation review",
     reasoning: "Finance offers the highest automation opportunity based on approval bottlenecks.",
     evidence: ["Approval SLA is slow", "Manual checks duplicate controls", "Automation readiness is strong"],
-    expectedROI: "$2.4M savings",
+    expectedROI: "€2.4M savings",
     implementationEffort: "Medium",
     confidence: 97,
     priority: "medium",
@@ -258,11 +258,11 @@ export const intelligenceRecommendations: IntelligenceRecommendation[] = [
 ];
 
 export const intelligenceScenarios: IntelligenceScenario[] = [
-  { id: "s1", label: "Current", revenue: "$24.6M", profit: "$6.8M", growth: "+8.1%", risk: "18", customerSatisfaction: "91" },
-  { id: "s2", label: "Optimistic", revenue: "$27.2M", profit: "$7.9M", growth: "+12.4%", risk: "12", customerSatisfaction: "94" },
-  { id: "s3", label: "Expected", revenue: "$26.1M", profit: "$7.2M", growth: "+10.2%", risk: "15", customerSatisfaction: "92" },
-  { id: "s4", label: "Conservative", revenue: "$25.0M", profit: "$6.4M", growth: "+7.0%", risk: "21", customerSatisfaction: "89" },
-  { id: "s5", label: "Worst Case", revenue: "$22.1M", profit: "$5.3M", growth: "+2.4%", risk: "31", customerSatisfaction: "84" },
+  { id: "s1", label: "Current", revenue: "€24.6M", profit: "€6.8M", growth: "+8.1%", risk: "18", customerSatisfaction: "91" },
+  { id: "s2", label: "Optimistic", revenue: "€27.2M", profit: "€7.9M", growth: "+12.4%", risk: "12", customerSatisfaction: "94" },
+  { id: "s3", label: "Expected", revenue: "€26.1M", profit: "€7.2M", growth: "+10.2%", risk: "15", customerSatisfaction: "92" },
+  { id: "s4", label: "Conservative", revenue: "€25.0M", profit: "€6.4M", growth: "+7.0%", risk: "21", customerSatisfaction: "89" },
+  { id: "s5", label: "Worst Case", revenue: "€22.1M", profit: "€5.3M", growth: "+2.4%", risk: "31", customerSatisfaction: "84" },
 ];
 
 export const intelligenceAnomalies: IntelligenceAnomaly[] = [

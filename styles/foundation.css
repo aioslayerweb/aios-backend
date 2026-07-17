@@ -220,6 +220,7 @@ pre {
   color: var(--public-color-navy);
   letter-spacing: -0.04em;
   text-wrap: balance;
+  overflow-wrap: anywhere;
 }
 
 .public-display-xl {
@@ -262,6 +263,7 @@ pre {
   font-size: var(--public-type-body-lg);
   line-height: 1.65;
   color: var(--public-color-text);
+  overflow-wrap: anywhere;
 }
 
 .public-body,
@@ -273,17 +275,20 @@ pre {
 .public-body {
   font-size: var(--public-type-body);
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .public-small {
   font-size: var(--public-type-small);
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .public-caption {
   font-size: var(--public-type-caption);
   line-height: 1.45;
   letter-spacing: 0.04em;
+  overflow-wrap: anywhere;
 }
 
 .public-card {
@@ -292,6 +297,7 @@ pre {
   background: var(--public-color-surface-strong);
   box-shadow: var(--public-shadow-soft);
   backdrop-filter: blur(16px);
+  min-width: 0;
 }
 
 .public-card-standard,
@@ -425,6 +431,8 @@ pre {
   color: var(--public-color-text);
   font-size: 0.92rem;
   font-weight: 600;
+  white-space: normal;
+  text-align: left;
   transition: all 180ms cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
@@ -530,6 +538,24 @@ pre {
   .public-container,
   .public-container-wide {
     width: min(calc(100% - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)), var(--public-content-width));
+  }
+
+  .public-card-standard,
+  .public-card-feature,
+  .public-card-comparison,
+  .public-card-module,
+  .public-card-product,
+  .public-card-article,
+  .public-card-kpi,
+  .public-card-floating {
+    padding: 20px;
+  }
+
+  .public-chip {
+    justify-content: flex-start;
+    min-height: 44px;
+    padding: 10px 14px;
+    width: 100%;
   }
 
   .public-h2 {

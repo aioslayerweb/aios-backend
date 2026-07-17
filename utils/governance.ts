@@ -125,7 +125,7 @@ export function createGovernanceDefaults(): GovernanceState {
   ]
 
   const policies: GovernancePolicyRule[] = [
-    { id: "p1", name: "Revenue Threshold", category: "revenue", status: "active", description: "Executive approval required above strategic revenue opportunity threshold.", threshold: "$250k ARR", scope: "Executive + Sales" },
+    { id: "p1", name: "Revenue Threshold", category: "revenue", status: "active", description: "Executive approval required above strategic revenue opportunity threshold.", threshold: "€250k ARR", scope: "Executive + Sales" },
     { id: "p2", name: "Risk Threshold", category: "risk", status: "active", description: "High-risk customer or operational events require governance visibility.", threshold: "Risk score > 80", scope: "Customer Success + Operations" },
     { id: "p3", name: "Financial Controls", category: "financial", status: "active", description: "Workflow changes affecting finance approvals must remain reviewable.", threshold: "Any approval reroute", scope: "Finance" },
     { id: "p4", name: "Compliance Documentation", category: "compliance", status: "warning", description: "Knowledge references used in AI reasoning must map to approved documentation sources.", threshold: "Approved source coverage 95%", scope: "Knowledge + Compliance" },

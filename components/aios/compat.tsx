@@ -55,7 +55,7 @@ export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: str
             aria-controls={`${item.key}-panel`}
             tabIndex={item.key === activeKey ? 0 : -1}
             onClick={() => setActiveKey(item.key)}
-            className="public-chip text-left"
+            className="public-chip max-w-full text-left"
             data-active={item.key === activeKey}
           >
             {item.label}

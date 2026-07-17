@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
+import { ProtectedRoute } from "@/components/auth/protected-route"
 
 type AppAccessGateProps = {
   children: ReactNode;
 };
 
 export function AppAccessGate({ children }: AppAccessGateProps) {
-  // Placeholder for future app auth checks; pass-through is intentional for demo mode.
-  return <>{children}</>;
+  return <ProtectedRoute>{children}</ProtectedRoute>
 }

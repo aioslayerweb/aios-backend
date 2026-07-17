@@ -83,7 +83,7 @@ export function WorkflowBuilderProvider({ children }: { children: ReactNode }) {
   const { addActivity } = useActivityFeedContext()
   const { addEntry } = useMemoryContext()
   const { notify } = useNotificationContext()
-  const runtimeStatus = useRuntimeStatusContext()
+  const { updateModuleStatus } = useRuntimeStatusContext()
 
   const selectedWorkflow = useMemo(
     () => workflows.find((item) => item.id === selectedWorkflowId) ?? null,
@@ -315,12 +315,12 @@ export function WorkflowBuilderProvider({ children }: { children: ReactNode }) {
       steps: previous.steps.map((step) => ({ ...step, status: "pending" })),
     }))
 
-    runtimeStatus.updateModuleStatus("automation", {
+    updateModuleStatus("automation", {
       status: "active",
       label: "Idle",
       description: "Workflow Builder execution preview is idle.",
     })
-  }, [runtimeStatus])
+  }, [updateModuleStatus])
 
   const runExecutionPreview = useCallback(() => {
     if (!selectedWorkflow || selectedWorkflow.nodes.length === 0) {
@@ -342,7 +342,7 @@ export function WorkflowBuilderProvider({ children }: { children: ReactNode }) {
       estimatedDurationSeconds,
     })
 
-    runtimeStatus.updateModuleStatus("automation", {
+    updateModuleStatus("automation", {
       status: "active",
       label: "Preview Running",
       description: "Workflow execution preview is active.",
@@ -443,7 +443,7 @@ export function WorkflowBuilderProvider({ children }: { children: ReactNode }) {
           autoDismissMs: 4200,
         })
 
-        runtimeStatus.updateModuleStatus("automation", {
+        updateModuleStatus("automation", {
           status: "healthy",
           label: "Ready",
           description: "Workflow preview completed and ready for next run.",
@@ -456,7 +456,7 @@ export function WorkflowBuilderProvider({ children }: { children: ReactNode }) {
         }))
       }
     }, 850)
-  }, [addActivity, addEntry, notify, runtimeStatus, selectedWorkflow, updateWorkflow])
+  }, [addActivity, addEntry, notify, selectedWorkflow, updateModuleStatus, updateWorkflow])
 
   const changeWorkflowStatus = useCallback(
     (status: WorkflowVersionStatus) => {

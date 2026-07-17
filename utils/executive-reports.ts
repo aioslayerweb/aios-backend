@@ -22,8 +22,8 @@ export function createExecutiveReportsDefaults(): ExecutiveReportsState {
   ]
 
   const strategicKPIs: StrategicKPIItem[] = [
-    { id: "k1", label: "Revenue Growth", value: "$4.8M", target: "$5.0M", delta: "+8.2%", trend: "up", confidence: 91 },
-    { id: "k2", label: "Pipeline Health", value: "$12.6M", target: "$11.8M", delta: "+6.4%", trend: "up", confidence: 87 },
+    { id: "k1", label: "Revenue Growth", value: "€4.8M", target: "€5.0M", delta: "+8.2%", trend: "up", confidence: 91 },
+    { id: "k2", label: "Pipeline Health", value: "€12.6M", target: "€11.8M", delta: "+6.4%", trend: "up", confidence: 87 },
     { id: "k3", label: "Customer Retention", value: "96.1%", target: "96.5%", delta: "-0.2 pts", trend: "down", confidence: 78 },
     { id: "k4", label: "Task Completion", value: "126", target: "120", delta: "+4", trend: "up", confidence: 83 },
     { id: "k5", label: "Workflow Automation", value: "99.1%", target: "98%", delta: "+1.1 pts", trend: "up", confidence: 94 },
@@ -41,7 +41,7 @@ export function createExecutiveReportsDefaults(): ExecutiveReportsState {
   }
 
   const recommendations: ExecutiveRecommendation[] = [
-    { id: "r1", title: "Increase customer success staffing", description: "Strategic account load is compressing response times for top-tier customers.", businessImpact: "Protects $420k ARR at immediate risk.", confidence: 88, risk: "Customer risk", estimatedROI: "12.4x retention leverage", nextStep: "Approve temporary staffing reallocation." },
+    { id: "r1", title: "Increase customer success staffing", description: "Strategic account load is compressing response times for top-tier customers.", businessImpact: "Protects €420k ARR at immediate risk.", confidence: 88, risk: "Customer risk", estimatedROI: "12.4x retention leverage", nextStep: "Approve temporary staffing reallocation." },
     { id: "r2", title: "Prioritize enterprise healthcare segment", description: "Pipeline and usage patterns show stronger close propensity in one vertical cluster.", businessImpact: "Accelerates near-term expansion revenue.", confidence: 84, risk: "Strategic timing risk", estimatedROI: "8.1x pipeline efficiency", nextStep: "Re-rank opportunity sequence in revenue workflow." },
     { id: "r3", title: "Reduce finance approval bottleneck", description: "A workflow approval branch is introducing repeat operational drag.", businessImpact: "Improves throughput and executive review speed.", confidence: 76, risk: "Operational risk", estimatedROI: "4.2x process efficiency", nextStep: "Route finance approval workflow for controlled optimization review." },
     { id: "r4", title: "Launch scoped knowledge refresh", description: "Stale references are weakening explainability coverage and decision accuracy.", businessImpact: "Improves board-report trust and AI narrative quality.", confidence: 73, risk: "Compliance documentation drift", estimatedROI: "3.7x reasoning reliability", nextStep: "Run governance-approved document refresh." },

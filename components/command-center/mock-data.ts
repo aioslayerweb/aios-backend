@@ -67,7 +67,7 @@ export const commandCenterData: CommandCenterData = {
     { id: "p3", title: "Resolve SOC-2 evidence gap", owner: "Security", due: "Tomorrow 11:00", score: 88 },
   ],
   decisions: [
-    { id: "d1", title: "Approve churn recovery campaign", impact: "$420k ARR at risk", confidence: 92, status: "pending" },
+    { id: "d1", title: "Approve churn recovery campaign", impact: "€420k ARR at risk", confidence: 92, status: "pending" },
     { id: "d2", title: "Increase enterprise sales coverage", impact: "Q4 pipeline +14%", confidence: 86, status: "pending" },
     { id: "d3", title: "Pause low-yield demand spend", impact: "Budget efficiency +9%", confidence: 84, status: "approved" },
   ],
@@ -78,7 +78,7 @@ export const commandCenterData: CommandCenterData = {
   ],
   recommendations: [
     { id: "r1", label: "Shift 8% budget from low-converting channels into enterprise ABM", href: "#", meta: "Confidence 89%" },
-    { id: "r2", label: "Launch retention playbook for top 20 at-risk accounts", href: "#", meta: "Expected ARR protection: $1.1M" },
+    { id: "r2", label: "Launch retention playbook for top 20 at-risk accounts", href: "#", meta: "Expected ARR protection: €1.1M" },
     { id: "r3", label: "Escalate vendor security review before expansion launch", href: "#", meta: "Risk severity: High" },
   ],
   recentActivity: [

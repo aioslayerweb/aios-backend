@@ -6,7 +6,7 @@ import type { RuntimeBusinessMetrics } from "./runtime-types"
 function toCurrency(value: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "EUR",
     maximumFractionDigits: 0,
   }).format(value)
 }

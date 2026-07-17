@@ -276,13 +276,13 @@ export function PublicRoiCalculatorSection() {
           <PublicCard variant="floating" className="space-y-4">
             <RoiInput label="Employees" value={employees} setValue={(value) => { markRoiUsage("employees"); setEmployees(value) }} min={25} max={10000} step={25} />
             <RoiInput label="Departments" value={departments} setValue={(value) => { markRoiUsage("departments"); setDepartments(value) }} min={2} max={60} step={1} />
-            <RoiInput label="Revenue (annual USD)" value={revenue} setValue={(value) => { markRoiUsage("revenue"); setRevenue(value) }} min={1000000} max={500000000} step={500000} />
+            <RoiInput label="Revenue (annual EUR)" value={revenue} setValue={(value) => { markRoiUsage("revenue"); setRevenue(value) }} min={1000000} max={500000000} step={500000} />
             <RoiInput label="Customer count" value={customers} setValue={(value) => { markRoiUsage("customers"); setCustomers(value) }} min={100} max={200000} step={100} />
             <RoiInput label="Monthly opportunities" value={opportunities} setValue={(value) => { markRoiUsage("opportunities"); setOpportunities(value) }} min={20} max={24000} step={20} />
             <RoiInput label="Support tickets (annual)" value={tickets} setValue={(value) => { markRoiUsage("tickets"); setTickets(value) }} min={120} max={300000} step={50} />
             <RoiInput label="Hours lost to manual work / month" value={hours} setValue={(value) => { markRoiUsage("hours"); setHours(value) }} min={80} max={20000} step={20} />
             <RoiInput label="Meetings per week" value={meetings} setValue={(value) => { markRoiUsage("meetings"); setMeetings(value) }} min={8} max={400} step={1} />
-            <RoiInput label="Average hourly employee cost (USD)" value={hourlyCost} setValue={(value) => { markRoiUsage("hourly_cost"); setHourlyCost(value) }} min={20} max={320} step={1} />
+            <RoiInput label="Average hourly employee cost (EUR)" value={hourlyCost} setValue={(value) => { markRoiUsage("hourly_cost"); setHourlyCost(value) }} min={20} max={320} step={1} />
           </PublicCard>
 
           <motion.div
@@ -293,9 +293,9 @@ export function PublicRoiCalculatorSection() {
             className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1"
           >
             <RoiStat title="Hours saved" value={`${metrics.hoursSavedMonthly.toLocaleString()} hrs/mo`} detail={`${metrics.annualHoursSaved.toLocaleString()} hours annually.`} />
-            <RoiStat title="Cost reduction" value={`$${metrics.costReduction.toLocaleString()}`} detail="Lower manual operations and faster routing." />
+            <RoiStat title="Cost reduction" value={`€${metrics.costReduction.toLocaleString()}`} detail="Lower manual operations and faster routing." />
             <RoiStat title="Recovered opportunities" value={`${metrics.opportunitiesRecovered.toLocaleString()} / year`} detail="Recovered with earlier risk and priority detection." />
-            <RoiStat title="Estimated annual value" value={`$${metrics.annualValue.toLocaleString()}`} detail="Combined operational and commercial impact." />
+            <RoiStat title="Estimated annual value" value={`€${metrics.annualValue.toLocaleString()}`} detail="Combined operational and commercial impact." />
             <RoiStat title="Productivity increase" value={`${metrics.productivityIncrease}%`} detail="Cross-functional productivity improvement estimate." />
             <RoiStat title="Payback period" value={`${metrics.paybackMonths} months`} detail={`Confidence model: ${metrics.confidence}%`} />
             <RoiStat title="ROI percentage" value={`${metrics.roiPercentage}%`} detail="Estimated first-year return on pilot investment." />
@@ -325,7 +325,7 @@ function RoiInput({
   return (
     <label className="block text-sm font-medium text-[color:var(--public-color-text)]">
       <span>{label}</span>
-      <div className="mt-2 grid grid-cols-[1fr_auto] items-center gap-3">
+      <div className="mt-2 grid grid-cols-1 items-center gap-3 sm:grid-cols-[1fr_auto]">
         <input
           className="public-input"
           type="range"
@@ -336,7 +336,7 @@ function RoiInput({
           onChange={(event) => setValue(Number(event.target.value))}
           aria-label={label}
         />
-        <span className="public-chip min-w-[120px] justify-end" aria-live="polite">
+        <span className="public-chip w-full justify-start sm:min-w-[120px] sm:w-auto sm:justify-end" aria-live="polite">
           {value.toLocaleString()}
         </span>
       </div>
@@ -400,8 +400,8 @@ export function PublicIntelligenceCapacitySection() {
   const plans = useMemo(() => {
     const capacityNeed = Math.round(dataPoints * (0.6 + monthlyConsumption / 100))
     const base = [
-      { key: "pilot" as const, title: "Pilot Plan", range: "Up to 180k ICU", price: "$15k-$25k / month", fit: "Focused discovery + first production workflows" },
-      { key: "growth" as const, title: "Growth Plan", range: "180k-750k ICU", price: "$30k-$75k / month", fit: "Multi-department scale and broader automation" },
+      { key: "pilot" as const, title: "Pilot Plan", range: "Up to 180k ICU", price: "€15k-€25k / month", fit: "Focused discovery + first production workflows" },
+      { key: "growth" as const, title: "Growth Plan", range: "180k-750k ICU", price: "€30k-€75k / month", fit: "Multi-department scale and broader automation" },
       { key: "enterprise" as const, title: "Enterprise Plan", range: "750k+ ICU", price: "Custom commercial model", fit: "Global operations, advanced governance, and high-volume orchestration" },
     ]
 

@@ -42,19 +42,19 @@ export const organizationChart: OrgChartNode[] = [
 ];
 
 export const departmentRecords: DepartmentRecord[] = [
-  { id: "d1", name: "Operations", head: "Liam Brooks", employees: 840, agents: 38, performanceScore: 92, healthScore: 94, budget: "$24.3M", status: "active" },
-  { id: "d2", name: "Engineering", head: "Priya Nair", employees: 1020, agents: 54, performanceScore: 95, healthScore: 91, budget: "$36.8M", status: "growing" },
-  { id: "d3", name: "Finance", head: "Noah Patel", employees: 420, agents: 31, performanceScore: 89, healthScore: 88, budget: "$18.2M", status: "attention" },
-  { id: "d4", name: "Sales", head: "Maya Rivera", employees: 760, agents: 46, performanceScore: 93, healthScore: 90, budget: "$29.5M", status: "active" },
-  { id: "d5", name: "Customer Success", head: "Amelia Scott", employees: 510, agents: 32, performanceScore: 91, healthScore: 92, budget: "$16.4M", status: "stable" },
-  { id: "d6", name: "Compliance", head: "Daniel Wright", employees: 190, agents: 18, performanceScore: 87, healthScore: 89, budget: "$9.7M", status: "attention" },
+  { id: "d1", name: "Operations", head: "Liam Brooks", employees: 840, agents: 38, performanceScore: 92, healthScore: 94, budget: "€24.3M", status: "active" },
+  { id: "d2", name: "Engineering", head: "Priya Nair", employees: 1020, agents: 54, performanceScore: 95, healthScore: 91, budget: "€36.8M", status: "growing" },
+  { id: "d3", name: "Finance", head: "Noah Patel", employees: 420, agents: 31, performanceScore: 89, healthScore: 88, budget: "€18.2M", status: "attention" },
+  { id: "d4", name: "Sales", head: "Maya Rivera", employees: 760, agents: 46, performanceScore: 93, healthScore: 90, budget: "€29.5M", status: "active" },
+  { id: "d5", name: "Customer Success", head: "Amelia Scott", employees: 510, agents: 32, performanceScore: 91, healthScore: 92, budget: "€16.4M", status: "stable" },
+  { id: "d6", name: "Compliance", head: "Daniel Wright", employees: 190, agents: 18, performanceScore: 87, healthScore: 89, budget: "€9.7M", status: "attention" },
 ];
 
 export const businessUnits: BusinessUnitRecord[] = [
-  { id: "b1", name: "North America Enterprise", region: "NAMER", revenue: "$84.2M", employees: 1240, agents: 68, processes: 132, risk: "Low", growth: "+14%" },
-  { id: "b2", name: "EMEA Strategic", region: "EMEA", revenue: "$52.9M", employees: 910, agents: 57, processes: 108, risk: "Medium", growth: "+9%" },
-  { id: "b3", name: "APAC Expansion", region: "APAC", revenue: "$31.7M", employees: 640, agents: 41, processes: 84, risk: "Medium", growth: "+17%" },
-  { id: "b4", name: "Public Sector", region: "Global", revenue: "$21.1M", employees: 390, agents: 24, processes: 62, risk: "Low", growth: "+8%" },
+  { id: "b1", name: "North America Enterprise", region: "NAMER", revenue: "€84.2M", employees: 1240, agents: 68, processes: 132, risk: "Low", growth: "+14%" },
+  { id: "b2", name: "EMEA Strategic", region: "EMEA", revenue: "€52.9M", employees: 910, agents: 57, processes: 108, risk: "Medium", growth: "+9%" },
+  { id: "b3", name: "APAC Expansion", region: "APAC", revenue: "€31.7M", employees: 640, agents: 41, processes: 84, risk: "Medium", growth: "+17%" },
+  { id: "b4", name: "Public Sector", region: "Global", revenue: "€21.1M", employees: 390, agents: 24, processes: 62, risk: "Low", growth: "+8%" },
 ];
 
 export const peopleDirectory: EmployeeRecord[] = [

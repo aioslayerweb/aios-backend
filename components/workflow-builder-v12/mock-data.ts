@@ -112,7 +112,7 @@ export const workflowBuilderData: WorkflowBuilderData = {
       status: "attention",
       owner: "Executive Office",
       decisionType: "Strategic Allocation",
-      businessImpact: "$2.4M revenue exposure",
+      businessImpact: "€2.4M revenue exposure",
       riskLevel: "Medium",
       policyApplied: "FIN-42",
       aiConfidence: 91,
@@ -163,7 +163,7 @@ export const workflowBuilderData: WorkflowBuilderData = {
   intelligence: [
     { id: "i1", label: "Workflow Confidence", value: "93%", detail: "AI reasoning enabled" },
     { id: "i2", label: "Estimated Runtime", value: "08m 40s", detail: "Current branch" },
-    { id: "i3", label: "Business Impact", value: "$2.4M", detail: "Revenue sensitivity" },
+    { id: "i3", label: "Business Impact", value: "€2.4M", detail: "Revenue sensitivity" },
     { id: "i4", label: "Risk Score", value: "28", detail: "Managed risk band" },
     { id: "i5", label: "Organization Alignment", value: "97%", detail: "Executive objectives" },
     { id: "i6", label: "Knowledge Sources", value: "36", detail: "Connected" },
@@ -179,7 +179,7 @@ export const workflowBuilderData: WorkflowBuilderData = {
     { id: "s5", label: "Memory Access", value: "24 pulls", detail: "policy + decisions" },
     { id: "s6", label: "Policy Validation", value: "11 checks", detail: "all pass" },
     { id: "s7", label: "External Systems", value: "4", detail: "Salesforce, SAP, M365, DWH" },
-    { id: "s8", label: "Estimated Cost", value: "$186", detail: "runtime compute" },
+    { id: "s8", label: "Estimated Cost", value: "€186", detail: "runtime compute" },
     { id: "s9", label: "Simulation Confidence", value: "92%", detail: "historical variance" },
   ],
   optimization: [
@@ -211,7 +211,7 @@ export const workflowBuilderData: WorkflowBuilderData = {
   decisionIntelligence: [
     { id: "d1", label: "Decision Owner", value: "CFO", detail: "Executive committee" },
     { id: "d2", label: "Decision Type", value: "Strategic Allocation", detail: "Capital decision" },
-    { id: "d3", label: "Business Impact", value: "$2.4M", detail: "Revenue protection" },
+    { id: "d3", label: "Business Impact", value: "€2.4M", detail: "Revenue protection" },
     { id: "d4", label: "Risk Level", value: "Medium", detail: "Policy managed" },
     { id: "d5", label: "Policy Applied", value: "FIN-42", detail: "Governance policy" },
     { id: "d6", label: "AI Confidence", value: "91%", detail: "Reasoning complete" },
@@ -221,8 +221,8 @@ export const workflowBuilderData: WorkflowBuilderData = {
     { id: "d10", label: "Reasoning Available", value: "Yes", detail: "Traceable" },
   ],
   businessOutcomes: [
-    { id: "bo1", label: "Estimated Revenue Impact", value: "$1.8M", detail: "Upside" },
-    { id: "bo2", label: "Estimated Cost Reduction", value: "$320k", detail: "Annualized" },
+    { id: "bo1", label: "Estimated Revenue Impact", value: "€1.8M", detail: "Upside" },
+    { id: "bo2", label: "Estimated Cost Reduction", value: "€320k", detail: "Annualized" },
     { id: "bo3", label: "Risk Reduction", value: "27%", detail: "Policy reinforced" },
     { id: "bo4", label: "Time Saved", value: "41h / month", detail: "Automation" },
     { id: "bo5", label: "Executive Priority Alignment", value: "97%", detail: "Strategic fit" },

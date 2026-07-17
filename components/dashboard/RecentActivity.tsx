@@ -6,7 +6,7 @@ const activities = [
   {
     id: "1",
     label: "Deal closed with Acme Corp",
-    value: "$24,000",
+    value: "€24,000",
     time: "2m ago",
     status: "success",
   },
@@ -27,7 +27,7 @@ const activities = [
   {
     id: "4",
     label: "Proposal rejected by GlobalNet",
-    value: "$9,500",
+    value: "€9,500",
     time: "3h ago",
     status: "error",
   },

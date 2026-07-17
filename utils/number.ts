@@ -2,7 +2,7 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat("en-US").format(value)
 }
 
-export function formatCurrency(value: number, currency = "USD"): string {
+export function formatCurrency(value: number, currency = "EUR"): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,

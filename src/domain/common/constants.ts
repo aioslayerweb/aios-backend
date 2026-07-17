@@ -1,5 +1,5 @@
 /** Default currency used by enterprise financial objects. */
-export const DEFAULT_CURRENCY = "USD"
+export const DEFAULT_CURRENCY = "EUR"
 
 /** Default language used by domain factories when locale is not specified. */
 export const DEFAULT_LANGUAGE = "en-US"

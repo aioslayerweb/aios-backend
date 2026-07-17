@@ -122,7 +122,7 @@ const OrchestratorContext = createContext<OrchestratorContextValue | null>(null)
 export function OrchestratorProvider({ children }: { children: ReactNode }) {
   const defaults = useMemo(() => createOrchestratorDefaultState(), [])
   const runtimeLive = useRuntimeLiveContext()
-  const runtimeStatus = useRuntimeStatusContext()
+  const { updateModuleStatus } = useRuntimeStatusContext()
   const { addActivity } = useActivityFeedContext()
   const { addEntry } = useMemoryContext()
   const { agents: workspaceAgents } = useAgentWorkspaceContext()
@@ -181,22 +181,22 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
                 : "memory-updated",
       }))
     )
-    runtimeStatus.updateModuleStatus("agents", {
+    updateModuleStatus("agents", {
       status: runtimeLive.runningAgents > 0 ? "active" : "healthy",
       label: `${runtimeLive.runningAgents} Live`,
       description: "Multi-agent orchestration is synchronized with runtime live signals.",
     })
-    runtimeStatus.updateModuleStatus("automation", {
+    updateModuleStatus("automation", {
       status: runtimeLive.queueDepth > 0 ? "active" : "healthy",
       label: runtimeLive.queueDepth > 0 ? `${runtimeLive.queueDepth} Queue` : "Orchestrating",
       description: "Multi-Agent Orchestrator is supervising cross-agent coordination.",
     })
-    runtimeStatus.updateModuleStatus("memory", {
+    updateModuleStatus("memory", {
       status: runtimeLive.memoryUpdates.length > 0 ? "synchronizing" : "healthy",
       label: `${runtimeLive.memoryUpdates.length} Sync`,
       description: "Memory synchronization is sourced from live runtime data.",
     })
-  }, [defaults.agents, defaults.executions, runtimeLive.agents, runtimeLive.executions, runtimeLive.events, runtimeLive.memoryUpdates, runtimeLive.queueDepth, runtimeLive.runningAgents, runtimeStatus])
+  }, [defaults.agents, defaults.executions, runtimeLive.agents, runtimeLive.executions, runtimeLive.events, runtimeLive.memoryUpdates, runtimeLive.queueDepth, runtimeLive.runningAgents, updateModuleStatus])
 
   useEffect(() => {
     const selected = workspaceAgents.find((agent) => agent.id === selectedAgentId)

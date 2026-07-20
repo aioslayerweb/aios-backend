@@ -52,6 +52,7 @@ import {
   useWorkspace,
 } from "@/hooks"
 import { workspaceItems, cn } from "@/utils"
+import { useNavigationBase } from "@/contexts/navigation-context"
 import { useKeyboardShortcuts } from "@/utils/keyboard"
 import { drawerVariants, pageVariants } from "@/theme"
 import { Avatar, Breadcrumb, Button, Dropdown, LoadingSpinner, StatusIndicator } from "@/components/ui"
@@ -169,15 +170,16 @@ function titleFromPath(pathname: string): string {
   return resolveWorkspaceLabel(pathname)
 }
 
-function breadcrumbItems(pathname: string): Array<{ label: string; href?: string }> {
+function breadcrumbItems(pathname: string, baseHref: string = "/app"): Array<{ label: string; href?: string }> {
   return [
-    { label: "Home", href: "/app" },
+    { label: "Home", href: baseHref },
     { label: resolveWorkspaceLabel(pathname) },
   ]
 }
 
 function WorkspaceHeader() {
   const pathname = usePathname()
+  const { baseHref } = useNavigationBase()
   const title = titleFromPath(pathname)
 
   return (
@@ -185,7 +187,7 @@ function WorkspaceHeader() {
       <AIOSCaption className="font-medium uppercase tracking-wide text-text-muted">Workspace</AIOSCaption>
       <AIOSH4 className="mt-1 text-brand-navy">{title}</AIOSH4>
       <div className="mt-3">
-        <Breadcrumb items={breadcrumbItems(pathname)} />
+        <Breadcrumb items={breadcrumbItems(pathname, baseHref)} />
       </div>
     </div>
   )
@@ -193,6 +195,7 @@ function WorkspaceHeader() {
 
 function ShellTopBar() {
   const pathname = usePathname()
+  const { baseHref } = useNavigationBase()
   const { isMobile, isTablet } = useBreakpoint()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { setOpen: setAIPanelOpen } = useAIAssistant()
@@ -201,7 +204,7 @@ function ShellTopBar() {
   const { aiStatus, memoryStatus, isConnected, isRunning } = useAIStatus()
 
   const currentWorkspaceTitle = useMemo(() => titleFromPath(pathname), [pathname])
-  const breadcrumbs = useMemo(() => breadcrumbItems(pathname), [pathname])
+  const breadcrumbs = useMemo(() => breadcrumbItems(pathname, baseHref), [pathname, baseHref])
 
   const quickActions = [
     {
@@ -296,17 +299,19 @@ function ShellTopBar() {
 function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean; onNavigate?: () => void }) {
   const pathname = usePathname()
   const { setWorkspace } = useWorkspace()
+  const { baseHref } = useNavigationBase()
 
   return (
     <nav className="flex-1 space-y-1 p-2" aria-label="Workspace modules">
       {workspaceItems.map((item) => {
         const Icon = iconByKey[item.icon as keyof typeof iconByKey] ?? Sparkles
-        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+        const href = item.href.replace(/^\/app/, baseHref)
+        const isActive = pathname === href || pathname.startsWith(`${href}/`)
 
         return (
           <motion.div key={item.key} whileHover={{ x: 2 }} transition={{ duration: 0.18 }}>
             <Link
-              href={item.href}
+              href={href}
               onClick={() => {
                 setWorkspace(item.key)
                 onNavigate?.()

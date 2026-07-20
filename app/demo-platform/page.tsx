@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DemoPlatformPage() {
-  return <ExecutiveCommandCenter />;
+  return <ExecutiveCommandCenter baseHref="/demo-platform" />;
 }

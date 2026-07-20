@@ -10,7 +10,7 @@ import { WorkspaceLayout } from "@/components/layout/foundation";
 export default function DemoPlatformLayout({ children }: { children: ReactNode }) {
   return (
     <AIOSRuntimeProvider>
-      <WorkspaceLayout>{children}</WorkspaceLayout>
+      <WorkspaceLayout baseHref="/demo-platform">{children}</WorkspaceLayout>
     </AIOSRuntimeProvider>
   );
 }

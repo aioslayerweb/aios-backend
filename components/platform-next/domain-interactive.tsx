@@ -334,12 +334,11 @@ function ResponsiveTelemetryPanel() {
           <thead className="bg-slate-50">
             <tr>
               {cols.map((col) => (
-                <th key={col.key} scope="col" className="px-3 py-2">
+                <th key={col.key} scope="col" className="px-3 py-2" aria-sort={sortKey === col.key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}>
                   <button
                     type="button"
                     onClick={() => toggle(col.key)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(col.key); } }}
-                    aria-sort={sortKey === col.key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
                     className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
                   >
                     {col.label}

@@ -67,10 +67,16 @@ function statusBadge(status: "active" | "placeholder" | "future" | undefined): s
   return "Live";
 }
 
-export function ExecutiveCommandCenter() {
+export function ExecutiveCommandCenter({ baseHref = "/app" }: { baseHref?: string }) {
   const [activeCityKey, setActiveCityKey] = useState(cityNodes[0]?.key);
   const [hoverCityKey, setHoverCityKey] = useState<string | null>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  // Rewrite all workspace item hrefs from /app/* → baseHref/*
+  const navItems = workspaceItems.map((item) => ({
+    ...item,
+    href: item.href === "/app" ? baseHref : item.href.replace(/^\/app(\/|$)/, `${baseHref}$1`),
+  }));
 
   const activeCity = useMemo(
     () => cityNodes.find((node) => node.key === activeCityKey) ?? cityNodes[0],
@@ -115,7 +121,7 @@ export function ExecutiveCommandCenter() {
             <p className="mt-1 text-sm font-semibold text-slate-700">All navigation sections</p>
           </div>
           <nav className="space-y-1 overflow-auto pr-1" aria-label="Workspace sections">
-            {workspaceItems.map((item) => (
+            {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -247,7 +253,7 @@ export function ExecutiveCommandCenter() {
             <p className="mt-1 text-sm text-slate-600">{activeCity?.signal}</p>
             <p className="mt-2 text-xs font-medium text-emerald-600">{activeCity?.agents} autonomous agents online</p>
             <Link
-              href={activeCity?.href ?? "/app"}
+              href={activeCity ? activeCity.href.replace(/^\/app(\/|$)/, `${baseHref}$1`) : baseHref}
               className="mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
             >
               Open workspace

@@ -1,6 +1,6 @@
 import { NextGenWorkspace } from "@/components/platform-next";
 
-export default function AppCustomersPage() {
+export default function CustomerIntelligencePage() {
   return (
     <NextGenWorkspace
       pageTitle="Customer Intelligence Center"

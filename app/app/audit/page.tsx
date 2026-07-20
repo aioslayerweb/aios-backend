@@ -1,10 +1,12 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function AuditPage() {
   return (
-    <WorkspacePlaceholder
-      title="Audit"
-      description="Audit trail visibility for decisions, policy actions, and autonomous task execution history."
+    <NextGenWorkspace
+      pageTitle="Audit Intelligence Center"
+      pageDescription="End-to-end audit visibility for decisions, policy actions, approvals, and autonomous task execution with enterprise-grade traceability."
+      centerLabel="AIOS Audit"
+      domain="audit"
     />
-  )
+  );
 }

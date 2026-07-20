@@ -1,11 +1,13 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function RuntimeCenterPage() {
   return (
-    <WorkspacePlaceholder
-      title="Runtime Center"
-      description="Runtime reliability, execution controls, and environment orchestration are being prepared for release."
-      comingSoon
+    <NextGenWorkspace
+      pageTitle="Runtime Center"
+      pageDescription="Runtime reliability, execution controls, health diagnostics, and environment orchestration in a single command surface for AIOS operators."
+      centerLabel="AIOS Runtime"
+      emphasis="roadmap"
+      domain="runtime"
     />
-  )
+  );
 }

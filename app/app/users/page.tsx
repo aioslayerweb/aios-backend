@@ -1,10 +1,12 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function UsersPage() {
   return (
-    <WorkspacePlaceholder
-      title="Users"
-      description="Executive and operator user profiles, access context, and workspace assignment controls."
+    <NextGenWorkspace
+      pageTitle="User Intelligence Center"
+      pageDescription="Executive and operator user profiles, identity context, workspace assignment, and operational ownership views in a unified enterprise directory."
+      centerLabel="AIOS User Management"
+      domain="users"
     />
-  )
+  );
 }

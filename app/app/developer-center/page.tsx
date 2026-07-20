@@ -1,11 +1,13 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function DeveloperCenterPage() {
   return (
-    <WorkspacePlaceholder
-      title="Developer Center"
-      description="Developer workflows, SDK tooling, and extension controls will be delivered in a roadmap milestone."
-      comingSoon
+    <NextGenWorkspace
+      pageTitle="Developer Center"
+      pageDescription="API, SDK, MCP tooling, logs, testing, documentation, tokens, and rate-limit visibility for engineering and platform extension teams."
+      centerLabel="AIOS Developer"
+      emphasis="roadmap"
+      domain="developer"
     />
-  )
+  );
 }

@@ -1,10 +1,12 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function PermissionsPage() {
   return (
-    <WorkspacePlaceholder
-      title="Permissions"
-      description="Policy-driven permission boundaries for people, agents, and autonomous workflow execution."
+    <NextGenWorkspace
+      pageTitle="Permission Governance Center"
+      pageDescription="Policy-driven permission boundaries for humans, AI operators, and autonomous workflows with role-aware controls, auditability, and risk reduction."
+      centerLabel="AIOS Permissions"
+      domain="permissions"
     />
-  )
+  );
 }

@@ -1,10 +1,12 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function OrganizationsPage() {
   return (
-    <WorkspacePlaceholder
-      title="Organizations"
-      description="Organization entities, hierarchy, and ownership intelligence for enterprise operating context."
+    <NextGenWorkspace
+      pageTitle="Organization Intelligence Center"
+      pageDescription="Enterprise organization entities, hierarchy, ownership intelligence, business capabilities, and relationship signals unified for executive visibility and governance."
+      centerLabel="AIOS Organization"
+      domain="organization"
     />
-  )
+  );
 }

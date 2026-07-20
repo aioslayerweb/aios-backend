@@ -38,7 +38,7 @@ import {
   Code2,
   Atom,
 } from "lucide-react"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { AIOSCaption, AIOSH4, AIOSSmall } from "@/src/components/aios"
@@ -101,6 +101,11 @@ const iconByKey = {
   permissions: Shield,
   audit: ClipboardList,
   "api-keys": KeyRound,
+  "sales-intelligence": WalletCards,
+  "finance-intelligence": LineChart,
+  operations: Workflow,
+  hr: Users,
+  "customer-intelligence": Users,
 } as const
 
 const workspaceLabels: Record<string, string> = {
@@ -116,6 +121,11 @@ const workspaceLabels: Record<string, string> = {
   "/app/corporate": "Organization Center",
   "/app/blueprint": "Business Blueprint Center",
   "/app/qbi": "QBI Center",
+  "/app/sales-intelligence": "Sales Intelligence Center",
+  "/app/finance-intelligence": "Finance Intelligence Center",
+  "/app/operations": "Operations Intelligence Center",
+  "/app/hr": "HR Intelligence Center",
+  "/app/customer-intelligence": "Customer Intelligence Center",
   "/app/integrations": "Integrations",
   "/app/activity": "Activity",
   "/app/reports": "Reports",
@@ -335,11 +345,12 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
 
 function ShellSidebar() {
   const { collapsed, toggle } = useSidebar()
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <motion.aside
       layout
-      transition={{ duration: 0.2 }}
+      transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
       className={cn("hidden border-r border-border bg-surface-canvas lg:flex lg:flex-col", collapsed ? "lg:w-20" : "lg:w-72")}
       aria-label="Primary workspace navigation"
     >
@@ -372,7 +383,12 @@ function ShellMobileSidebarDrawer({
   return (
     <AnimatePresence>
       {open ? (
-        <div className="fixed inset-0 z-[var(--z-drawer)] bg-slate-900/40 lg:hidden" onClick={onClose}>
+        <div
+          className="fixed inset-0 z-[var(--z-drawer)] bg-slate-900/40 lg:hidden"
+          onClick={onClose}
+          onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}
+          role="presentation"
+        >
           <motion.aside
             variants={drawerVariants}
             initial="initial"
@@ -381,6 +397,8 @@ function ShellMobileSidebarDrawer({
             className="h-full w-80 max-w-[88vw] border-r border-border bg-surface-canvas"
             onClick={(event) => event.stopPropagation()}
             aria-label="Mobile workspace navigation drawer"
+            aria-modal="true"
+            role="dialog"
           >
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
               <BrandLogo width={102} height={24} />
@@ -434,6 +452,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const { open: aiPanelOpen, setOpen: setAIPanelOpen } = useAIAssistant()
   const { drawerOpen, setDrawerOpen } = useNotificationCenter()
   const { isDesktop, isMobile } = useBreakpoint()
+  const pathname = usePathname()
 
   useKeyboardShortcuts({
     "mod+k": open,
@@ -444,20 +463,38 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
     n: () => setDrawerOpen(true),
   })
 
+  const mobileNavItems = useMemo(() => [
+    { href: "/app", label: "Home", icon: Home },
+    { href: "/app/executive", label: "Executive", icon: Sparkles },
+    { href: "/app/intelligence", label: "Intelligence", icon: LineChart },
+    { href: "/app/agents", label: "Agents", icon: Bot },
+    { href: "/app/settings", label: "Settings", icon: Settings },
+  ], [])
+
   return (
     <div className="min-h-screen bg-surface-app text-text-primary">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-lg focus:bg-brand-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        Skip to main content
+      </a>
+
       <div className="flex min-h-screen">
         <ShellSidebar />
 
-        <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col", drawerOpen && isDesktop && "pr-[360px]") }>
+        <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col", drawerOpen && isDesktop && "pr-[360px]")}>
           <ShellTopBar />
           <WorkspaceHeader />
           <motion.main
+            id="main-content"
             variants={pageVariants}
             initial="initial"
             animate="animate"
-            className="min-h-0 flex-1 overflow-y-auto bg-surface-app"
+            className="min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0"
             aria-label="Main content area"
+            tabIndex={-1}
           >
             {children}
           </motion.main>
@@ -466,6 +503,34 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
 
         <AIAssistantPanel mode="desktop" open={true} />
       </div>
+
+      {/* Mobile bottom navigation */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-[var(--z-header)] flex items-center justify-around border-t border-border bg-surface-canvas/95 pb-safe pt-2 backdrop-blur lg:hidden"
+        aria-label="Mobile primary navigation"
+      >
+        {mobileNavItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+          const Icon = item.icon
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+                isActive
+                  ? "text-brand-primary"
+                  : "text-text-muted hover:text-text-secondary"
+              )}
+              aria-current={isActive ? "page" : undefined}
+              aria-label={item.label}
+            >
+              <Icon className="h-5 w-5" aria-hidden="true" />
+              <span>{item.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
 
       <AIAssistantPanel
         mode={isMobile ? "mobile" : "tablet"}

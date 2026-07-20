@@ -1,11 +1,13 @@
-import { WorkspacePlaceholder } from "../../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function MCPHealthPage() {
   return (
-    <WorkspacePlaceholder
-      title="MCP Health"
-      description="Platform health diagnostics and readiness scoring for MCP will be introduced on the roadmap."
-      comingSoon
+    <NextGenWorkspace
+      pageTitle="MCP Health"
+      pageDescription="Platform health diagnostics, readiness scoring, latency posture, and reliability analytics for enterprise MCP operations."
+      centerLabel="AIOS MCP"
+      emphasis="roadmap"
+      domain="mcp"
     />
-  )
+  );
 }

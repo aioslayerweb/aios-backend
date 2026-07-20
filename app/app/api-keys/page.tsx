@@ -1,10 +1,12 @@
-import { WorkspacePlaceholder } from "../_components/workspace-placeholder"
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function ApiKeysPage() {
   return (
-    <WorkspacePlaceholder
-      title="API Keys"
-      description="Secure API credential lifecycle management for integrations, agents, and platform services."
+    <NextGenWorkspace
+      pageTitle="API Key Security Center"
+      pageDescription="Secure API credential lifecycle management for integrations, operators, and platform services with governance-ready key posture and policy context."
+      centerLabel="AIOS Security"
+      domain="api-keys"
     />
-  )
+  );
 }

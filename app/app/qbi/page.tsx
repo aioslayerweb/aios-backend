@@ -6,6 +6,7 @@ export default function AppQbiPage() {
       pageTitle="QBI Center"
       pageDescription="Quantum Business Intelligence for Monte Carlo simulation, probability mapping, forecasting, scenario modeling, confidence scoring, optimization pathways, and predictive recommendations for executive action."
       centerLabel="AIOS QBI"
+      domain="qbi"
     />
   );
 }

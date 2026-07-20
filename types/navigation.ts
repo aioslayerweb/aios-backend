@@ -38,6 +38,11 @@ export type WorkspaceKey =
   | "permissions"
   | "audit"
   | "api-keys"
+  | "sales-intelligence"
+  | "finance-intelligence"
+  | "operations"
+  | "hr"
+  | "customer-intelligence"
 
 export type WorkspaceItem = {
   key: WorkspaceKey
@@ -86,4 +91,9 @@ export type WorkspaceItem = {
     | "permissions"
     | "audit"
     | "api-keys"
+    | "sales-intelligence"
+    | "finance-intelligence"
+    | "operations"
+    | "hr"
+    | "customer-intelligence"
 }

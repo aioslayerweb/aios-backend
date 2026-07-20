@@ -36,6 +36,7 @@ import {
   Route,
   Cpu,
   Code2,
+  Atom,
 } from "lucide-react"
 import { AnimatePresence, motion } from "framer-motion"
 import Link from "next/link"
@@ -65,6 +66,8 @@ const iconByKey = {
   executive: Sparkles,
   commands: Command,
   corporate: Building2,
+  blueprint: Network,
+  qbi: Atom,
   sales: WalletCards,
   knowledge: Brain,
   memory: Database,
@@ -111,6 +114,8 @@ const workspaceLabels: Record<string, string> = {
   "/app/decisions": "Decision Center",
   "/app/intelligence": "Intelligence Center",
   "/app/corporate": "Organization Center",
+  "/app/blueprint": "Business Blueprint Center",
+  "/app/qbi": "QBI Center",
   "/app/integrations": "Integrations",
   "/app/activity": "Activity",
   "/app/reports": "Reports",

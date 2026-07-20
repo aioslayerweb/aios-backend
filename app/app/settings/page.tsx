@@ -1,15 +1,11 @@
-import { Settings } from "lucide-react";
+import { NextGenWorkspace } from "@/components/platform-next";
 
 export default function AppSettingsPage() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
-        <Settings size={28} className="text-slate-600" />
-      </div>
-      <h2 className="mb-2 text-xl font-semibold text-slate-800">Settings</h2>
-      <p className="mb-6 max-w-sm text-sm text-slate-500">
-        Workspace configuration, integrations, and team preferences.
-      </p>
-    </div>
+    <NextGenWorkspace
+      pageTitle="Settings Center"
+      pageDescription="Organization, users, roles, notifications, billing, security, intelligence capacity, and enterprise preferences managed through a consistent spatial control surface."
+      centerLabel="AIOS Settings"
+    />
   );
 }

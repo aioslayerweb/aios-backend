@@ -96,6 +96,16 @@
   --color-text-muted: #6B7280;
   --color-text-inverse: #FFFFFF;
 
+  --color-platform-glass: rgba(255, 255, 255, 0.72);
+  --color-platform-glass-strong: rgba(255, 255, 255, 0.9);
+  --color-platform-border-soft: rgba(255, 255, 255, 0.7);
+  --color-platform-ambient-blue: rgba(28, 130, 242, 0.2);
+  --color-platform-ambient-cyan: rgba(77, 161, 251, 0.18);
+
+  --motion-duration-fast: 150ms;
+  --motion-duration-base: 250ms;
+  --motion-duration-slow: 400ms;
+
   --font-sans: var(--aios-platform-font-sans);
   --font-mono: var(--aios-platform-font-mono);
 

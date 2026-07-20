@@ -4,6 +4,8 @@ export const workspaceItems: WorkspaceItem[] = [
   { key: "home", title: "Home", href: "/app", shortcut: "G H", icon: "home" },
   { key: "executive", title: "Executive", href: "/app/executive", shortcut: "G E", icon: "executive" },
   { key: "corporate", title: "Corporate", href: "/app/corporate", shortcut: "G C", icon: "corporate" },
+  { key: "blueprint", title: "Business Blueprint", href: "/app/blueprint", shortcut: "G B", icon: "blueprint" },
+  { key: "qbi", title: "QBI", href: "/app/qbi", shortcut: "G Q", icon: "qbi" },
   { key: "knowledge", title: "Knowledge", href: "/app/knowledge", shortcut: "G K", icon: "knowledge" },
   { key: "memory", title: "Memory", href: "/app/memory", shortcut: "G M", icon: "memory" },
   { key: "agents", title: "Agents", href: "/app/agents", shortcut: "G A", icon: "agents" },

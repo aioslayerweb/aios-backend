@@ -1,8 +1,8 @@
 "use client";
 
 import { memo, Suspense, lazy, useMemo, useCallback, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Check, ChevronDown, ChevronUp, Mail, MoreHorizontal, RefreshCcw, Sparkles, X } from "lucide-react";
 import { enterpriseDatasets, enterpriseKpis, type EnterpriseEntity } from "@/lib/demo/enterprise-seed-data";
 import { WorkspaceCard, WorkspaceSection, WorkspaceShell } from "@/components/workspace";
 import { BrandLogo } from "@/components/branding";
@@ -130,25 +130,96 @@ const VISIBLE_ROWS_DEFAULT = 5;
 
 /** Stable entity row — memo prevents re-render when only sibling state changes */
 const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity }) {
+  const [expanded, setExpanded] = useState(false);
+  const [status, setStatus] = useState<EnterpriseEntity["status"]>(entity.status);
+  const [dismissed, setDismissed] = useState(false);
+
+  const cycleStatus = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setStatus((prev) => prev === "healthy" ? "watch" : prev === "watch" ? "risk" : "healthy");
+  }, []);
+
+  if (dismissed) return null;
+
   return (
-    <li className="rounded-xl border border-slate-200 bg-white px-3 py-2">
-      <div className="flex items-center justify-between gap-2">
+    <li className="overflow-hidden rounded-xl border border-slate-200 bg-white transition-all">
+      <button
+        type="button"
+        onClick={() => setExpanded((p) => !p)}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+        aria-expanded={expanded}
+      >
         <p className="truncate text-sm font-semibold text-slate-700">{entity.name}</p>
-        <span
-          className={cn(
-            "inline-flex shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide",
-            statusTone(entity.status),
-          )}
-        >
-          {entity.status}
-        </span>
-      </div>
-      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={cycleStatus}
+            aria-label={`Toggle status for ${entity.name}`}
+            className={cn(
+              "inline-flex shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-colors",
+              statusTone(status),
+            )}
+          >
+            {status}
+          </button>
+          <ChevronDown className={cn("h-3.5 w-3.5 text-slate-400 transition-transform", expanded && "rotate-180")} aria-hidden />
+        </div>
+      </button>
+
+      <div className="px-3 pb-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
         <span>{entity.owner}</span>
         <span>{entity.value}</span>
         <span>Confidence {entity.confidence}%</span>
         <span>{entity.updatedAt}</span>
       </div>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+          >
+            <div className="flex flex-wrap gap-1.5 border-t border-slate-100 bg-slate-50/60 px-3 py-2">
+              <button
+                type="button"
+                onClick={() => setStatus("healthy")}
+                className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors"
+              >
+                <Check className="h-3 w-3" /> Approve
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("watch")}
+                className="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 hover:bg-blue-100 transition-colors"
+              >
+                <Mail className="h-3 w-3" /> Contact
+              </button>
+              <button
+                type="button"
+                onClick={() => setStatus("watch")}
+                className="inline-flex items-center gap-1 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100 transition-colors"
+              >
+                <RefreshCcw className="h-3 w-3" /> Review
+              </button>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); setDismissed(true); }}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
+              >
+                <X className="h-3 w-3" /> Dismiss
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
+              >
+                <MoreHorizontal className="h-3 w-3" /> More
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </li>
   );
 });

@@ -7,11 +7,12 @@ import { NavigationProvider } from "@/contexts/navigation-context"
 type WorkspaceLayoutProps = {
   children: ReactNode
   baseHref?: string
+  hideWorkspaceHeader?: boolean
 }
 
-export function WorkspaceLayout({ children, baseHref = "/app" }: WorkspaceLayoutProps) {
+export function WorkspaceLayout({ children, baseHref = "/app", hideWorkspaceHeader = false }: WorkspaceLayoutProps) {
   return (
-    <NavigationProvider baseHref={baseHref}>
+    <NavigationProvider baseHref={baseHref} hideWorkspaceHeader={hideWorkspaceHeader}>
       <ShellErrorBoundary>
         <ApplicationLayout>
           <PageWrapper>{children}</PageWrapper>

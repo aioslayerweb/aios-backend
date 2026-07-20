@@ -179,8 +179,10 @@ function breadcrumbItems(pathname: string, baseHref: string = "/app"): Array<{ l
 
 function WorkspaceHeader() {
   const pathname = usePathname()
-  const { baseHref } = useNavigationBase()
+  const { baseHref, hideWorkspaceHeader } = useNavigationBase()
   const title = titleFromPath(pathname)
+
+  if (hideWorkspaceHeader) return null
 
   return (
     <div className="border-b border-border bg-surface-canvas px-4 py-4 md:px-6 lg:px-8">

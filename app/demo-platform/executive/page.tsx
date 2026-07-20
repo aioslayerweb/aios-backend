@@ -1,5 +1,5 @@
-import { ExecutiveWorkspaceView } from "@/components/executive-workspace";
+import { DemoExecutiveDashboard } from "@/components/demo/executive-dashboard";
 
 export default function DemoPage() {
-  return <ExecutiveWorkspaceView />;
+  return <DemoExecutiveDashboard />;
 }

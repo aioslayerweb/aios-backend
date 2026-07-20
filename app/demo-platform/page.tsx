@@ -1,12 +1,12 @@
-import type { Metadata } from "next"
-import { DemoPlatformPage } from "@/components/demo-platform/demo-platform-page"
+import type { Metadata } from "next";
+import { ExecutiveCommandCenter } from "@/components/executive-command-center/executive-command-center";
 
 export const metadata: Metadata = {
-  title: "Demo Platform | AIOS",
-  description: "Interactive AIOS demo platform with 15 dummy datasets, editable backend workflows, and public sandbox actions.",
+  title: "Demo Platform | AIOS Pilot",
+  description: "Interactive AIOS Pilot demo — Executive Command Center, Spatial Intelligence Plane, AI Recommendations, and full platform navigation.",
   alternates: { canonical: "https://aiospilot.com/demo-platform" },
-}
+};
 
-export default function DemoPlatformRoute() {
-  return <DemoPlatformPage />
+export default function DemoPlatformPage() {
+  return <ExecutiveCommandCenter />;
 }

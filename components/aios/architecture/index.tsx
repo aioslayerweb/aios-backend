@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion"
-import type { LucideIcon } from "lucide-react"
+import type { ReactNode } from "react"
 import { AIOSCard } from "@/components/aios/cards"
 
 export type AIOSOrbitNode = {
   title: string
   x: string
   y: string
-  icon?: LucideIcon
+  icon?: ReactNode
   href?: string
 }
 
@@ -48,10 +48,9 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
       </div>
 
       {nodes.map((node, index) => {
-        const Icon = node.icon
         const content = (
           <>
-            {Icon ? <span className="mb-2 inline-flex rounded-xl bg-[var(--public-color-muted)] p-2 text-[color:var(--public-color-primary)]"><Icon size={15} /></span> : null}
+            {node.icon ? <span className="mb-2 inline-flex rounded-xl bg-[var(--public-color-muted)] p-2 text-[color:var(--public-color-primary)]">{node.icon}</span> : null}
             <span className="block text-[11px] font-semibold leading-tight text-[color:var(--public-color-navy)] sm:text-xs">{node.title}</span>
           </>
         )

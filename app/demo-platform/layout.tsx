@@ -12,10 +12,10 @@ export default function DemoPlatformLayout({ children }: { children: ReactNode }
   return (
     <AppProviders authSessionEnabled={false} liveDataEnabled={false}>
       <AIOSRuntimeProvider>
-        <div className="space-y-3 px-2 pt-2 md:px-3">
+        <div className="aios-demo-root space-y-3 px-2 pt-2 md:px-3" data-aios-demo-root>
           <div
             role="note"
-            className="mx-auto w-full max-w-[1400px] rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-2 text-xs text-blue-900"
+            className="aios-demo-notice mx-auto w-full max-w-[1400px] rounded-2xl border border-blue-200 bg-blue-50/80 px-4 py-2 text-xs text-blue-900"
           >
             <strong className="font-semibold">Demo preview · synthetic sample data.</strong>
             <span className="ml-1">Interactions are local previews only; they do not change business data.</span>

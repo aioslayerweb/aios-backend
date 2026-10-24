@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Binary,
   Bot,
@@ -32,12 +30,20 @@ import {
   PublicProblemSolutionSection,
   PublicStructuredData,
 } from "@/components/public-site/storytelling-sections"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Modules",
+  "Explore AIOS modules and how their business intelligence, memory, governance, and workflow capabilities relate.",
+  "/modules",
+)
 
 const modules = [
   {
     key: "executive",
     title: "Executive Center",
-    icon: Building2,
+    icon: <Building2 size={18} />,
     summary: "Strategic priorities, decision confidence, and board-level context in one operating view.",
     highlights: ["Critical decisions", "Executive briefings", "Priority shifts"],
     previewTitle: "Executive signal board",
@@ -45,7 +51,7 @@ const modules = [
   {
     key: "command",
     title: "Command Center",
-    icon: Radar,
+    icon: <Radar size={18} />,
     summary: "Cross-system command surface for orchestrating signals, tasks, and automated pathways.",
     highlights: ["Live orchestration", "Cross-team routing", "Escalation control"],
     previewTitle: "Operational command matrix",
@@ -53,7 +59,7 @@ const modules = [
   {
     key: "memory",
     title: "Memory Center",
-    icon: Database,
+    icon: <Database size={18} />,
     summary: "Persistent business memory objects preserving outcomes, context, and evidence trails.",
     highlights: ["Memory timelines", "Outcome retention", "Context continuity"],
     previewTitle: "Business memory timeline",
@@ -61,7 +67,7 @@ const modules = [
   {
     key: "knowledge",
     title: "Knowledge Center",
-    icon: Network,
+    icon: <Network size={18} />,
     summary: "Knowledge graph intelligence connecting policies, entities, and enterprise reasoning.",
     highlights: ["Graph insights", "Context linking", "Evidence indexing"],
     previewTitle: "Knowledge graph cluster",
@@ -69,7 +75,7 @@ const modules = [
   {
     key: "workflow",
     title: "Workflow Builder",
-    icon: Workflow,
+    icon: <Workflow size={18} />,
     summary: "Governed autonomous workflows from approved decisions to measurable execution.",
     highlights: ["Policy gates", "Automation chains", "Runtime telemetry"],
     previewTitle: "Workflow orchestration canvas",
@@ -77,7 +83,7 @@ const modules = [
   {
     key: "agent",
     title: "Agent Studio",
-    icon: Bot,
+    icon: <Bot size={18} />,
     summary: "Specialized AI operators collaborating with shared memory and role-aware intelligence.",
     highlights: ["Operator network", "Capability packs", "Confidence routing"],
     previewTitle: "Agent collaboration map",
@@ -85,7 +91,7 @@ const modules = [
   {
     key: "organization",
     title: "Organization Center",
-    icon: Briefcase,
+    icon: <Briefcase size={18} />,
     summary: "Organizational structures, accountability context, and decision ownership intelligence.",
     highlights: ["Ownership mapping", "Entity intelligence", "Org alignment"],
     previewTitle: "Organization intelligence panel",
@@ -93,7 +99,7 @@ const modules = [
   {
     key: "runtime",
     title: "Runtime Center",
-    icon: Cpu,
+    icon: <Cpu size={18} />,
     summary: "Runtime controls for safe execution, resilience, and enterprise policy enforcement.",
     highlights: ["Runtime health", "Policy enforcement", "Execution recovery"],
     previewTitle: "Runtime reliability cockpit",
@@ -101,7 +107,7 @@ const modules = [
   {
     key: "developer",
     title: "Developer Center",
-    icon: Code2,
+    icon: <Code2 size={18} />,
     summary: "SDKs, extensions, and integration tooling for enterprise platform customization.",
     highlights: ["SDK surfaces", "Extension lifecycle", "Developer telemetry"],
     previewTitle: "Developer extension workspace",
@@ -109,7 +115,7 @@ const modules = [
   {
     key: "role",
     title: "Role-Based Intelligence",
-    icon: Binary,
+    icon: <Binary size={18} />,
     summary: "Adaptive intelligence views for each role, function, and decision horizon.",
     highlights: ["Role context", "Adaptive priorities", "Decision narratives"],
     previewTitle: "Role intelligence dashboard",
@@ -143,12 +149,6 @@ const modulesBenefits = [
   { title: "Higher reliability", body: "Shared runtime and governance reduce module drift and execution risk." },
 ]
 
-const modulesOutcomes = [
-  { label: "Adoption velocity", value: "+35%", detail: "Teams onboard new modules faster with shared patterns." },
-  { label: "Context retention", value: "3.1x", detail: "Business context continuity across module boundaries." },
-  { label: "Execution consistency", value: "96%", detail: "Governed workflows remain stable across module surfaces." },
-]
-
 export default function ModulesPage() {
   return (
     <PublicPageShell activeHref="/modules">
@@ -167,7 +167,7 @@ export default function ModulesPage() {
               Explore Platform
             </PublicButtonLink>
             <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
           </>
         }
@@ -225,10 +225,10 @@ export default function ModulesPage() {
           <div className="mt-14">
             <PublicFeatureGrid
               items={[
-                { title: "Shared memory", body: "Every module contributes to one persistent business memory graph.", icon: Database },
-                { title: "Unified orchestration", body: "Signals, approvals, and workflows use the same runtime contract.", icon: Workflow },
-                { title: "Role-based views", body: "Presentation adapts by function while system language remains stable.", icon: Binary },
-                { title: "Organization context", body: "Modules align to executives, operators, and enterprise ownership models.", icon: Briefcase },
+                { title: "Shared memory", body: "Every module contributes to one persistent business memory graph.", icon: <Database size={18} /> },
+                { title: "Unified orchestration", body: "Signals, approvals, and workflows use the same runtime contract.", icon: <Workflow size={18} /> },
+                { title: "Role-based views", body: "Presentation adapts by function while system language remains stable.", icon: <Binary size={18} /> },
+                { title: "Organization context", body: "Modules align to executives, operators, and enterprise ownership models.", icon: <Briefcase size={18} /> },
               ]}
               columns={4}
             />
@@ -240,7 +240,6 @@ export default function ModulesPage() {
         title="Module-level benefits with system-level outcomes"
         body="The more modules your organization activates, the stronger your business intelligence layer becomes."
         benefits={modulesBenefits}
-        outcomes={modulesOutcomes}
       />
 
       <PublicExecutiveRoleSection />

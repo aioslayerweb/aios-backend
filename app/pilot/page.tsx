@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
 import { PublicButtonLink, PublicCard, PublicContainer, PublicPageShell, PublicSection, PublicSectionHeader } from "@/components/aios"
 import { PublicStructuredData } from "@/components/public-site/storytelling-sections"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = {
-  title: "Pilot Program | AIOS",
-  description: "Learn how to qualify for the AIOS enterprise pilot program, timelines, deliverables, and next steps.",
-  alternates: { canonical: "https://aios.layer/pilot" },
-}
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Pilot Program",
+  "Learn about the AIOS pilot discovery process and how to discuss a scoped evaluation for your organization.",
+  "/pilot",
+)
 
 export default function PilotPage() {
   return (

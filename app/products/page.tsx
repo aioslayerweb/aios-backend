@@ -1,5 +1,3 @@
-"use client"
-
 import {
   BrainCircuit,
   Building2,
@@ -11,7 +9,6 @@ import {
 } from "lucide-react"
 import {
   PublicButtonLink,
-  PublicComparison,
   PublicContainer,
   PublicFeatureGrid,
   PublicFooterCta,
@@ -24,7 +21,6 @@ import {
 import {
   PublicBenefitsOutcomesSection,
   PublicBuyerJourneySection,
-  PublicCompetitorComparisonSection,
   PublicConversionRailSection,
   PublicEnterpriseTrustMatrixSection,
   PublicExecutiveRoleSection,
@@ -37,85 +33,65 @@ import {
   PublicStructuredData,
   PublicTrustAndProofSection,
 } from "@/components/public-site/storytelling-sections"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Products",
+  "Explore AIOS Pilot and the product capabilities that connect business intelligence, memory, role-based context, and workflows.",
+  "/products",
+)
 
 const products = [
   {
     key: "revenue-operator",
     title: "Revenue Operator",
-    icon: ChartNoAxesCombined,
-    benefits: ["Forecast variance alerts", "Pipeline risk detection", "Opportunity prioritization"],
-    outcomes: ["Faster deal recovery", "Improved forecast confidence", "Higher win-rate consistency"],
-    useCases: ["Quarterly pipeline stabilization", "Churn risk prevention", "Territory performance optimization"],
-    roi: "Up to 12% forecast improvement",
-    pricingTeaser: "Growth plan add-on",
+    icon: <ChartNoAxesCombined size={18} />,
+    summary: "A product concept for connecting pipeline context, account signals, and revenue decisions.",
+    useCases: ["Pipeline review", "Account context", "Opportunity prioritization"],
   },
   {
     key: "customer-intelligence",
     title: "Customer Intelligence",
-    icon: Users,
-    benefits: ["Customer health scoring", "Journey anomaly detection", "Engagement signal synthesis"],
-    outcomes: ["Reduced churn", "Higher retention", "Better account expansion timing"],
-    useCases: ["At-risk account intervention", "Enterprise renewal strategy", "Support-to-success handoff"],
-    roi: "Up to 18% churn reduction",
-    pricingTeaser: "Included in Professional",
+    icon: <Users size={18} />,
+    summary: "A product concept for bringing customer history, service context, and account ownership together.",
+    useCases: ["Customer history", "Service context", "Account ownership"],
   },
   {
     key: "executive-center",
     title: "Executive Center",
-    icon: Building2,
-    benefits: ["Priority dashboards", "Decision context narratives", "Board-ready summaries"],
-    outcomes: ["Lower decision latency", "Higher strategic clarity", "Improved leadership alignment"],
-    useCases: ["Weekly operating reviews", "Executive briefings", "Cross-functional alignment"],
-    roi: "40% faster strategic decisions",
-    pricingTeaser: "Professional and Enterprise",
+    icon: <Building2 size={18} />,
+    summary: "A product concept for organizing leadership priorities, decision context, and cross-functional dependencies.",
+    useCases: ["Operating reviews", "Executive briefings", "Cross-functional context"],
   },
   {
     key: "business-memory",
     title: "Business Memory",
-    icon: Database,
-    benefits: ["Persistent institutional memory", "Outcome-linked context", "Evidence indexing"],
-    outcomes: ["Compounding intelligence", "Fewer repeated mistakes", "Higher recommendation quality"],
-    useCases: ["Post-mortem learning loops", "Decision traceability", "Policy evolution"],
-    roi: "3x faster context recall",
-    pricingTeaser: "Core platform foundation",
+    icon: <Database size={18} />,
+    summary: "A product concept for connecting business events, evidence, decisions, and outcomes over time.",
+    useCases: ["Decision context", "Outcome records", "Knowledge continuity"],
   },
   {
     key: "workflow-builder",
     title: "Workflow Builder",
-    icon: Workflow,
-    benefits: ["Policy-governed automation", "Approval checkpoints", "Adaptive execution chains"],
-    outcomes: ["Reduced manual operations", "More reliable execution", "Safer automation rollout"],
-    useCases: ["Finance approval chains", "Ops escalation workflows", "Cross-team orchestration"],
-    roi: "35% operations efficiency gain",
-    pricingTeaser: "Professional and Enterprise",
+    icon: <Workflow size={18} />,
+    summary: "A product concept for representing governed steps from an approved decision to an outcome.",
+    useCases: ["Approval paths", "Operational handoffs", "Workflow governance"],
   },
   {
     key: "knowledge-center",
     title: "Knowledge Center",
-    icon: Network,
-    benefits: ["Knowledge graph unification", "Signal-to-knowledge linkage", "Context-aware search"],
-    outcomes: ["Faster investigation", "Stronger traceability", "More explainable recommendations"],
-    useCases: ["Policy intelligence", "Entity relationship insights", "Regulatory evidence navigation"],
-    roi: "50% faster root-cause analysis",
-    pricingTeaser: "Included in Professional",
+    icon: <Network size={18} />,
+    summary: "A product concept for linking business entities, policies, and supporting evidence.",
+    useCases: ["Policy context", "Entity relationships", "Evidence navigation"],
   },
   {
     key: "advanced-intelligence-pack",
     title: "Advanced Intelligence Pack",
-    icon: BrainCircuit,
-    benefits: ["Deep reasoning models", "Confidence calibration", "Predictive scenario testing"],
-    outcomes: ["Higher precision recommendations", "Earlier risk detection", "More reliable automation outcomes"],
-    useCases: ["Strategic what-if analysis", "Multi-factor risk forecasting", "Executive simulation briefs"],
-    roi: "Up to 2.4x insight accuracy lift",
-    pricingTeaser: "Enterprise premium package",
+    icon: <BrainCircuit size={18} />,
+    summary: "A product concept for exploring evidence-led reasoning and decision scenarios.",
+    useCases: ["Scenario exploration", "Risk context", "Executive decision briefs"],
   },
-]
-
-const comparisonRows = [
-  { label: "Decision speed", left: "Weekly review cadence", right: "Continuous intelligence updates" },
-  { label: "Signal coverage", left: "Siloed system snapshots", right: "Cross-system unified intelligence" },
-  { label: "Automation reliability", left: "Rule-based execution", right: "Policy-governed adaptive workflows" },
-  { label: "Executive visibility", left: "Manual dashboards", right: "Live decision narratives" },
 ]
 
 const productProblemCards = [
@@ -126,29 +102,23 @@ const productProblemCards = [
 ]
 
 const productSolutionCards = [
-  { title: "AIOS Pilot", body: "A guided enterprise pilot focused on measurable business outcomes." },
-  { title: "Future editions", body: "Expansion paths for role-based, function-based, and enterprise-wide adoption." },
-  { title: "Capacity model", body: "Plan by intelligence scope: employees, workflows, operators, and integrations." },
-  { title: "ROI-first packaging", body: "Every package ties value to time saved, recovery, and revenue impact." },
+  { title: "AIOS Pilot", body: "A starting point for discussing a defined business use case." },
+  { title: "Role context", body: "Explore how priorities can differ by role while permissions stay separate." },
+  { title: "Connected memory", body: "Relate signals, supporting evidence, decisions, and outcomes." },
+  { title: "Governed workflows", body: "Consider how policy and human approval shape execution." },
 ]
 
 const productHowItWorks = [
-  { label: "Phase 1", title: "Pilot discovery", body: "Define objectives, constraints, and executive success criteria." },
-  { label: "Phase 2", title: "AIOS activation", body: "Connect key systems and configure memory, roles, and operators." },
-  { label: "Phase 3", title: "Outcome tracking", body: "Measure decisions, throughput, and financial impact continuously." },
-  { label: "Phase 4", title: "Enterprise scale", body: "Expand to additional modules and business functions with confidence." },
+  { label: "Step 1", title: "Clarify a decision", body: "Describe the business question, owners, and intended scope." },
+  { label: "Step 2", title: "Review context", body: "Identify relevant information, systems, and access boundaries." },
+  { label: "Step 3", title: "Agree evaluation", body: "Choose evidence and measures appropriate to the use case." },
+  { label: "Step 4", title: "Discuss next steps", body: "Set scope and timing with the people responsible for delivery." },
 ]
 
 const productBenefits = [
-  { title: "Clear commercial model", body: "A transparent path from pilot to enterprise adoption." },
-  { title: "Capacity visibility", body: "Estimate platform fit across teams, customers, and workflows." },
-  { title: "Business-backed ROI", body: "Value is linked to concrete operational and financial outcomes." },
-]
-
-const productOutcomes = [
-  { label: "Pilot-to-scale conversion", value: "72%", detail: "Pilot organizations progressing to broader deployment." },
-  { label: "Median payback", value: "< 6 months", detail: "Across validated pilot operating models." },
-  { label: "Executive confidence", value: "95%", detail: "Leadership clarity on AIOS value and roadmap." },
+  { title: "Decision context", body: "Frame business questions with relevant signals and supporting evidence." },
+  { title: "Role perspective", body: "Explore the information that matters to different decision-makers." },
+  { title: "Governed execution", body: "Keep policies and human approval in view when considering automation." },
 ]
 
 export default function ProductsPage() {
@@ -156,17 +126,17 @@ export default function ProductsPage() {
     <PublicPageShell activeHref="/products">
       <PublicStructuredData
         name="AIOS Products"
-        description="Explore AIOS Pilot, enterprise offerings, future editions, pricing overview, capacity modeling, and ROI pathways."
+        description="Explore AIOS product concepts for business intelligence, memory, role context, and governed workflows."
         path="/products"
       />
       <PublicHero
         eyebrow="AIOS Products"
-        title="AIOS Pilot and enterprise offerings on one intelligence operating system"
-        body="From pilot program to enterprise scale, AIOS products are designed around capacity, governance, and measurable business outcomes."
+        title="Explore the AIOS product model"
+        body="Review product concepts for connecting business signals, memory, role context, decision support, and governed workflows."
         actions={
           <>
             <PublicButtonLink href="/contact" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
             <PublicButtonLink href="/modules" variant="secondary" size="lg">
               Explore Modules
@@ -198,31 +168,18 @@ export default function ProductsPage() {
       <PublicSection>
         <PublicContainer>
           <PublicSectionHeader
-            eyebrow="Comparison"
-            title="AIOS replaces fragmented categories with one continuous operating layer"
-            body="Products are no longer separate islands. They inherit one reusable public and product system."
-          />
-          <div className="mt-14">
-            <PublicComparison rows={comparisonRows} leftLabel="Traditional stack" rightLabel="AIOS" />
-          </div>
-        </PublicContainer>
-      </PublicSection>
-
-      <PublicSection>
-        <PublicContainer>
-          <PublicSectionHeader
             eyebrow="Product Explorer"
-            title="Evaluate each product through the same interaction and content model"
-            body="Product detail presentation now follows one reusable system for benefits, outcomes, and use cases."
+            title="Explore product concepts through common business questions"
+            body="The descriptions below explain areas of focus. They do not claim that integrations, operators, or outcomes are active in a production environment."
           />
           <div className="mt-14">
             <PublicTabbedPanel
               items={products.map((item) => ({
                 key: item.key,
                 label: item.title,
-                title: `${item.title} · ${item.roi}`,
-                body: `${item.pricingTeaser}. ${item.outcomes.join(" · ")}`,
-                bullets: [...item.benefits.slice(0, 2), ...item.useCases.slice(0, 2)],
+                title: item.title,
+                body: item.summary,
+                bullets: item.useCases,
                 icon: item.icon,
               }))}
             />
@@ -240,13 +197,13 @@ export default function ProductsPage() {
           <div className="mt-14">
             <PublicFeatureGrid
               items={[
-                { title: "Revenue intelligence", body: "Forecast and opportunity interventions with context-rich reasoning.", icon: ChartNoAxesCombined },
-                { title: "Customer continuity", body: "Journey, churn, and expansion signals stay connected to enterprise context.", icon: Users },
-                { title: "Executive clarity", body: "Decision narratives and briefings align product surfaces with leadership needs.", icon: Building2 },
-                { title: "Business memory", body: "Institutional memory compounds insight quality across every product.", icon: Database },
-                { title: "Workflow governance", body: "Autonomous execution stays policy-aware and measurable.", icon: Workflow },
-                { title: "Knowledge graph", body: "Recommendations are grounded in linked context and explainability.", icon: Network },
-                { title: "Advanced intelligence", body: "Scenario reasoning and confidence calibration improve recommendation precision.", icon: BrainCircuit },
+                { title: "Revenue intelligence", body: "Forecast and opportunity interventions with context-rich reasoning.", icon: <ChartNoAxesCombined size={18} /> },
+                { title: "Customer continuity", body: "Journey, churn, and expansion signals stay connected to enterprise context.", icon: <Users size={18} /> },
+                { title: "Executive clarity", body: "Decision narratives and briefings align product surfaces with leadership needs.", icon: <Building2 size={18} /> },
+                { title: "Business memory", body: "Institutional memory compounds insight quality across every product.", icon: <Database size={18} /> },
+                { title: "Workflow governance", body: "Autonomous execution stays policy-aware and measurable.", icon: <Workflow size={18} /> },
+                { title: "Knowledge graph", body: "Recommendations are grounded in linked context and explainability.", icon: <Network size={18} /> },
+                { title: "Advanced intelligence", body: "Scenario reasoning and confidence calibration improve recommendation precision.", icon: <BrainCircuit size={18} /> },
               ]}
               columns={4}
             />
@@ -255,10 +212,9 @@ export default function ProductsPage() {
       </PublicSection>
 
       <PublicBenefitsOutcomesSection
-        title="Commercial confidence from pilot to enterprise"
-        body="AIOS product strategy is built for measurable impact and responsible scale."
+        title="A decision-support model designed around context and governance"
+        body="These are intended product principles, not measured customer outcomes."
         benefits={productBenefits}
-        outcomes={productOutcomes}
       />
 
       <PublicRoiCalculatorSection />
@@ -271,18 +227,13 @@ export default function ProductsPage() {
 
       <PublicExecutiveRoleSection />
 
-      <PublicCompetitorComparisonSection />
-
       <PublicSocialProofSection />
 
       <PublicBuyerJourneySection />
 
       <PublicTrustAndProofSection
-        title="Social proof and pilot readiness"
-        body="Reusable trust sections are now available across public routes for customer stories, partner logos, and future case studies."
-        quote="AIOS gave us a realistic path from pilot outcomes to enterprise rollout with clear value checkpoints."
-        person="VP Strategy, Enterprise Pilot"
-        role="Global B2B Technology"
+        title="Evidence before claims"
+        body="No customer endorsements, partner logos, certifications, or measured performance figures are used to substantiate this overview."
       />
 
       <PublicConversionRailSection />

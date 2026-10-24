@@ -31,13 +31,13 @@ export const metadata: Metadata = {
     title: brandTheme.defaultTitle,
     description: brandTheme.description,
     type: "website",
-    images: [{ url: brandAssets.openGraph, width: 1200, height: 1200, alt: "AIOS" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "AIOS Pilot" }],
   },
   twitter: {
     card: "summary_large_image",
     title: brandTheme.defaultTitle,
     description: brandTheme.description,
-    images: [brandAssets.openGraph],
+    images: ["/opengraph-image"],
   },
 }
 

@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import type { ReactNode } from "react"
 import { useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import type { LucideIcon } from "lucide-react"
 import { BrandLogo } from "@/components/branding"
 import { AIOSArchitectureOrbit } from "@/components/aios/architecture"
 import { AIOSFloatingCard, AIOSGlassCard } from "@/components/aios/cards"
@@ -36,11 +36,10 @@ export function AIOSComparisonCard({ rows, leftLabel, rightLabel }: { rows: Arra
   )
 }
 
-export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: string; label: string; title: string; body: string; bullets: string[]; icon?: LucideIcon }>; initialKey?: string }) {
+export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: string; label: string; title: string; body: string; bullets: string[]; icon?: ReactNode }>; initialKey?: string }) {
   const [activeKey, setActiveKey] = useState(initialKey ?? items[0]?.key ?? "")
   const reduceMotion = useReducedMotion()
   const active = items.find((item) => item.key === activeKey) ?? items[0]
-  const ActiveIcon = active?.icon
 
   return (
     <div className="grid gap-5 lg:grid-cols-[0.7fr_1.3fr]">
@@ -75,7 +74,7 @@ export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: str
             aria-labelledby={`${active.key}-tab`}
           >
             <AIOSFloatingCard className="overflow-hidden">
-              {ActiveIcon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]"><ActiveIcon size={18} /></span> : null}
+              {active.icon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">{active.icon}</span> : null}
               <h3 className="public-h3">{active.title}</h3>
               <p className="public-body-lg mt-4">{active.body}</p>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -123,7 +122,7 @@ export {
 }
 
 export function AIOSFooterBrand() {
-  return <BrandLogo width={132} height={31} />
+  return <BrandLogo width={112} height={56} />
 }
 
 export function AIOSPublicLink({ href, children }: { href: string; children: React.ReactNode }) {

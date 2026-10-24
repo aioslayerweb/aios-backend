@@ -1,0 +1,25 @@
+# AIOS Pilot
+
+AIOS is an AI-powered business intelligence operating layer. Its product model connects business signals, business memory, knowledge, executive insight, recommendations, decisions, governed workflows, and learning from outcomes.
+
+## Concepts
+
+- Role-Based Intelligence (RBI) prioritizes information relevant to a person's role within their permitted access.
+- Role-Based Access Control (RBAC) defines what a person is authorized to access. RBI does not grant permissions or bypass RBAC.
+- Recommendations and workflow actions are distinct. Execution depends on configured permissions, policies, and approval requirements.
+
+## Public pages
+
+- [Home](https://aiospilot.com/)
+- [Platform](https://aiospilot.com/platform)
+- [Architecture](https://aiospilot.com/architecture)
+- [Modules](https://aiospilot.com/modules)
+- [Products](https://aiospilot.com/products)
+- [Resources](https://aiospilot.com/resources)
+- [About](https://aiospilot.com/about)
+- [Contact](https://aiospilot.com/contact)
+- [Security](https://aiospilot.com/security)
+- [Privacy](https://aiospilot.com/privacy)
+- [Terms](https://aiospilot.com/terms)
+
+The public demo uses synthetic data and local preview interactions. It does not demonstrate production tenant isolation or a live business connection.

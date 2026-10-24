@@ -55,11 +55,8 @@ export function AIOSFloatingParticles({ count = 14 }: { count?: number }) {
 
 export function AIOSLightBackground({ children }: { children?: ReactNode }) {
   return (
-    <>
-      <AIOSMeshGradient />
-      <AIOSGridBackground />
-      <AIOSNoiseTexture />
+    <div aria-hidden="true" className="public-atmosphere">
       {children}
-    </>
+    </div>
   )
 }

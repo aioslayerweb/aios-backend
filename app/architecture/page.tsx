@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Blocks,
   Bot,
@@ -31,17 +29,25 @@ import {
   PublicProblemSolutionSection,
   PublicStructuredData,
 } from "@/components/public-site/storytelling-sections"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Architecture",
+  "Explore the AIOS operating model from business signals and memory through intelligence, decisions, governance, and learning.",
+  "/architecture",
+)
 
 const architectureLayers = [
-  { title: "Data Layer", subtitle: "Signals from CRM, ERP, support, collaboration, and finance systems.", icon: Database },
-  { title: "Business Memory", subtitle: "Persistent memory objects indexing evidence, timelines, and outcomes.", icon: Blocks },
-  { title: "Role-Based Intelligence", subtitle: "Context windows per executive role, function, and decision scope.", icon: Briefcase },
-  { title: "Intelligence Engine", subtitle: "Reasoning, confidence scoring, narrative synthesis, and prioritization.", icon: BrainCircuit },
-  { title: "Decision Engine", subtitle: "Governed recommendation pathways with approval and ownership control.", icon: GitBranch },
-  { title: "AI Operators", subtitle: "Specialized autonomous operators for revenue, customer, finance, and operations.", icon: Bot },
-  { title: "Workflow Runtime", subtitle: "Runtime orchestration of approved policies, tasks, and automation sequences.", icon: Workflow },
-  { title: "External Integrations", subtitle: "Bidirectional sync with enterprise APIs, SDKs, and messaging systems.", icon: Network },
-  { title: "Execution Layer", subtitle: "Measured actions, business outcomes, and feedback loops into memory.", icon: Layers },
+  { title: "Data Layer", subtitle: "Signals from CRM, ERP, support, collaboration, and finance systems.", icon: <Database size={18} /> },
+  { title: "Business Memory", subtitle: "Persistent memory objects indexing evidence, timelines, and outcomes.", icon: <Blocks size={18} /> },
+  { title: "Role-Based Intelligence", subtitle: "Context windows per executive role, function, and decision scope.", icon: <Briefcase size={18} /> },
+  { title: "Intelligence Engine", subtitle: "Reasoning, confidence scoring, narrative synthesis, and prioritization.", icon: <BrainCircuit size={18} /> },
+  { title: "Decision Engine", subtitle: "Governed recommendation pathways with approval and ownership control.", icon: <GitBranch size={18} /> },
+  { title: "AI Operators", subtitle: "Specialized autonomous operators for revenue, customer, finance, and operations.", icon: <Bot size={18} /> },
+  { title: "Workflow Runtime", subtitle: "Runtime orchestration of approved policies, tasks, and automation sequences.", icon: <Workflow size={18} /> },
+  { title: "External Integrations", subtitle: "Bidirectional sync with enterprise APIs, SDKs, and messaging systems.", icon: <Network size={18} /> },
+  { title: "Execution Layer", subtitle: "Measured actions, business outcomes, and feedback loops into memory.", icon: <Layers size={18} /> },
 ]
 
 const posterSteps = [
@@ -87,12 +93,6 @@ const architectureBenefits = [
   { title: "Faster integration", body: "Business capability APIs reduce implementation ambiguity and drift." },
 ]
 
-const architectureOutcomes = [
-  { label: "Integration speed", value: "+27%", detail: "Faster onboarding of critical business systems." },
-  { label: "Audit readiness", value: "98%", detail: "Traceable decisions and execution records by default." },
-  { label: "Architecture confidence", value: "93%", detail: "Stakeholders report clearer understanding of system operation." },
-]
-
 const timelineItems = posterSteps.map((title, index) => ({
   label: `Stage ${index + 1}`,
   title,
@@ -122,7 +122,7 @@ export default function ArchitecturePage() {
               Explore Platform
             </PublicButtonLink>
             <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
           </>
         }
@@ -203,7 +203,6 @@ export default function ArchitecturePage() {
         title="Architecture that supports enterprise adoption"
         body="The AIOS architecture model is designed to satisfy technical rigor and executive clarity at the same time."
         benefits={architectureBenefits}
-        outcomes={architectureOutcomes}
       />
 
       <PublicEnterpriseTrustMatrixSection />

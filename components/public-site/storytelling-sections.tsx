@@ -1,19 +1,17 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import type { LucideIcon } from "lucide-react"
-import { motion, useReducedMotion } from "framer-motion"
+import type { ReactNode } from "react"
+import Link from "next/link"
 import {
   Briefcase,
   Calculator,
+  ArrowRight,
   CheckCircle2,
-  CircleDollarSign,
   ClipboardCheck,
   Cpu,
-  Database,
   Factory,
   Gauge,
-  Handshake,
   Layers,
   Lock,
   Scale,
@@ -21,7 +19,6 @@ import {
   Sparkles,
   TrendingUp,
   UserCheck,
-  Users,
   Workflow,
 } from "lucide-react"
 import {
@@ -29,7 +26,6 @@ import {
   PublicCard,
   PublicContainer,
   PublicFeatureGrid,
-  PublicLogoMarquee,
   PublicSection,
   PublicSectionHeader,
 } from "@/components/aios"
@@ -37,7 +33,7 @@ import {
 export type StoryCardItem = {
   title: string
   body: string
-  icon?: LucideIcon
+  icon?: ReactNode
 }
 
 export type StoryStep = {
@@ -117,192 +113,114 @@ export function PublicBenefitsOutcomesSection({
   title,
   body,
   benefits,
-  outcomes,
 }: {
   title: string
   body: string
   benefits: StoryCardItem[]
-  outcomes: Array<{ label: string; value: string; detail: string }>
 }) {
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader eyebrow="Benefits" title={title} body={body} />
-        <div className="mt-14 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="mt-14">
           <PublicFeatureGrid items={benefits} columns={3} />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            {outcomes.map((item) => (
-              <PublicCard key={item.label} variant="kpi" hover>
-                <p className="public-caption text-[color:var(--public-color-text-soft)]">{item.label}</p>
-                <p className="public-h3 mt-3">{item.value}</p>
-                <p className="public-small mt-3">{item.detail}</p>
-              </PublicCard>
-            ))}
-          </div>
+          <p className="mt-6 max-w-3xl border-l-2 border-[color:var(--public-color-primary)] pl-4 text-sm leading-6 text-[color:var(--public-color-text-muted)]">
+            These are intended product outcomes, not measured customer results. AIOS does not publish verified performance figures in this section.
+          </p>
         </div>
       </PublicContainer>
     </PublicSection>
   )
 }
 
-const defaultTrustLogos = [
-  "Global Manufacturing Group",
-  "Northwind Logistics",
-  "Atlas Financial",
-  "Crescent Health",
-  "Orion Retail",
-  "Apex Infrastructure",
-]
-
 export function PublicTrustAndProofSection({
   title,
   body,
-  quote,
-  person,
-  role,
-  logos = defaultTrustLogos,
 }: {
   title: string
   body: string
-  quote: string
-  person: string
-  role: string
+  quote?: string
+  person?: string
+  role?: string
   logos?: string[]
 }) {
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader eyebrow="Enterprise Trust" title={title} body={body} />
-        {logos.length ? (
-          <div className="mt-12">
-            <PublicLogoMarquee items={logos} />
-          </div>
-        ) : null}
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           <PublicCard variant="feature" hover>
             <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">
               <ShieldCheck size={18} />
             </span>
             <h3 className="public-h4">Security and governance</h3>
-            <p className="public-body mt-3">Policy-aware controls, RBAC, and traceable decision evidence are built in.</p>
+            <p className="public-body mt-3">Access permissions and approval policies should remain explicit in any AI-assisted operating model.</p>
           </PublicCard>
           <PublicCard variant="feature" hover>
             <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">
               <TrendingUp size={18} />
             </span>
             <h3 className="public-h4">Measurable outcomes</h3>
-            <p className="public-body mt-3">Every recommendation includes expected business impact and post-action learning.</p>
+            <p className="public-body mt-3">Business impact should be evaluated with evidence and measured outcomes, not assumed from a recommendation.</p>
           </PublicCard>
           <PublicCard variant="feature" hover>
             <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">
               <Sparkles size={18} />
             </span>
             <h3 className="public-h4">Executive-ready clarity</h3>
-            <p className="public-body mt-3">AIOS explains what changed, why it matters, and what to do next.</p>
+            <p className="public-body mt-3">The AIOS product model is designed to make observations, evidence, reasoning, and suggested next steps legible.</p>
           </PublicCard>
         </div>
-        <PublicCard variant="floating" className="mt-8">
-          <p className="public-body-lg">&quot;{quote}&quot;</p>
-          <p className="public-small mt-4">{person}</p>
-          <p className="public-caption mt-1">{role}</p>
-        </PublicCard>
+        <p className="mt-8 border-t border-[color:var(--public-color-border)] pt-5 text-sm text-[color:var(--public-color-text-muted)]">
+          No customer logos, endorsements, certifications, or independently verified performance results are presented here.
+        </p>
       </PublicContainer>
     </PublicSection>
   )
 }
 
 export function PublicRoiCalculatorSection() {
-  const reduceMotion = useReducedMotion()
-  const [employees, setEmployees] = useState(450)
-  const [departments, setDepartments] = useState(8)
-  const [revenue, setRevenue] = useState(12000000)
-  const [opportunities, setOpportunities] = useState(420)
-  const [customers, setCustomers] = useState(900)
-  const [tickets, setTickets] = useState(1800)
-  const [hours, setHours] = useState(1200)
-  const [meetings, setMeetings] = useState(80)
+  const [employees, setEmployees] = useState(50)
+  const [hoursPerEmployee, setHoursPerEmployee] = useState(8)
+  const [recoverableShare, setRecoverableShare] = useState(10)
   const [hourlyCost, setHourlyCost] = useState(62)
-  const [hasTrackedUse, setHasTrackedUse] = useState(false)
 
-  const metrics = useMemo(() => {
-    const hoursSavedMonthly = Math.round(hours * 0.33 + meetings * 0.9 + departments * 6)
-    const annualHoursSaved = hoursSavedMonthly * 12
-    const costReduction = Math.round(annualHoursSaved * hourlyCost * 0.76)
-    const opportunitiesRecovered = Math.round(opportunities * 0.11)
-    const annualValue = Math.round(revenue * 0.012 + opportunitiesRecovered * 6800 + costReduction)
-    const productivityIncrease = Math.min(48, Math.round((hoursSavedMonthly / Math.max(hours, 1)) * 100))
-    const pilotCost = 180000
-    const paybackMonths = Math.max(2, Math.round((pilotCost / Math.max(annualValue / 12, 1)) * 10) / 10)
-    const roiPercentage = Math.max(10, Math.round(((annualValue - pilotCost) / pilotCost) * 100))
-    const intelligenceCapacity = Math.round(
-      employees * 22 +
-      departments * 120 +
-      customers * 1.8 +
-      opportunities * 18 +
-      tickets * 0.9,
-    )
+  const scenario = useMemo(() => {
+    const hoursPerMonth = Math.round(employees * hoursPerEmployee * recoverableShare / 100)
+    const annualCapacityValue = hoursPerMonth * hourlyCost * 12
+    return { hoursPerMonth, annualCapacityValue }
+  }, [employees, hoursPerEmployee, hourlyCost, recoverableShare])
 
-    return {
-      annualHoursSaved,
-      hoursSavedMonthly,
-      opportunitiesRecovered,
-      costReduction,
-      annualValue,
-      productivityIncrease,
-      paybackMonths,
-      roiPercentage,
-      intelligenceCapacity,
-      confidence: Math.min(97, 81 + Math.round(customers / 1800)),
-    }
-  }, [customers, departments, employees, hourlyCost, hours, meetings, opportunities, revenue, tickets])
-
-  function markRoiUsage(field: string) {
-    if (hasTrackedUse) {
-      return
-    }
-
-    setHasTrackedUse(true)
-    window.aiosTrackEvent?.("roi_calculator_use", { field })
-  }
+  const euroFormatter = new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  })
 
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="ROI Experience"
-          title="Estimate enterprise value with the AIOS Pilot model"
-          body="Configure team and business inputs to estimate time savings, recovered opportunities, and payback period."
+          eyebrow="Illustrative scenario"
+          title="Explore the value of time reclaimed"
+          body="Adjust the inputs to see a simple scenario based only on your assumptions. This is not an AIOS performance forecast or a promise of savings."
         />
 
         <div className="mt-14 grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <PublicCard variant="floating" className="space-y-4">
-            <RoiInput label="Employees" value={employees} setValue={(value) => { markRoiUsage("employees"); setEmployees(value) }} min={25} max={10000} step={25} />
-            <RoiInput label="Departments" value={departments} setValue={(value) => { markRoiUsage("departments"); setDepartments(value) }} min={2} max={60} step={1} />
-            <RoiInput label="Revenue (annual EUR)" value={revenue} setValue={(value) => { markRoiUsage("revenue"); setRevenue(value) }} min={1000000} max={500000000} step={500000} />
-            <RoiInput label="Customer count" value={customers} setValue={(value) => { markRoiUsage("customers"); setCustomers(value) }} min={100} max={200000} step={100} />
-            <RoiInput label="Monthly opportunities" value={opportunities} setValue={(value) => { markRoiUsage("opportunities"); setOpportunities(value) }} min={20} max={24000} step={20} />
-            <RoiInput label="Support tickets (annual)" value={tickets} setValue={(value) => { markRoiUsage("tickets"); setTickets(value) }} min={120} max={300000} step={50} />
-            <RoiInput label="Hours lost to manual work / month" value={hours} setValue={(value) => { markRoiUsage("hours"); setHours(value) }} min={80} max={20000} step={20} />
-            <RoiInput label="Meetings per week" value={meetings} setValue={(value) => { markRoiUsage("meetings"); setMeetings(value) }} min={8} max={400} step={1} />
-            <RoiInput label="Average hourly employee cost (EUR)" value={hourlyCost} setValue={(value) => { markRoiUsage("hourly_cost"); setHourlyCost(value) }} min={20} max={320} step={1} />
+          <PublicCard variant="floating" className="space-y-5">
+            <RoiInput label="People in scope" value={employees} setValue={setEmployees} min={1} max={5000} step={1} />
+            <RoiInput label="Hours of repeatable work per person / month" value={hoursPerEmployee} setValue={setHoursPerEmployee} min={1} max={80} step={1} />
+            <RoiInput label="Assumed share of time reclaimed (%)" value={recoverableShare} setValue={setRecoverableShare} min={0} max={50} step={1} />
+            <RoiInput label="Illustrative hourly cost (EUR)" value={hourlyCost} setValue={setHourlyCost} min={10} max={500} step={1} />
           </PublicCard>
 
-          <motion.div
-            key={`${metrics.annualValue}-${metrics.roiPercentage}`}
-            initial={reduceMotion ? { opacity: 1 } : { opacity: 0.84, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduceMotion ? 0.01 : 0.34 }}
-            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1"
-          >
-            <RoiStat title="Hours saved" value={`${metrics.hoursSavedMonthly.toLocaleString()} hrs/mo`} detail={`${metrics.annualHoursSaved.toLocaleString()} hours annually.`} />
-            <RoiStat title="Cost reduction" value={`€${metrics.costReduction.toLocaleString()}`} detail="Lower manual operations and faster routing." />
-            <RoiStat title="Recovered opportunities" value={`${metrics.opportunitiesRecovered.toLocaleString()} / year`} detail="Recovered with earlier risk and priority detection." />
-            <RoiStat title="Estimated annual value" value={`€${metrics.annualValue.toLocaleString()}`} detail="Combined operational and commercial impact." />
-            <RoiStat title="Productivity increase" value={`${metrics.productivityIncrease}%`} detail="Cross-functional productivity improvement estimate." />
-            <RoiStat title="Payback period" value={`${metrics.paybackMonths} months`} detail={`Confidence model: ${metrics.confidence}%`} />
-            <RoiStat title="ROI percentage" value={`${metrics.roiPercentage}%`} detail="Estimated first-year return on pilot investment." />
-            <RoiStat title="Intelligence capacity" value={`${metrics.intelligenceCapacity.toLocaleString()} ICU`} detail="Potential capacity requirement for pilot sizing." />
-          </motion.div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <RoiStat title="Potential time capacity / month" value={`${scenario.hoursPerMonth.toLocaleString()} hours`} detail={`${employees.toLocaleString()} people × ${hoursPerEmployee} hours × ${recoverableShare}% assumed share.`} />
+            <RoiStat title="Equivalent annual capacity value" value={euroFormatter.format(scenario.annualCapacityValue)} detail={`Calculated as monthly hours × ${euroFormatter.format(hourlyCost)} hourly cost × 12. This is not a cost-saving estimate.`} />
+            <p className="public-small sm:col-span-2 lg:col-span-1">
+              No inputs are sent to AIOS by this calculator. Actual outcomes depend on the business process, implementation, and measured results.
+            </p>
+          </div>
         </div>
       </PublicContainer>
     </PublicSection>
@@ -355,26 +273,23 @@ function RoiStat({ title, value, detail }: { title: string; value: string; detai
       <p className="public-caption text-[color:var(--public-color-text-soft)]">{title}</p>
       <p className="public-h3 mt-3">{value}</p>
       <p className="public-small mt-2">{detail}</p>
-      <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--public-color-primary)]">
-        <CheckCircle2 size={15} /> Pilot-ready estimate
-      </p>
     </PublicCard>
   )
 }
 
 const trustControls = [
-  { title: "Enterprise Security", body: "Defense-in-depth controls for data, model operations, and runtime boundaries.", icon: ShieldCheck },
-  { title: "RBAC", body: "Role-aware access controls aligned to enterprise operating structures.", icon: UserCheck },
-  { title: "Role-Based Intelligence", body: "Intelligence context is tailored by role while system logic stays unified.", icon: Briefcase },
-  { title: "Data Privacy", body: "Policy controls and data boundaries designed for enterprise privacy standards.", icon: Lock },
-  { title: "Human Approval", body: "Critical actions route through explicit approvals before execution.", icon: ClipboardCheck },
-  { title: "Audit Trail", body: "Recommendations, decisions, and actions are fully traceable.", icon: Scale },
-  { title: "Governance", body: "Governed execution with explainability and accountability built in.", icon: Layers },
-  { title: "Compliance Ready", body: "Architecture patterns designed to align with compliance workflows.", icon: CheckCircle2 },
-  { title: "API First", body: "Business capability APIs accelerate integration and enterprise interoperability.", icon: Workflow },
-  { title: "Scalable Architecture", body: "Designed for increasing signal volumes and organizational complexity.", icon: Factory },
-  { title: "Enterprise-grade AI", body: "AI operators work with memory, policy, and confidence calibration.", icon: Cpu },
-  { title: "Decision Support", body: "Executive-grade recommendations connected to outcomes and evidence.", icon: Gauge },
+  { title: "Security", body: "Review the controls required for the intended data, model, and runtime boundaries.", icon: <ShieldCheck size={18} /> },
+  { title: "RBAC", body: "Role-based access control determines which resources a person may access.", icon: <UserCheck size={18} /> },
+  { title: "Role-Based Intelligence", body: "Role context can prioritize information without changing access permissions.", icon: <Briefcase size={18} /> },
+  { title: "Data privacy", body: "Data use and retention requirements should be defined for each deployment.", icon: <Lock size={18} /> },
+  { title: "Human approval", body: "Approval steps should be configured for actions that require human review.", icon: <ClipboardCheck size={18} /> },
+  { title: "Traceability", body: "Keep recommendations, decisions, and outcomes linked where the system supports it.", icon: <Scale size={18} /> },
+  { title: "Governance", body: "Define ownership, policies, and accountability before enabling execution.", icon: <Layers size={18} /> },
+  { title: "Compliance alignment", body: "Assess applicable obligations with the organization's compliance owners.", icon: <CheckCircle2 size={18} /> },
+  { title: "Business APIs", body: "Connect product capabilities through documented interfaces where available.", icon: <Workflow size={18} /> },
+  { title: "Scalability", body: "Assess signal volumes and organizational complexity during implementation planning.", icon: <Factory size={18} /> },
+  { title: "AI oversight", body: "Review reasoning, confidence, and escalation requirements for each use case.", icon: <Cpu size={18} /> },
+  { title: "Decision support", body: "Recommendations should connect observations, evidence, and proposed next steps.", icon: <Gauge size={18} /> },
 ]
 
 export function PublicEnterpriseTrustMatrixSection() {
@@ -382,9 +297,9 @@ export function PublicEnterpriseTrustMatrixSection() {
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="Why Trust AIOS"
-          title="Enterprise trust controls built into the operating system"
-          body="AIOS is engineered for enterprise-grade reliability, governance, and human control from day one."
+          eyebrow="Trust principles"
+          title="Keep access, decisions, and execution governed"
+          body="These principles describe the intended operating model. They are not a claim of certification or a statement that every control is enabled in every deployment."
         />
         <div className="mt-14">
           <PublicFeatureGrid items={trustControls} columns={4} />
@@ -395,61 +310,28 @@ export function PublicEnterpriseTrustMatrixSection() {
 }
 
 export function PublicIntelligenceCapacitySection() {
-  const [dataPoints, setDataPoints] = useState(240000)
-  const [monthlyConsumption, setMonthlyConsumption] = useState(68)
-  const [activePlan, setActivePlan] = useState<"pilot" | "growth" | "enterprise">("pilot")
-
-  const plans = useMemo(() => {
-    const capacityNeed = Math.round(dataPoints * (0.6 + monthlyConsumption / 100))
-    const base = [
-      { key: "pilot" as const, title: "Pilot Plan", range: "Up to 180k ICU", price: "€15k-€25k / month", fit: "Focused discovery + first production workflows" },
-      { key: "growth" as const, title: "Growth Plan", range: "180k-750k ICU", price: "€30k-€75k / month", fit: "Multi-department scale and broader automation" },
-      { key: "enterprise" as const, title: "Enterprise Plan", range: "750k+ ICU", price: "Custom commercial model", fit: "Global operations, advanced governance, and high-volume orchestration" },
-    ]
-
-    return { capacityNeed, base }
-  }, [dataPoints, monthlyConsumption])
-
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="Intelligence Capacity"
-          title="Interactive pricing and capacity planning"
-          body="Estimate capacity requirements and compare pilot, growth, and enterprise plans based on your operating scale."
+          eyebrow="Commercial fit"
+          title="Scope depends on your operating context"
+          body="AIOS does not publish standard capacity estimates or pricing here. A conversation should establish the use case, systems in scope, governance requirements, and deployment needs."
         />
-        <div className="mt-14 grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <PublicCard variant="floating" className="space-y-4">
-            <RoiInput label="Data points / month" value={dataPoints} setValue={setDataPoints} min={20000} max={2000000} step={10000} />
-            <RoiInput label="Monthly intelligence consumption (%)" value={monthlyConsumption} setValue={setMonthlyConsumption} min={15} max={100} step={1} />
-            <PublicCard variant="kpi" className="mt-4">
-              <p className="public-caption text-[color:var(--public-color-text-soft)]">Estimated capacity need</p>
-              <p className="public-h3 mt-3">{plans.capacityNeed.toLocaleString()} ICU</p>
-              <p className="public-small mt-2">Capacity based on expected data throughput and active intelligence consumption.</p>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {[
+            ["Business context", "Clarify which decisions or processes are in scope."],
+            ["Systems and data", "Identify relevant sources and access requirements."],
+            ["Governance", "Agree permissions, approvals, and success measures."],
+          ].map(([title, body]) => (
+            <PublicCard key={title} variant="feature">
+              <h3 className="public-h4">{title}</h3>
+              <p className="public-body mt-3">{body}</p>
             </PublicCard>
-          </PublicCard>
-
-          <div className="grid gap-4">
-            {plans.base.map((plan) => (
-              <button
-                key={plan.key}
-                type="button"
-                onClick={() => {
-                  setActivePlan(plan.key)
-                  window.aiosTrackEvent?.("pricing_plan_select", { plan: plan.key })
-                }}
-                className="text-left"
-                aria-pressed={activePlan === plan.key}
-              >
-                <PublicCard variant="feature" hover className={activePlan === plan.key ? "border-[color:var(--public-color-primary)]" : ""}>
-                  <p className="public-caption text-[color:var(--public-color-primary)]">{plan.title}</p>
-                  <h3 className="public-h4 mt-2">{plan.range}</h3>
-                  <p className="public-body mt-3">{plan.fit}</p>
-                  <p className="public-small mt-4">Commercial model: {plan.price}</p>
-                </PublicCard>
-              </button>
-            ))}
-          </div>
+          ))}
+        </div>
+        <div className="mt-8">
+          <PublicButtonLink href="/contact">Discuss fit and scope</PublicButtonLink>
         </div>
       </PublicContainer>
     </PublicSection>
@@ -457,52 +339,31 @@ export function PublicIntelligenceCapacitySection() {
 }
 
 export function PublicPilotProgramSection() {
-  const qualifications = [
-    "Multi-team operating complexity",
-    "Clear executive sponsor",
-    "Willingness to instrument outcomes",
-    "Cross-system signal access",
+  const planningTopics = [
+    ["Use case", "Clarify the business question and decision owners."],
+    ["Context and controls", "Review relevant sources, access boundaries, and approval needs."],
+    ["Evidence of value", "Agree what should be measured and how outcomes will be assessed."],
   ]
-  const timeline = ["Week 1-2 Discovery", "Week 3-4 Integration", "Week 5-8 Operator + Workflow Activation", "Week 9-12 Outcome Review + Scale Plan"]
-  const deliverables = ["Pilot architecture map", "Role-based intelligence setup", "Workflow automation blueprint", "Executive outcomes report"]
 
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
           eyebrow="Pilot Program"
-          title="Start with a structured enterprise pilot"
-          body="AIOS pilots are designed for measurable business outcomes, executive alignment, and clear scale pathways."
+          title="Plan a pilot around a real business decision"
+          body="Pilot scope, timing, and deliverables should be agreed during discovery; no fixed schedule or result is promised here."
         />
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          <PublicCard variant="feature" hover>
-            <p className="public-eyebrow">Who Qualifies</p>
-            <div className="mt-4 space-y-3">
-              {qualifications.map((item) => (
-                <p key={item} className="public-body">• {item}</p>
-              ))}
-            </div>
-          </PublicCard>
-          <PublicCard variant="feature" hover>
-            <p className="public-eyebrow">Timeline</p>
-            <div className="mt-4 space-y-3">
-              {timeline.map((item) => (
-                <p key={item} className="public-body">• {item}</p>
-              ))}
-            </div>
-          </PublicCard>
-          <PublicCard variant="feature" hover>
-            <p className="public-eyebrow">Deliverables + Success Metrics</p>
-            <div className="mt-4 space-y-3">
-              {deliverables.map((item) => (
-                <p key={item} className="public-body">• {item}</p>
-              ))}
-            </div>
-          </PublicCard>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {planningTopics.map(([title, body]) => (
+            <PublicCard key={title} variant="feature">
+              <h3 className="public-h4">{title}</h3>
+              <p className="public-body mt-3">{body}</p>
+            </PublicCard>
+          ))}
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
           <PublicButtonLink href="/contact" size="lg">Book Pilot</PublicButtonLink>
-          <PublicButtonLink href="/contact" variant="secondary" size="lg">Schedule Discovery</PublicButtonLink>
+          <PublicButtonLink href="/pilot/discovery" variant="secondary" size="lg">Explore discovery</PublicButtonLink>
         </div>
       </PublicContainer>
     </PublicSection>
@@ -510,26 +371,14 @@ export function PublicPilotProgramSection() {
 }
 
 export function PublicSocialProofSection() {
-  const proof = [
-    { title: "Pilot Customers", body: "Reusable section ready for pilot customer profiles and quantified outcomes.", icon: Handshake },
-    { title: "Future Testimonials", body: "Structured quote cards designed for executive and operator voices.", icon: Users },
-    { title: "Case Studies", body: "Case-study cards for operations, revenue, finance, and customer continuity narratives.", icon: Briefcase },
-    { title: "Technology Partners", body: "Partner ecosystem surfaces for integrations and co-delivery narratives.", icon: Database },
-    { title: "Advisory Board", body: "Advisory and strategic operator profiles to reinforce category credibility.", icon: CircleDollarSign },
-    { title: "Customer Quotes", body: "High-trust quote rail designed for enterprise proof-point storytelling.", icon: Sparkles },
-  ]
-
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="Social Proof"
-          title="Evidence sections built for commercial conversations"
-          body="AIOS now includes reusable proof modules for pilots, partner trust, testimonials, and case-study storytelling."
+          eyebrow="Evidence"
+          title="Claims should be supported by evidence"
+          body="No customer testimonials, partner endorsements, certifications, or measured outcome claims are presented here without verification."
         />
-        <div className="mt-14">
-          <PublicFeatureGrid items={proof} columns={3} />
-        </div>
       </PublicContainer>
     </PublicSection>
   )
@@ -614,21 +463,28 @@ export function PublicExecutiveRoleSection() {
 }
 
 export function PublicBuyerJourneySection() {
-  const steps = ["Awareness", "Understanding", "Trust", "Evaluation", "ROI", "Pilot Program", "Demo Request"]
+  const steps = [
+    { label: "Platform", href: "/platform" },
+    { label: "Architecture", href: "/architecture" },
+    { label: "Modules", href: "/modules" },
+    { label: "Security", href: "/security" },
+    { label: "Pilot", href: "/pilot" },
+    { label: "Contact", href: "/contact" },
+  ]
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="Buyer Journey"
-          title="A clear path from first visit to pilot activation"
-          body="Every page now supports one progression: understand AIOS, evaluate fit, estimate value, and start a pilot."
+          eyebrow="Explore AIOS"
+          title="A practical path through the product"
+          body="Review the operating model, technical architecture, modules, and governance before discussing fit."
         />
-        <div className="mt-10 grid gap-3 md:grid-cols-2 xl:grid-cols-7">
-          {steps.map((item, index) => (
-            <PublicCard key={item} variant="kpi" hover>
-              <p className="public-caption text-[color:var(--public-color-primary)]">Step {index + 1}</p>
-              <p className="public-body mt-2 font-semibold text-[color:var(--public-color-navy)]">{item}</p>
-            </PublicCard>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {steps.map((item) => (
+            <Link key={item.href} href={item.href} className="public-card public-card-standard p-5 font-semibold text-[color:var(--public-color-navy)] transition hover:border-[color:var(--public-color-primary)]">
+              <span>{item.label}</span>
+              <ArrowRight aria-hidden="true" className="ml-2 inline" size={15} />
+            </Link>
           ))}
         </div>
       </PublicContainer>
@@ -642,17 +498,14 @@ export function PublicConversionRailSection() {
       <PublicContainer>
         <PublicCard variant="floating" className="bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(247,249,252,0.96))]">
           <PublicSectionHeader
-            eyebrow="Start Engagement"
-            title="Choose your next step"
-            body="Book a demo, join pilot, talk to sales, schedule discovery, download overview, or request pricing."
+            eyebrow="Continue exploring"
+            title="Choose a useful next step"
+            body="Explore a synthetic product walkthrough, review the architecture, or discuss a business use case."
           />
           <div className="mt-8 flex flex-wrap gap-3">
-            <PublicButtonLink href="/contact">Book Demo</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary">Join Pilot</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary">Talk to Sales</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary">Schedule Discovery</PublicButtonLink>
-            <PublicButtonLink href="/resources" variant="secondary">Download Overview</PublicButtonLink>
-            <PublicButtonLink href="/products" variant="secondary">Request Pricing</PublicButtonLink>
+            <PublicButtonLink href="/demo-platform/executive">Explore the demo</PublicButtonLink>
+            <PublicButtonLink href="/architecture" variant="secondary">Review architecture</PublicButtonLink>
+            <PublicButtonLink href="/contact" variant="secondary">Discuss a use case</PublicButtonLink>
           </div>
         </PublicCard>
       </PublicContainer>

@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Bot,
   BrainCircuit,
@@ -31,26 +29,34 @@ import {
   PublicProblemSolutionSection,
   PublicStructuredData,
 } from "@/components/public-site/storytelling-sections"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Platform",
+  "See how AIOS connects business systems, signals, memory, role-based intelligence, people, and governed workflows.",
+  "/platform",
+)
 
 const orbitNodes = [
-  { title: "Signals", x: "14%", y: "18%", icon: Database },
-  { title: "Memory", x: "76%", y: "18%", icon: Database },
-  { title: "Reasoning", x: "84%", y: "52%", icon: BrainCircuit },
-  { title: "Decisions", x: "16%", y: "52%", icon: GitBranch },
-  { title: "Operators", x: "28%", y: "84%", icon: Bot },
-  { title: "Workflows", x: "72%", y: "84%", icon: Workflow },
+  { title: "Signals", x: "14%", y: "18%", icon: <Database size={15} /> },
+  { title: "Memory", x: "76%", y: "18%", icon: <Database size={15} /> },
+  { title: "Reasoning", x: "84%", y: "52%", icon: <BrainCircuit size={15} /> },
+  { title: "Decisions", x: "16%", y: "52%", icon: <GitBranch size={15} /> },
+  { title: "Operators", x: "28%", y: "84%", icon: <Bot size={15} /> },
+  { title: "Workflows", x: "72%", y: "84%", icon: <Workflow size={15} /> },
 ]
 
 const pillars = [
-  { title: "Business Signals", body: "Unified signal ingestion from CRM, ERP, collaboration, support, and finance systems.", icon: Database },
-  { title: "Business Memory", body: "Persistent memory objects that retain outcomes, context, and evidence over time.", icon: Database },
-  { title: "Role Intelligence", body: "Decision context adapts by executive role without changing the system language.", icon: Building2 },
-  { title: "Reasoning Engine", body: "Confidence-scored interpretation and recommendation synthesis grounded in evidence.", icon: BrainCircuit },
-  { title: "Decision Governance", body: "Policy-aware recommendation routing, approvals, and explainable control.", icon: GitBranch },
-  { title: "AI Operators", body: "Specialized agents collaborate through shared context and execution goals.", icon: Bot },
-  { title: "Workflow Runtime", body: "Governed autonomous execution with measured outcomes and recovery patterns.", icon: Workflow },
-  { title: "Enterprise Trust", body: "Security, observability, and resilient runtime controls built into the platform layer.", icon: ShieldCheck },
-  { title: "Knowledge Graph", body: "Entity relationships and evidence linkage improve explainability and searchability.", icon: Network },
+  { title: "Business Signals", body: "Unified signal ingestion from CRM, ERP, collaboration, support, and finance systems.", icon: <Database size={18} /> },
+  { title: "Business Memory", body: "Persistent memory objects that retain outcomes, context, and evidence over time.", icon: <Database size={18} /> },
+  { title: "Role Intelligence", body: "Decision context adapts by executive role without changing the system language.", icon: <Building2 size={18} /> },
+  { title: "Reasoning Engine", body: "Confidence-scored interpretation and recommendation synthesis grounded in evidence.", icon: <BrainCircuit size={18} /> },
+  { title: "Decision Governance", body: "Policy-aware recommendation routing, approvals, and explainable control.", icon: <GitBranch size={18} /> },
+  { title: "AI Operators", body: "Specialized agents collaborate through shared context and execution goals.", icon: <Bot size={18} /> },
+  { title: "Workflow Runtime", body: "Governed autonomous execution with measured outcomes and recovery patterns.", icon: <Workflow size={18} /> },
+  { title: "Enterprise Trust", body: "Security, observability, and resilient runtime controls built into the platform layer.", icon: <ShieldCheck size={18} /> },
+  { title: "Knowledge Graph", body: "Entity relationships and evidence linkage improve explainability and searchability.", icon: <Network size={18} /> },
 ]
 
 const platformRows = [
@@ -87,12 +93,6 @@ const platformBenefits = [
   { title: "Governed automation", body: "Execution stays safe, traceable, and aligned with enterprise policy." },
 ]
 
-const platformOutcomes = [
-  { label: "Decision cycle", value: "-38%", detail: "Reduced lag from signal to action." },
-  { label: "Execution quality", value: "+31%", detail: "Higher reliability in governed workflows." },
-  { label: "Policy compliance", value: "99.2%", detail: "Automations remain aligned with approval logic." },
-]
-
 export default function PlatformPage() {
   return (
     <PublicPageShell activeHref="/platform">
@@ -108,7 +108,7 @@ export default function PlatformPage() {
         actions={
           <>
             <PublicButtonLink href="/contact" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
             <PublicButtonLink href="/architecture" variant="secondary" size="lg">
               Review Architecture
@@ -168,7 +168,6 @@ export default function PlatformPage() {
         title="Platform benefits that scale across every module"
         body="Because platform capabilities are shared, value compounds as new teams and workflows come online."
         benefits={platformBenefits}
-        outcomes={platformOutcomes}
       />
 
       <PublicEnterpriseTrustMatrixSection />

@@ -1,0 +1,184 @@
+.aios-demo-root {
+  --demo-ink: #0b1c30;
+  --demo-muted: #55657a;
+  --demo-primary: #004ac6;
+  --demo-border: rgba(115, 133, 162, 0.2);
+  --demo-surface: rgba(255, 255, 255, 0.88);
+  --demo-elevation: 0 18px 45px rgba(23, 54, 101, 0.09);
+  color: var(--demo-ink);
+}
+
+.aios-demo-notice {
+  border-color: rgba(37, 99, 235, 0.2);
+  background: linear-gradient(100deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.92));
+  box-shadow: 0 8px 24px rgba(26, 75, 139, 0.06);
+}
+
+.aios-demo-app {
+  background:
+    radial-gradient(ellipse at 60% 0%, rgba(203, 224, 255, 0.5), transparent 38rem),
+    linear-gradient(145deg, #f7faff 0%, #f2f6fc 48%, #f9fbff 100%);
+}
+
+.aios-demo-sidebar {
+  border-color: var(--demo-border);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(205, 225, 255, 0.42), transparent 22rem),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 8px 0 30px rgba(19, 49, 92, 0.035);
+}
+
+.aios-demo-sidebar > div:first-child {
+  height: 4.25rem;
+  border-color: var(--demo-border);
+  padding-inline: 1rem;
+}
+
+.aios-demo-navigation {
+  padding: 0.75rem 0.65rem 1.5rem;
+}
+
+.aios-demo-nav-group + .aios-demo-nav-group {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(115, 133, 162, 0.13);
+}
+
+.aios-demo-nav-heading {
+  margin: 0.1rem 0.4rem 0.45rem;
+  color: #64758b;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.aios-demo-navigation a {
+  min-height: 2.45rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  line-height: 1.25;
+}
+
+.aios-demo-navigation a[aria-current="page"] {
+  border-color: rgba(37, 99, 235, 0.17);
+  background: linear-gradient(115deg, rgba(225, 238, 255, 0.96), rgba(247, 250, 255, 0.95));
+  box-shadow: inset 2px 0 #2563eb, 0 5px 15px rgba(26, 75, 139, 0.06);
+}
+
+.aios-demo-topbar {
+  border-color: var(--demo-border);
+  background: rgba(250, 252, 255, 0.88);
+  box-shadow: 0 6px 24px rgba(19, 49, 92, 0.035);
+}
+
+.aios-demo-main {
+  background:
+    radial-gradient(ellipse at 58% 0%, rgba(211, 230, 255, 0.24), transparent 36rem),
+    transparent;
+  overscroll-behavior: contain;
+}
+
+.aios-demo-app #main-content > div {
+  min-width: 0;
+}
+
+.aios-demo-app main section[aria-labelledby] {
+  min-width: 0;
+  border-color: rgba(146, 164, 191, 0.2);
+  box-shadow: var(--demo-elevation);
+  backdrop-filter: blur(14px);
+}
+
+.aios-demo-app main .border-border.bg-white,
+.aios-demo-app main .border-border.bg-surface-canvas {
+  border-color: rgba(127, 148, 180, 0.22);
+  box-shadow: 0 12px 32px rgba(23, 54, 101, 0.065);
+}
+
+.aios-demo-app main input,
+.aios-demo-app main select,
+.aios-demo-app main textarea {
+  max-width: 100%;
+}
+
+.aios-demo-app main :where(button, a, input, select, textarea):focus-visible {
+  outline-color: #004ac6;
+  outline-offset: 2px;
+}
+
+.aios-demo-bottom-nav {
+  min-height: 4.25rem;
+  border-color: rgba(115, 133, 162, 0.2);
+  background: rgba(250, 252, 255, 0.96);
+  box-shadow: 0 -8px 24px rgba(23, 54, 101, 0.08);
+}
+
+.aios-demo-bottom-nav a {
+  min-width: 3.25rem;
+  min-height: 2.75rem;
+}
+
+.aios-demo-app .aios-demo-mobile-drawer {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(205, 225, 255, 0.38), transparent 20rem),
+    rgba(250, 252, 255, 0.98);
+}
+
+.aios-demo-app .aios-demo-spatial-stage {
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+.aios-demo-app .aios-demo-spatial-hub {
+  rotate: x 4deg;
+  translate: 0 0 18px;
+  transform-style: preserve-3d;
+}
+
+.aios-demo-app .aios-demo-spatial-node {
+  box-shadow: 0 16px 32px rgba(24, 85, 158, 0.11), 0 3px 8px rgba(24, 85, 158, 0.07);
+  translate: 0 0 12px;
+}
+
+@media (max-width: 639px) {
+  .aios-demo-root {
+    padding-inline: 0.5rem;
+  }
+
+  .aios-demo-app main section[aria-labelledby] {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 1rem;
+  }
+
+  .aios-demo-app main .grid > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .aios-demo-app main svg,
+  .aios-demo-app main canvas,
+  .aios-demo-app main img {
+    max-width: 100%;
+  }
+
+  .aios-demo-app .aios-demo-spatial-hub,
+  .aios-demo-app .aios-demo-spatial-node {
+    rotate: none;
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aios-demo-app *,
+  .aios-demo-app *::before,
+  .aios-demo-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

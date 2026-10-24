@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
 import { PublicButtonLink, PublicCard, PublicContainer, PublicPageShell, PublicSection, PublicSectionHeader } from "@/components/aios"
 import { PublicStructuredData } from "@/components/public-site/storytelling-sections"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | AIOS",
-  description: "Learn how AIOS handles data, privacy, memory, signal processing, and enterprise accountability.",
-  alternates: { canonical: "https://aios.layer/privacy" },
-}
+export const metadata: Metadata = publicPageMetadata(
+  "Privacy Policy",
+  "Review the AIOS privacy policy, including the principles that guide data handling, access, and business memory.",
+  "/privacy",
+)
 
 export default function PrivacyPage() {
   return (

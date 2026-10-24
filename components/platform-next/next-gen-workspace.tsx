@@ -2,7 +2,7 @@
 
 import { memo, Suspense, lazy, useMemo, useCallback, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Check, ChevronDown, ChevronUp, Mail, MoreHorizontal, RefreshCcw, Sparkles, X } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Mail, RefreshCcw, Sparkles, X } from "lucide-react";
 import { enterpriseDatasets, enterpriseKpis, type EnterpriseEntity } from "@/lib/demo/enterprise-seed-data";
 import { WorkspaceCard, WorkspaceSection, WorkspaceShell } from "@/components/workspace";
 import { BrandLogo } from "@/components/branding";
@@ -134,8 +134,7 @@ const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity
   const [status, setStatus] = useState<EnterpriseEntity["status"]>(entity.status);
   const [dismissed, setDismissed] = useState(false);
 
-  const cycleStatus = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const cycleStatus = useCallback(() => {
     setStatus((prev) => prev === "healthy" ? "watch" : prev === "watch" ? "risk" : "healthy");
   }, []);
 
@@ -143,14 +142,18 @@ const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity
 
   return (
     <li className="overflow-hidden rounded-xl border border-slate-200 bg-white transition-all">
-      <button
-        type="button"
-        onClick={() => setExpanded((p) => !p)}
-        className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
-        aria-expanded={expanded}
-      >
-        <p className="truncate text-sm font-semibold text-slate-700">{entity.name}</p>
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center gap-2 px-3 py-2">
+        <button
+          type="button"
+          onClick={() => setExpanded((p) => !p)}
+          className="flex min-w-0 flex-1 items-center justify-between gap-2 text-left hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+          aria-expanded={expanded}
+          aria-controls={expanded ? `entity-actions-${entity.id}` : undefined}
+        >
+          <p className="truncate text-sm font-semibold text-slate-700">{entity.name}</p>
+          <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-slate-400 transition-transform", expanded && "rotate-180")} aria-hidden />
+        </button>
+        <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
             onClick={cycleStatus}
@@ -162,9 +165,8 @@ const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity
           >
             {status}
           </button>
-          <ChevronDown className={cn("h-3.5 w-3.5 text-slate-400 transition-transform", expanded && "rotate-180")} aria-hidden />
         </div>
-      </button>
+      </div>
 
       <div className="px-3 pb-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
         <span>{entity.owner}</span>
@@ -176,6 +178,7 @@ const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity
       <AnimatePresence>
         {expanded && (
           <motion.div
+            id={`entity-actions-${entity.id}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -209,12 +212,6 @@ const EntityRow = memo(function EntityRow({ entity }: { entity: EnterpriseEntity
                 className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
               >
                 <X className="h-3 w-3" /> Dismiss
-              </button>
-              <button
-                type="button"
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500 hover:bg-slate-100 transition-colors"
-              >
-                <MoreHorizontal className="h-3 w-3" /> More
               </button>
             </div>
           </motion.div>
@@ -318,7 +315,7 @@ export function NextGenWorkspace({
           </div>
 
           <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white/90 px-3 py-2 shadow-sm">
-            <BrandLogo width={124} height={30} />
+            <BrandLogo width={60} height={30} />
             <span
               className={cn(
                 "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold",
@@ -328,7 +325,7 @@ export function NextGenWorkspace({
               )}
             >
               <Sparkles className="h-3.5 w-3.5" />
-              {emphasis === "roadmap" ? "Roadmap Enabled" : "Live Intelligence"}
+              {emphasis === "roadmap" ? "Roadmap preview" : "Synthetic demo"}
             </span>
           </div>
         </div>

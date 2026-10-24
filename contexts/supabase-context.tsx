@@ -1,7 +1,8 @@
 "use client"
 
-import { createContext, useContext, useMemo, type ReactNode } from "react"
-import { getBrowserSupabaseClient, type BrowserSupabaseClient } from "@/lib/supabase"
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
+import { loadWhenEnabled } from "@/lib/runtime/live-data-boundary"
+import type { BrowserSupabaseClient } from "@/lib/supabase"
 
 type SupabaseContextValue = {
   client: BrowserSupabaseClient | null
@@ -9,13 +10,37 @@ type SupabaseContextValue = {
 
 const SupabaseContext = createContext<SupabaseContextValue | null>(null)
 
-export function SupabaseProvider({ children }: { children: ReactNode }) {
-  const value = useMemo(
-    () => ({ client: getBrowserSupabaseClient() }),
-    []
-  )
+export function SupabaseProvider({
+  children,
+  enabled,
+}: {
+  children: ReactNode
+  enabled: boolean
+}) {
+  const [client, setClient] = useState<BrowserSupabaseClient | null>(null)
 
-  return <SupabaseContext.Provider value={value}>{children}</SupabaseContext.Provider>
+  useEffect(() => {
+    let active = true
+
+    const initializeClient = async () => {
+      const nextClient = await loadWhenEnabled(enabled, async () => {
+        const { getBrowserSupabaseClient } = await import("@/lib/supabase")
+        return getBrowserSupabaseClient()
+      })
+
+      if (active) {
+        setClient(nextClient)
+      }
+    }
+
+    void initializeClient()
+
+    return () => {
+      active = false
+    }
+  }, [enabled])
+
+  return <SupabaseContext.Provider value={{ client }}>{children}</SupabaseContext.Provider>
 }
 
 export function useSupabaseContext(): SupabaseContextValue {

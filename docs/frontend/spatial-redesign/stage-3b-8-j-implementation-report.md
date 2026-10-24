@@ -1,0 +1,109 @@
+# Stage 3B.8-J: Executive Command Center Demo
+
+## Result
+
+**PASS WITH CONDITIONS**
+
+The public demo now presents a responsive Executive Command Center at
+`/demo-platform`. The supplied Executive Command Center desktop image governed
+the composition; the QBI image was inspected for context but was not
+implemented. Tablet and mobile layouts were derived from the desktop reference
+and the approved responsive specification.
+
+## Scope and data boundary
+
+- The page centers a selectable AIOS Pilot hub and connected business domains,
+  with sample revenue evidence to the left, customer health/risk/activity to
+  the right, and executive recommendations below.
+- Desktop uses the connected landscape. Tablet retains the landscape above
+  supporting evidence. Mobile presents the selected hub-to-domain relationship
+  and an accessible domain selector, then stacks the supporting information.
+- All displayed records, metrics, graph points, and recommendation text are
+  deterministic synthetic fixtures local to the demo component.
+- Domain/customer/opportunity selection, Ask AIOS, and recommendation
+  previews only update local interface state. The UI explains that previews
+  do not access or change business data.
+- The existing demo provider boundary remains configured with
+  `liveDataEnabled={false}`. The new component does not import Supabase,
+  runtime/live-data contexts, SaaS data loaders, or business APIs.
+- Both `/demo-platform` and `/demo-platform/executive` now render the same
+  canonical component. The former executive dashboard source is retained
+  unchanged to preserve existing work; it is no longer referenced by these
+  routes.
+- Shared-shell changes are limited to the public demo: remove SaaS search,
+  profile, runtime status, notification, and assistant controls; point mobile
+  navigation to demo routes. The default `/app` shell behavior remains on its
+  existing branch.
+
+## Interactions and accessibility
+
+- Business-domain selection updates the highlighted connection and selected
+  signal summary.
+- Opportunity and customer rows expand a clearly labeled synthetic evidence
+  preview.
+- Ask AIOS and recommendation controls reveal local explanations; no operation
+  is submitted or represented as completed.
+- Controls are native buttons with selected/expanded state, visible focus,
+  keyboard operation, and touch-sized targets. The mobile domain selector is
+  the accessible alternative to the desktop spatial node layout.
+- Reduced-motion preference disables control transitions through the
+  `motion-reduce` CSS variant. No continuous or decorative animation was added.
+- Chart summaries and legends are labeled; meaning is not conveyed by color
+  alone.
+
+## Validation performed
+
+- `npm run typecheck` — passed.
+- `npm run test:security` — 36 tests: 27 passed, 0 failed, 9 TODO. TODO
+  security requirements remain unresolved and are not proof of tenant
+  isolation.
+- Focused `npm run lint -- --file ...` for the changed component, shell, and
+  routes — passed with no warnings or errors.
+- `git diff --check` and a trailing-whitespace check on new source files —
+  passed.
+- Source review confirmed the component contains no live-data/Supabase imports,
+  fetch calls, or randomized visualization data; route review confirmed both
+  demo executive paths use the canonical component.
+- Browser-based visual and interaction review was performed locally at
+  1440x1000, 1024x900, 768x1024, 390x844, and 320x740. No horizontal page
+  overflow was detected at those sizes. Domain selection and Ask AIOS were
+  exercised with pointer and keyboard input; the `/demo-platform/executive`
+  navigation target and reduced-motion CSS behavior were also checked.
+
+## Conditions and limitations
+
+- During local browser review, the pre-existing Auth.js session endpoint
+  returned HTTP 500 because required local authentication configuration is
+  unavailable. This task did not alter environment settings. The demo page
+  still rendered, and the new component does not call that endpoint. This is
+  an environment limitation, not a production deployment finding.
+- The supplied images are static desktop references. The implementation
+  follows their hierarchy and spatial relationships but is not claimed to be
+  pixel-identical or founder-approved at every viewport.
+- No production build, deployment, external service, database, or tenant
+  isolation behavior was tested. This frontend work does not establish
+  production security or production tenant isolation.
+- The existing modified and untracked work present before implementation was
+  preserved; no commit, push, deployment, or dependency change was made.
+
+## Files changed for this stage
+
+- `components/demo/executive-command-center-demo.tsx` — new spatial demo
+  composition and deterministic synthetic fixtures.
+- `app/demo-platform/page.tsx` — use the canonical demo component at the
+  public demo entry.
+- `app/demo-platform/executive/page.tsx` — use the same component on the
+  existing executive route.
+- `components/layout/foundation/application-layout.tsx` — keep the public
+  demo shell route-scoped and remove SaaS-only controls from the public demo.
+- `tests/security/demo-executive-command-center.test.ts` — protect route
+  canonicalization and synthetic-data source boundaries.
+- `docs/frontend/spatial-redesign/stage-3b-8-j-implementation-report.md` —
+  this implementation record.
+
+## Recommended next stage
+
+Review the local screenshots against the original Executive Command Center
+reference, then plan the QBI slice separately. Do not extend this component
+into `/app` until the SaaS identity, organization-authorization, and
+tenant-isolation gates are independently satisfied.

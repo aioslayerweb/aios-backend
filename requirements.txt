@@ -3,3 +3,4 @@ uvicorn
 supabase
 python-dotenv
 requests
+PyJWT[crypto]==2.15.1

@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:security": "tsx --test tests/security/*.test.ts",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "quality:gates": "npm run lint && npm run typecheck && npm run build",
@@ -32,6 +33,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@supabase/ssr": "0.10.0",
     "@supabase/supabase-js": "^2.110.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^0.468.0",

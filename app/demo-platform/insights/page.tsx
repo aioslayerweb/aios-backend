@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   CircleAlert as AlertCircle,
   TrendingUp,
@@ -8,21 +8,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import InsightCard from "@/components/insights/InsightCard";
-import { supabase } from "@/lib/supabase";
 import { ContentContainer } from "@/components/layout/foundation";
+import { syntheticDemoInsights } from "@/lib/demo/synthetic-insights";
 
 type FilterType = "all" | "risks" | "opportunities" | "alerts";
-
-interface InsightData {
-  id: string;
-  type: "Risk" | "Opportunity" | "Alert";
-  title: string;
-  description: string;
-  impact_score: number;
-  confidence_score: number;
-  status: string;
-  created_at: string;
-}
 
 const insightIcons: Record<string, LucideIcon> = {
   Risk: AlertCircle,
@@ -31,49 +20,10 @@ const insightIcons: Record<string, LucideIcon> = {
 };
 
 export default function DemoInsightsPage() {
-  const [insights, setInsights] = useState<InsightData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchInsights() {
-      try {
-        if (!supabase) {
-          console.error("Supabase client not available");
-          setIsLoading(false);
-          return;
-        }
-        const { data, error } = await supabase
-          .from("business_insights")
-          .select("*")
-          .limit(20);
-
-        if (error) throw error;
-        if (data) {
-          setInsights(
-            data.map((item) => ({
-              id: item.id,
-              type: item.insight_type || "Alert",
-              title: item.title || "Untitled Insight",
-              description: item.description || "No description provided",
-              impact_score: item.impact_score || 0,
-              confidence_score: item.confidence_score || 0,
-              status: item.status || "Active",
-              created_at: item.created_at || new Date().toISOString(),
-            })),
-          );
-        }
-      } catch (error) {
-        console.error("Error fetching insights:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchInsights();
-  }, []);
-
-  const filteredInsights = insights.filter((insight) => {
+  const filteredInsights = syntheticDemoInsights.filter((insight) => {
     if (filter === "all") return true;
     if (filter === "risks") return insight.type === "Risk";
     if (filter === "opportunities") return insight.type === "Opportunity";
@@ -81,21 +31,30 @@ export default function DemoInsightsPage() {
     return true;
   });
 
-  const handleInsightAction = (insightId: string, action: string) => {
-    console.log(`Insight ${insightId} - Action: ${action}`);
+  const handleInsightAction = (_insightId: string, action: string) => {
+    const actionLabels: Record<string, string> = {
+      resolve: "resolve",
+      assign: "assign",
+      ignore: "ignore",
+    };
+    setActionFeedback(`Simulation only — ${actionLabels[action] ?? "review"} action recorded locally. No business data was changed.`);
   };
 
   return (
     <ContentContainer className="space-y-4">
       <header className="rounded-xl border border-border bg-white px-4 py-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-          AIOS Business Intelligence
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">Synthetic demo data · simulation only</p>
         <h2 className="mt-1 text-xl font-semibold text-brand-navy">Executive Insights</h2>
         <p className="mt-1 text-sm text-text-secondary">
-          AI-generated insights on risks, opportunities, and critical business signals.
+          Example risks, opportunities, and alerts for exploring the AIOS experience. These are not live business insights.
         </p>
       </header>
+
+      {actionFeedback ? (
+        <p role="status" aria-live="polite" className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          {actionFeedback}
+        </p>
+      ) : null}
 
       <div className="flex gap-2">
         {(["all", "risks", "opportunities", "alerts"] as const).map((f) => (
@@ -113,11 +72,7 @@ export default function DemoInsightsPage() {
         ))}
       </div>
 
-      {isLoading ? (
-        <div className="flex items-center justify-center rounded-xl border border-border bg-white py-12">
-          <p className="text-sm text-text-muted">Loading insights...</p>
-        </div>
-      ) : filteredInsights.length === 0 ? (
+      {filteredInsights.length === 0 ? (
         <div className="flex items-center justify-center rounded-xl border border-border bg-white py-12">
           <p className="text-sm text-text-muted">
             No {filter === "all" ? "" : filter} insights found.

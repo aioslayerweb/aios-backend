@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <BrandLogo width={158} height={38} priority />
               <h1 className="public-h2">Enterprise authentication foundation for AIOS</h1>
               <p className="public-body max-w-xl text-[color:var(--public-color-text-soft)]">
-                Production-grade session security with JWT strategy, protected route middleware, and modular architecture ready for enterprise OAuth expansion.
+                Choose the isolated demo sign-in or verify a real Supabase identity. Real-account sign-in confirms identity only; organization and business-data access are not enabled yet.
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-white/70 bg-white/70 p-4 backdrop-blur">

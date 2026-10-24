@@ -1,5 +1,5 @@
-import { DemoExecutiveDashboard } from "@/components/demo/executive-dashboard";
+import { DemoExecutiveCommandCenter } from "@/components/demo/executive-command-center-demo";
 
 export default function DemoPage() {
-  return <DemoExecutiveDashboard />;
+  return <DemoExecutiveCommandCenter />;
 }

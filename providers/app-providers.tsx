@@ -36,12 +36,20 @@ import { RuntimePlatformProvider } from "@/contexts/runtime-platform-context"
 import { InfrastructureProvider } from "@/contexts/infrastructure-context"
 import { AuthSessionProvider } from "@/providers/auth-session-provider"
 
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({
+  children,
+  liveDataEnabled,
+  authSessionEnabled = true,
+}: {
+  children: ReactNode
+  liveDataEnabled: boolean
+  authSessionEnabled?: boolean
+}) {
   return (
-    <AuthSessionProvider>
+    <AuthSessionProvider enabled={authSessionEnabled}>
       <AIOSThemeProvider>
       <RuntimeProvider>
-        <SupabaseProvider>
+        <SupabaseProvider enabled={liveDataEnabled}>
           <MemoryProvider>
             <WorkspaceProvider>
               <SidebarProvider>
@@ -49,11 +57,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
                   <NotificationProvider>
                     <CommandPaletteProvider>
                       <RuntimeStatusProvider>
-                          <RuntimeLiveProvider>
+                          <RuntimeLiveProvider liveDataEnabled={liveDataEnabled}>
                             <ActivityFeedProvider>
                               <AgentWorkspaceProvider>
                                 <GlobalSearchProvider>
-                                  <ExecutiveWorkspaceProvider>
+                                  <ExecutiveWorkspaceProvider liveDataEnabled={liveDataEnabled}>
                                     <IntegrationProvider>
                                       <PromptOSProvider>
                                         <WorkflowBuilderProvider>

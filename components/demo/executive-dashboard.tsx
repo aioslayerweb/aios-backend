@@ -114,11 +114,11 @@ const churnRisks: ChurnRisk[] = [
 ];
 
 const activityItems: ActivityItem[] = [
-  { id: 1, text: "Reply sent to Global Marine Inc.", time: "2 min ago", icon: "doc" },
-  { id: 2, text: "Deal stage updated for Skyline Aviation.", time: "8 min ago", icon: "trending" },
-  { id: 3, text: "Churn risk detected for BetaTech Industries", time: "15 min ago", icon: "bell" },
-  { id: 4, text: "Workflow automated: Onboarding Process", time: "32 min ago", icon: "workflow" },
-  { id: 5, text: "Invoice reminder sent to Northwind Logistics", time: "1 hr ago", icon: "doc" },
+  { id: 1, text: "Example: Reply sent to Global Marine Inc.", time: "Sample", icon: "doc" },
+  { id: 2, text: "Example: Deal stage updated for Skyline Aviation.", time: "Sample", icon: "trending" },
+  { id: 3, text: "Example: Churn risk detected for BetaTech Industries", time: "Sample", icon: "bell" },
+  { id: 4, text: "Example: Workflow automated for Onboarding Process", time: "Sample", icon: "workflow" },
+  { id: 5, text: "Example: Invoice reminder sent to Northwind Logistics", time: "Sample", icon: "doc" },
 ];
 
 const recommendations: RecommendationCard[] = [
@@ -511,7 +511,7 @@ export function DemoExecutiveDashboard() {
                   <p className="text-xs font-semibold text-slate-600">Prioritized actions from the spatial network</p>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-bold text-cyan-700">
-                  <Cpu className="h-3 w-3" /> Live orchestration
+                  <Cpu className="h-3 w-3" /> Simulated orchestration
                 </span>
               </div>
               <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
@@ -602,7 +602,7 @@ export function DemoExecutiveDashboard() {
 
             {/* AI Activity Feed */}
             <div className="rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-sm">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">AI Activity Feed</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Sample AI Activity</p>
               <div className="mt-2 space-y-2" aria-live="polite">
                 {activityItems.map((item) => {
                   const Icon = activityIcon[item.icon];

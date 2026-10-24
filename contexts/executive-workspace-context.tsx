@@ -7,7 +7,7 @@ import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
 import { useNotificationContext } from "@/contexts/notification-context"
 import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
-import { fetchRuntimeBusinessMetrics } from "@/lib/runtime"
+import { loadWhenEnabled } from "@/lib/runtime/live-data-boundary"
 import type {
   DecisionCenterItem,
   ExecutiveWorkspaceState,
@@ -34,7 +34,13 @@ type ExecutiveWorkspaceContextValue = ExecutiveWorkspaceState & {
 
 const ExecutiveWorkspaceContext = createContext<ExecutiveWorkspaceContextValue | null>(null)
 
-export function ExecutiveWorkspaceProvider({ children }: { children: ReactNode }) {
+export function ExecutiveWorkspaceProvider({
+  children,
+  liveDataEnabled,
+}: {
+  children: ReactNode
+  liveDataEnabled: boolean
+}) {
   const { filteredActivities } = useActivityFeedContext()
   const { unreadCount } = useNotificationContext()
   const { agentStatuses } = useAIAssistantContext()
@@ -57,8 +63,11 @@ export function ExecutiveWorkspaceProvider({ children }: { children: ReactNode }
 
     const syncMetrics = async () => {
       try {
-        const runtimeMetrics = await fetchRuntimeBusinessMetrics()
-        if (!active) {
+        const runtimeMetrics = await loadWhenEnabled(liveDataEnabled, async () => {
+          const { fetchRuntimeBusinessMetrics } = await import("@/lib/runtime")
+          return fetchRuntimeBusinessMetrics()
+        })
+        if (!active || !runtimeMetrics) {
           return
         }
 
@@ -92,7 +101,7 @@ export function ExecutiveWorkspaceProvider({ children }: { children: ReactNode }
     return () => {
       active = false
     }
-  }, [runtimeEvents.length, runtimeMemoryUpdates.length])
+  }, [liveDataEnabled, runtimeEvents.length, runtimeMemoryUpdates.length])
 
   useEffect(() => {
     if (runtimeEvents.length === 0) {

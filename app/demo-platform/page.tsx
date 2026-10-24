@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ExecutiveCommandCenter } from "@/components/executive-command-center/executive-command-center";
+import { DemoExecutiveCommandCenter } from "@/components/demo/executive-command-center-demo";
 
 export const metadata: Metadata = {
   title: "Demo Platform | AIOS Pilot",
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function DemoPlatformPage() {
-  return <ExecutiveCommandCenter baseHref="/demo-platform" />;
+  return <DemoExecutiveCommandCenter />;
 }

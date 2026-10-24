@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
 import "./globals.css"
-import { AppProviders } from "@/providers"
 import { brandAssets, brandTheme } from "@/components/branding"
 import { PublicAnalytics } from "@/components/public-site/public-analytics"
 
@@ -108,7 +107,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body className="bg-surface-app text-text-primary antialiased">
-        <AppProviders>{children}</AppProviders>
+        {children}
         <PublicAnalytics />
       </body>
     </html>

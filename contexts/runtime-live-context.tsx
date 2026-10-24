@@ -12,7 +12,7 @@ import {
 import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
 import { useRuntimeContext } from "@/contexts/runtime-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
-import { loadRuntimeLiveSnapshot } from "@/lib/runtime"
+import { loadWhenEnabled } from "@/lib/runtime/live-data-boundary"
 import type {
   ActivitySource,
   ExecutionQueueItem,
@@ -54,7 +54,13 @@ function toExecutionStatus(status: ExecutionQueueItem["status"]): "queued" | "ru
   return status
 }
 
-export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
+export function RuntimeLiveProvider({
+  children,
+  liveDataEnabled,
+}: {
+  children: ReactNode
+  liveDataEnabled: boolean
+}) {
   const { setAiStatus, setMemoryStatus, setConnectionStatus } = useRuntimeContext()
   const { setWebsocketState, setConnectionState, updateModuleStatus } = useRuntimeStatusContext()
   const {
@@ -72,8 +78,11 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
     let active = true
     const syncSnapshot = async () => {
       try {
-        const snapshot = await loadRuntimeLiveSnapshot()
-        if (!active) {
+        const snapshot = await loadWhenEnabled(liveDataEnabled, async () => {
+          const { loadRuntimeLiveSnapshot } = await import("@/lib/runtime")
+          return loadRuntimeLiveSnapshot()
+        })
+        if (!active || !snapshot) {
           return
         }
 
@@ -164,6 +173,12 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
     }
 
     void syncSnapshot()
+    if (!liveDataEnabled) {
+      return () => {
+        active = false
+      }
+    }
+
     const timer = window.setInterval(() => {
       void syncSnapshot()
     }, 3500)
@@ -182,6 +197,7 @@ export function RuntimeLiveProvider({ children }: { children: ReactNode }) {
     setWebsocketState,
     setConnectionState,
     updateModuleStatus,
+    liveDataEnabled,
   ])
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length

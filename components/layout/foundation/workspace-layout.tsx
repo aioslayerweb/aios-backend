@@ -15,7 +15,9 @@ export function WorkspaceLayout({ children, baseHref = "/app", hideWorkspaceHead
     <NavigationProvider baseHref={baseHref} hideWorkspaceHeader={hideWorkspaceHeader}>
       <ShellErrorBoundary>
         <ApplicationLayout>
-          <PageWrapper>{children}</PageWrapper>
+          <PageWrapper className={baseHref === "/demo-platform" ? "!px-2 md:!px-6 lg:!px-8 xl:!px-10" : undefined}>
+            {children}
+          </PageWrapper>
         </ApplicationLayout>
       </ShellErrorBoundary>
     </NavigationProvider>

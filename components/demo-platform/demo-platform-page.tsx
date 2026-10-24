@@ -22,6 +22,7 @@ import { BrandLogo } from "@/components/branding"
 import { Drawer } from "@/components/ui/drawer"
 import { Modal } from "@/components/ui/modal"
 import { workspaceItems } from "@/utils/navigation"
+import { formatSimulationActivity } from "@/lib/demo/simulation"
 
 type DatasetStatus = "healthy" | "attention" | "processing" | "draft"
 type DatasetCategory = "Revenue" | "Operations" | "Customer" | "Finance" | "Compliance"
@@ -53,13 +54,13 @@ const initialDatasets: DemoDataset[] = [
   { id: "ds-01", name: "Revenue Forecast Delta", category: "Revenue", status: "healthy", priority: "Critical", records: 14820, owner: "Finance Ops", lastSync: "2m ago", summary: "Tracks forecast drift against regional pipeline and bookings.", recommendedAction: "Re-run weekly executive briefing", workflow: "Forecast Confidence Refresh", api: "finance.forecast.delta" },
   { id: "ds-02", name: "Churn Exposure Matrix", category: "Customer", status: "attention", priority: "Critical", records: 642, owner: "Customer Success", lastSync: "4m ago", summary: "Surfaces at-risk accounts with SLA, sentiment, and renewal timing.", recommendedAction: "Escalate top 12 accounts", workflow: "Retention Risk Escalation", api: "customer.churn.exposure" },
   { id: "ds-03", name: "Demand Quality Signals", category: "Revenue", status: "healthy", priority: "High", records: 9200, owner: "Marketing", lastSync: "6m ago", summary: "Measures pipeline quality by source, segment, and conversion timing.", recommendedAction: "Trigger attribution reconciliation", workflow: "Demand Quality Calibration", api: "marketing.demand.quality" },
-  { id: "ds-04", name: "Pricing Exception Queue", category: "Revenue", status: "processing", priority: "High", records: 187, owner: "Revenue Strategy", lastSync: "Live", summary: "Captures discount approvals and margin exceptions for review.", recommendedAction: "Approve 3 pending exceptions", workflow: "Pricing Exception Governance", api: "revenue.pricing.exceptions" },
+  { id: "ds-04", name: "Pricing Exception Queue", category: "Revenue", status: "processing", priority: "High", records: 187, owner: "Revenue Strategy", lastSync: "now", summary: "Captures discount approvals and margin exceptions for review.", recommendedAction: "Approve 3 pending exceptions", workflow: "Pricing Exception Governance", api: "revenue.pricing.exceptions" },
   { id: "ds-05", name: "Workflow Throughput Lens", category: "Operations", status: "healthy", priority: "High", records: 12110, owner: "Operations", lastSync: "3m ago", summary: "Monitors queue velocity, bottlenecks, and cross-team handoff delays.", recommendedAction: "Automate low-risk routing", workflow: "Queue Balancing", api: "ops.workflow.throughput" },
   { id: "ds-06", name: "Incident Recovery Monitor", category: "Operations", status: "attention", priority: "Critical", records: 214, owner: "Platform Reliability", lastSync: "9m ago", summary: "Combines incident severity, MTTR trends, and dependency blast radius.", recommendedAction: "Assign auto-remediation agent", workflow: "Incident Recovery", api: "runtime.incident.recovery" },
   { id: "ds-07", name: "Executive Briefing Memory", category: "Compliance", status: "healthy", priority: "Medium", records: 4800, owner: "Strategy", lastSync: "11m ago", summary: "Stores briefing narratives, actions taken, and outcome follow-through.", recommendedAction: "Generate board-ready summary", workflow: "Executive Briefing Generation", api: "memory.executive.briefings" },
   { id: "ds-08", name: "Policy Drift Registry", category: "Compliance", status: "draft", priority: "High", records: 311, owner: "Governance", lastSync: "1h ago", summary: "Highlights where operational behavior drifts from policy thresholds.", recommendedAction: "Review policy overrides", workflow: "Policy Drift Review", api: "governance.policy.drift" },
   { id: "ds-09", name: "Integration Health Stream", category: "Operations", status: "healthy", priority: "Medium", records: 23140, owner: "IT Systems", lastSync: "1m ago", summary: "Continuously scores integration freshness, latency, and API failure rate.", recommendedAction: "Refresh 2 degraded connectors", workflow: "Connector Recovery", api: "integrations.health.stream" },
-  { id: "ds-10", name: "Customer Journey Friction", category: "Customer", status: "processing", priority: "High", records: 1830, owner: "CX Analytics", lastSync: "Live", summary: "Maps friction across onboarding, support, and renewal sequences.", recommendedAction: "Open remediation workflow", workflow: "Journey Friction Repair", api: "journey.friction.signals" },
+  { id: "ds-10", name: "Customer Journey Friction", category: "Customer", status: "processing", priority: "High", records: 1830, owner: "CX Analytics", lastSync: "now", summary: "Maps friction across onboarding, support, and renewal sequences.", recommendedAction: "Open remediation workflow", workflow: "Journey Friction Repair", api: "journey.friction.signals" },
   { id: "ds-11", name: "Cash Efficiency Watch", category: "Finance", status: "healthy", priority: "Critical", records: 780, owner: "Treasury", lastSync: "8m ago", summary: "Observes burn, runway, and payment timing signals across business units.", recommendedAction: "Publish CFO alert pack", workflow: "Cash Efficiency Review", api: "finance.cash.efficiency" },
   { id: "ds-12", name: "Vendor Risk Landscape", category: "Compliance", status: "attention", priority: "Medium", records: 428, owner: "Procurement", lastSync: "14m ago", summary: "Scores supplier concentration, contract exposure, and incident history.", recommendedAction: "Review top 5 suppliers", workflow: "Vendor Risk Escalation", api: "procurement.vendor.risk" },
   { id: "ds-13", name: "Opportunity Command Queue", category: "Revenue", status: "healthy", priority: "Critical", records: 2670, owner: "Sales Ops", lastSync: "2m ago", summary: "Sequences expansion and rescue opportunities by confidence and impact.", recommendedAction: "Launch opportunity swarm", workflow: "Opportunity Orchestration", api: "sales.opportunity.command" },
@@ -74,10 +75,6 @@ const statusStyles: Record<DatasetStatus, string> = {
   draft: "border-slate-200 bg-slate-100 text-slate-600",
 }
 
-function createLogMessage(action: string, datasetName: string): string {
-  return `${action} executed for ${datasetName}`
-}
-
 function statValue(datasets: DemoDataset[], status: DatasetStatus): number {
   return datasets.filter((dataset) => dataset.status === status).length
 }
@@ -86,16 +83,18 @@ const demoBackendMobileNavItems = workspaceItems.map((item) => ({ href: item.hre
 
 export function DemoPlatformPage() {
   const reduceMotion = useReducedMotion()
-  const [datasets, setDatasets] = useState(initialDatasets)
+  const [datasets, setDatasets] = useState(() =>
+    initialDatasets.map((dataset) => ({ ...dataset, lastSync: `Sample: ${dataset.lastSync}` })),
+  )
   const [selectedDatasetId, setSelectedDatasetId] = useState(initialDatasets[0]?.id ?? "")
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<DatasetCategory | "All">("All")
   const [editOpen, setEditOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
   const [logs, setLogs] = useState<DemoActionLog[]>([
-    { id: "log-1", datasetId: "ds-02", message: "Retention Risk Escalation triggered for Churn Exposure Matrix", at: "Just now" },
-    { id: "log-2", datasetId: "ds-04", message: "Pricing exception review assigned to Revenue Strategy", at: "3m ago" },
-    { id: "log-3", datasetId: "ds-11", message: "CFO alert pack generated from Cash Efficiency Watch", at: "7m ago" },
+    { id: "log-1", datasetId: "ds-02", message: "SIMULATION ONLY: Retention Risk Escalation preview for Churn Exposure Matrix", at: "Example" },
+    { id: "log-2", datasetId: "ds-04", message: "SIMULATION ONLY: Pricing exception review preview for Revenue Strategy", at: "Example" },
+    { id: "log-3", datasetId: "ds-11", message: "SIMULATION ONLY: CFO alert pack preview from Cash Efficiency Watch", at: "Example" },
   ])
 
   const filteredDatasets = useMemo(() => {
@@ -125,10 +124,10 @@ export function DemoPlatformPage() {
       return
     }
 
-    const updated = status ? { ...selectedDataset, status, lastSync: "Just now" } : { ...selectedDataset, lastSync: "Just now" }
+    const updated = status ? { ...selectedDataset, status, lastSync: "Simulation" } : { ...selectedDataset, lastSync: "Simulation" }
     updateDataset(updated)
     setLogs((current) => [
-      { id: `log-${Date.now()}`, datasetId: selectedDataset.id, message: createLogMessage(action, selectedDataset.name), at: "Just now" },
+      { id: `log-${Date.now()}`, datasetId: selectedDataset.id, message: formatSimulationActivity(action, selectedDataset.name), at: "Simulation" },
       ...current,
     ])
   }
@@ -150,12 +149,12 @@ export function DemoPlatformPage() {
                   <Sparkles size={14} /> Demo Platform
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-                  <CheckCircle2 size={14} /> 15 interactive datasets
+                  <CheckCircle2 size={14} /> 15 synthetic datasets · simulations only
                 </span>
               </div>
               <h1 className="public-h2 mt-5">Explore a full AIOS backend demo without signing in</h1>
               <p className="public-body mt-3 max-w-2xl text-[color:var(--public-color-text-soft)]">
-                Every dataset below is clickable, editable, and actionable. Use this sandbox to test orchestration, approvals, sync actions, and decision support on a fully responsive demo surface.
+                Explore synthetic datasets and interactive scenarios. Controls update only local demo state; they do not sync a backend, run workflows, or assign real AI actions.
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
                 <PublicCard variant="glass" className="rounded-2xl p-4">
@@ -176,15 +175,15 @@ export function DemoPlatformPage() {
             <div className="rounded-[32px] border border-[var(--public-color-border)] bg-white/80 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)] backdrop-blur">
               <PublicSectionHeader
                 eyebrow="Demo Capabilities"
-                title="Backend-grade controls in a public sandbox"
-                body="Edit metadata, trigger workflows, refresh syncs, assign AI actions, and inspect action logs from a single responsive command surface."
+                title="Interactive scenarios in a public sandbox"
+                body="Edit sample metadata and preview workflow, sync, and AI-action feedback. These controls are simulations only and do not perform backend operations."
               />
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {[
-                  "Dataset editing",
-                  "Workflow triggers",
-                  "Sync refresh actions",
-                  "Action logs",
+                  "Local sample editing",
+                  "Workflow simulations",
+                  "Sync-refresh previews",
+                  "Simulation activity log",
                   "Mobile detail drawer",
                   "Public demo access",
                 ].map((item) => (
@@ -320,20 +319,20 @@ export function DemoPlatformPage() {
                         <Edit3 size={16} /> Edit dataset
                       </button>
                       <button type="button" className="public-button public-button-secondary justify-center" onClick={() => runAction("Sync refresh", "processing")}>
-                        <RefreshCw size={16} /> Refresh sync
+                        <RefreshCw size={16} /> Simulate sync refresh
                       </button>
                       <button type="button" className="public-button public-button-secondary justify-center" onClick={() => runAction("Workflow trigger", "healthy")}>
-                        <Play size={16} /> Trigger workflow
+                        <Play size={16} /> Simulate workflow
                       </button>
                       <button type="button" className="public-button public-button-primary justify-center" onClick={() => runAction("AI operator assignment", "healthy")}>
-                        <Bot size={16} /> Assign AI operator
+                        <Bot size={16} /> Simulate AI assignment
                       </button>
                     </div>
 
                     <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
                       <div className="flex items-center gap-2">
                         <Activity className="h-4 w-4 text-blue-500" />
-                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recent actions</p>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Recent simulated actions</p>
                       </div>
                       <ul className="mt-3 space-y-2 text-sm text-slate-600">
                         {relatedLogs.length ? relatedLogs.map((entry) => (
@@ -360,7 +359,7 @@ export function DemoPlatformPage() {
             onSave={(nextDataset) => {
               updateDataset(nextDataset)
               setLogs((current) => [
-                { id: `log-${Date.now()}`, datasetId: nextDataset.id, message: createLogMessage("Dataset update", nextDataset.name), at: "Just now" },
+                { id: `log-${Date.now()}`, datasetId: nextDataset.id, message: formatSimulationActivity("Dataset update", nextDataset.name), at: "Simulation" },
                 ...current,
               ])
               setEditOpen(false)
@@ -379,17 +378,17 @@ export function DemoPlatformPage() {
               <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">API</p><p className="mt-1 break-all text-sm font-semibold text-slate-800">{selectedDataset.api}</p></div>
               <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Owner</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.owner}</p></div>
               <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Status</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.status}</p></div>
-              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Last sync</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.lastSync}</p></div>
+              <div className="min-w-0 rounded-2xl border border-slate-200 bg-white p-3"><p className="text-xs uppercase tracking-wide text-slate-500">Sample update</p><p className="mt-1 break-words text-sm font-semibold text-slate-800">{selectedDataset.lastSync}</p></div>
             </div>
             <div className="grid gap-3">
               <button type="button" className="public-button public-button-primary justify-center" onClick={() => runAction("Demo launch", "processing")}>
-                <Rocket size={16} /> Launch backend action
+                <Rocket size={16} /> Simulate action
               </button>
               <button type="button" className="public-button public-button-secondary justify-center" onClick={() => runAction("Compliance review", "attention")}>
-                <ShieldCheck size={16} /> Mark for review
+                <ShieldCheck size={16} /> Simulate review
               </button>
               <button type="button" className="public-button public-button-secondary justify-center" onClick={() => runAction("AI suggestion generation", "healthy")}>
-                <Wand2 size={16} /> Generate AI suggestion
+                <Wand2 size={16} /> Simulate AI suggestion
               </button>
             </div>
           </div>
@@ -424,7 +423,7 @@ function DemoDatasetEditor({ dataset, onSave, onClose }: DemoDatasetEditorProps)
           summary,
           status,
           priority,
-          lastSync: "Just now",
+          lastSync: "Simulation",
         })
       }}
     >

@@ -7,6 +7,13 @@ from fastapi.responses import HTMLResponse
 
 from config.settings import settings
 from supabase_client import supabase
+from backend.routes.organizations import (
+    router as organizations_router,
+)
+from backend.routes.security import router as security_router
+from backend.services.organization_memberships import (
+    SupabaseMembershipRepository,
+)
 
 from services.signals import extract_signals
 from services.executive_engine import build_executive_overview
@@ -30,6 +37,9 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
 )
+app.include_router(security_router)
+app.include_router(organizations_router)
+app.state.organization_membership_repository = SupabaseMembershipRepository(supabase)
 
 # ==========================================
 # Middleware

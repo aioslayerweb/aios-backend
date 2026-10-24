@@ -8,6 +8,12 @@ import { useSearchParams } from "next/navigation"
 import { AuthenticationLoading } from "@/components/auth/auth-loading"
 import { AuthenticationButton } from "@/components/auth/auth-button"
 import { signInWithCredentials } from "@/lib/auth/client"
+import {
+  getVerifiedSupabaseIdentity,
+  signInWithSupabase,
+  signOutSupabase,
+  type VerifiedSupabaseIdentity,
+} from "@/lib/auth/supabase-bff-client"
 
 export function LoginCard() {
   const reduceMotion = useReducedMotion()
@@ -15,8 +21,12 @@ export function LoginCard() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isSubmitting, setSubmitting] = useState(false)
+  const [authMode, setAuthMode] = useState<"demo" | "supabase">("demo")
+  const [verifiedIdentity, setVerifiedIdentity] = useState<VerifiedSupabaseIdentity | null>(null)
+  const [identityError, setIdentityError] = useState(false)
+  const [authError, setAuthError] = useState(false)
 
-  const error = searchParams.get("error")
+  const error = searchParams.get("error") || authError
   const callbackUrl = useMemo(() => searchParams.get("callbackUrl") ?? "/app", [searchParams])
 
   const canSubmit = email.trim().length > 3 && password.length >= 8
@@ -27,8 +37,59 @@ export function LoginCard() {
     }
 
     setSubmitting(true)
-    await signInWithCredentials(email.trim(), password, callbackUrl)
-    setSubmitting(false)
+    setAuthError(false)
+    setIdentityError(false)
+    if (authMode === "supabase") {
+      setVerifiedIdentity(null)
+    }
+
+    try {
+      if (authMode === "demo") {
+        await signInWithCredentials(email.trim(), password, callbackUrl)
+        setSubmitting(false)
+        return
+      }
+      await signInWithSupabase(email.trim(), password)
+    } catch {
+      setAuthError(true)
+      setSubmitting(false)
+      return
+    }
+
+    try {
+      const identity = await getVerifiedSupabaseIdentity()
+      if (!identity) {
+        throw new Error("Identity verification failed")
+      }
+      setVerifiedIdentity(identity)
+    } catch {
+      setIdentityError(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleSignOut() {
+    setSubmitting(true)
+    setIdentityError(false)
+    try {
+      await signOutSupabase()
+      setVerifiedIdentity(null)
+      setPassword("")
+    } catch {
+      setIdentityError(true)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  async function handleCheckIdentity() {
+    setIdentityError(false)
+    try {
+      setVerifiedIdentity(await getVerifiedSupabaseIdentity())
+    } catch {
+      setIdentityError(true)
+    }
   }
 
   return (
@@ -50,6 +111,55 @@ export function LoginCard() {
           </p>
         ) : null}
 
+        <div className="mt-5 grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+          <button
+            type="button"
+            aria-pressed={authMode === "demo"}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold ${authMode === "demo" ? "bg-white shadow-sm" : "text-slate-600"}`}
+            onClick={() => {
+              setAuthMode("demo")
+              setAuthError(false)
+            }}
+          >
+            Demo access
+          </button>
+          <button
+            type="button"
+            aria-pressed={authMode === "supabase"}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold ${authMode === "supabase" ? "bg-white shadow-sm" : "text-slate-600"}`}
+            onClick={() => {
+              setAuthMode("supabase")
+              setAuthError(false)
+              setVerifiedIdentity(null)
+              void handleCheckIdentity()
+            }}
+          >
+            Supabase account
+          </button>
+        </div>
+
+        {authMode === "supabase" && verifiedIdentity ? (
+          <div className="mt-5 space-y-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">Identity verified</p>
+              <p className="mt-1 break-all text-xs text-emerald-800">Subject: {verifiedIdentity.sub}</p>
+              <p className="mt-2 text-xs text-emerald-800">
+                This confirms identity only. Organization access is not enabled in this stage.
+              </p>
+            </div>
+            {identityError ? (
+              <p className="text-sm text-rose-700">Unable to complete sign-out. Please try again.</p>
+            ) : null}
+            <button
+              type="button"
+              className="public-button public-button-secondary w-full justify-center"
+              disabled={isSubmitting}
+              onClick={() => void handleSignOut()}
+            >
+              Sign out of Supabase account
+            </button>
+          </div>
+        ) : (
         <form
           className="mt-6 space-y-4"
           onSubmit={async (event) => {
@@ -90,21 +200,50 @@ export function LoginCard() {
             </div>
           </label>
 
-          {isSubmitting ? <AuthenticationLoading label="Signing in..." /> : null}
+          {isSubmitting ? <AuthenticationLoading label={authMode === "demo" ? "Signing in..." : "Verifying identity..."} /> : null}
 
-          <AuthenticationButton
-            email={email}
-            password={password}
-            disabled={!canSubmit || isSubmitting}
-            label="Sign in securely"
-            onAuthenticate={() => {
-              void handleAuthenticate()
-            }}
-          />
-
-          <p className="text-xs text-[color:var(--public-color-text-soft)]">
-            Callback destination: <span className="font-semibold">{callbackUrl}</span>
-          </p>
+          {authMode === "demo" ? (
+            <>
+              <AuthenticationButton
+                email={email}
+                password={password}
+                disabled={!canSubmit || isSubmitting}
+                label="Sign in to demo"
+                onAuthenticate={() => {
+                  void handleAuthenticate()
+                }}
+              />
+              <p className="text-xs text-[color:var(--public-color-text-soft)]">
+                Demo callback destination: <span className="font-semibold">{callbackUrl}</span>
+              </p>
+            </>
+          ) : (
+            <>
+              <button
+                type="submit"
+                disabled={!canSubmit || isSubmitting}
+                className="public-button public-button-primary w-full justify-center disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Verify Supabase identity
+              </button>
+              <p className="text-xs text-[color:var(--public-color-text-soft)]">
+                Your password is sent over HTTPS to AIOS and Supabase Auth for verification. Supabase tokens stay in HttpOnly cookies and are never returned to browser JavaScript.
+              </p>
+              {identityError ? (
+                <>
+                  <p className="text-sm text-rose-700">Unable to verify the current identity. Please try again.</p>
+                  <button
+                    type="button"
+                    className="public-button public-button-secondary w-full justify-center"
+                    disabled={isSubmitting}
+                    onClick={() => void handleSignOut()}
+                  >
+                    Sign out of Supabase account
+                  </button>
+                </>
+              ) : null}
+            </>
+          )}
 
           <div className="rounded-2xl border border-blue-200 bg-blue-50/70 px-4 py-3 text-sm text-blue-900">
             <p className="font-semibold">Need a guided walkthrough first?</p>
@@ -114,6 +253,7 @@ export function LoginCard() {
             </Link>
           </div>
         </form>
+        )}
       </div>
     </motion.div>
   )

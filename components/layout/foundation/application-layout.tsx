@@ -198,6 +198,7 @@ function WorkspaceHeader() {
 function ShellTopBar() {
   const pathname = usePathname()
   const { baseHref } = useNavigationBase()
+  const isPublicDemo = baseHref === "/demo-platform"
   const { isMobile, isTablet } = useBreakpoint()
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const { setOpen: setAIPanelOpen } = useAIAssistant()
@@ -249,51 +250,59 @@ function ShellTopBar() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={open}
-            className="ml-2 inline-flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border border-border px-3 text-sm text-text-secondary hover:bg-surface-muted md:max-w-sm"
-            aria-label="Open global search and command palette"
-          >
-            <Search className="h-4 w-4" />
-            <span className="truncate">Search commands, modules, and signals</span>
-            <span className="ml-auto hidden rounded border border-border px-1.5 py-0.5 text-[10px] text-text-muted sm:inline">⌘K</span>
-          </button>
+          {!isPublicDemo ? (
+            <button
+              type="button"
+              onClick={open}
+              className="ml-2 inline-flex h-9 min-w-0 flex-1 items-center gap-2 rounded-md border border-border px-3 text-sm text-text-secondary hover:bg-surface-muted md:max-w-sm"
+              aria-label="Open global search and command palette"
+            >
+              <Search className="h-4 w-4" />
+              <span className="truncate">Search commands, modules, and signals</span>
+              <span className="ml-auto hidden rounded border border-border px-1.5 py-0.5 text-[10px] text-text-muted sm:inline">⌘K</span>
+            </button>
+          ) : null}
 
           <div className="ml-auto flex items-center gap-2">
-            <Dropdown label="Quick Actions" items={quickActions} icon={<Lightbulb className="h-4 w-4" />} className="hidden md:block" />
+            {!isPublicDemo ? <Dropdown label="Quick Actions" items={quickActions} icon={<Lightbulb className="h-4 w-4" />} className="hidden md:block" /> : null}
 
-            <NotificationBell unreadCount={unreadCount} onClick={toggleDrawer} open={drawerOpen} />
+            {!isPublicDemo ? <NotificationBell unreadCount={unreadCount} onClick={toggleDrawer} open={drawerOpen} /> : null}
 
-            <div className="hidden items-center gap-1 md:flex">
-              <StatusIndicator tone={isRunning ? "warning" : "success"} label={`AI ${aiStatus}`} />
-              <StatusIndicator tone={memoryStatus === "synced" ? "success" : "warning"} label={`Memory ${memoryStatus}`} />
-              <StatusIndicator tone={isConnected ? "success" : "error"} label={isConnected ? "Supabase online" : "Supabase offline"} />
-            </div>
+            {!isPublicDemo ? (
+              <div className="hidden items-center gap-1 md:flex">
+                <StatusIndicator tone={isRunning ? "warning" : "success"} label={`AI ${aiStatus}`} />
+                <StatusIndicator tone={memoryStatus === "synced" ? "success" : "warning"} label={`Memory ${memoryStatus}`} />
+                <StatusIndicator tone={isConnected ? "success" : "error"} label={isConnected ? "Supabase online" : "Supabase offline"} />
+              </div>
+            ) : null}
 
-            <button
-              type="button"
-              onClick={() => setAIPanelOpen(true)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-surface-muted xl:hidden"
-              aria-label="Open AI assistant panel"
-            >
-              <Bot className="h-4 w-4" />
-            </button>
+            {!isPublicDemo ? (
+              <button
+                type="button"
+                onClick={() => setAIPanelOpen(true)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border hover:bg-surface-muted xl:hidden"
+                aria-label="Open AI assistant panel"
+              >
+                <Bot className="h-4 w-4" />
+              </button>
+            ) : null}
 
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 hover:bg-surface-muted"
-              aria-label="Open user profile"
-            >
-              <Avatar name="AIOS Executive" className="h-7 w-7" />
-              <span className="hidden text-xs font-medium text-text-secondary md:inline">Executive</span>
-            </button>
+            {!isPublicDemo ? (
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 hover:bg-surface-muted"
+                aria-label="Open user profile"
+              >
+                <Avatar name="AIOS Executive" className="h-7 w-7" />
+                <span className="hidden text-xs font-medium text-text-secondary md:inline">Executive</span>
+              </button>
+            ) : null}
           </div>
         </div>
       </header>
 
       <ShellMobileSidebarDrawer open={mobileSidebarOpen} onClose={() => setMobileSidebarOpen(false)} />
-      <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      {!isPublicDemo ? <NotificationDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} /> : null}
     </>
   )
 }
@@ -352,13 +361,15 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
 
 function ShellSidebar() {
   const { collapsed, toggle } = useSidebar()
+  const { baseHref } = useNavigationBase()
+  const isPublicDemo = baseHref === "/demo-platform"
   const shouldReduceMotion = useReducedMotion()
 
   return (
     <motion.aside
       layout
       transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-      className={cn("hidden border-r border-border bg-surface-canvas lg:flex lg:flex-col", collapsed ? "lg:w-20" : "lg:w-72")}
+      className={cn("hidden border-r border-border bg-surface-canvas lg:flex lg:flex-col", collapsed ? "lg:w-20" : isPublicDemo ? "lg:w-48" : "lg:w-72")}
       aria-label="Primary workspace navigation"
     >
       <div className="flex h-14 items-center justify-between px-3">
@@ -387,6 +398,8 @@ function ShellMobileSidebarDrawer({
   open: boolean
   onClose: () => void
 }) {
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <AnimatePresence>
       {open ? (
@@ -397,10 +410,10 @@ function ShellMobileSidebarDrawer({
           role="presentation"
         >
           <motion.aside
-            variants={drawerVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
+            variants={shouldReduceMotion ? undefined : drawerVariants}
+            initial={shouldReduceMotion ? false : "initial"}
+            animate={shouldReduceMotion ? { x: 0, opacity: 1, transition: { duration: 0 } } : "animate"}
+            exit={shouldReduceMotion ? { x: 0, opacity: 0, transition: { duration: 0 } } : "exit"}
             className="h-full w-80 max-w-[88vw] border-r border-border bg-surface-canvas"
             onClick={(event) => event.stopPropagation()}
             aria-label="Mobile workspace navigation drawer"
@@ -460,23 +473,43 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
   const { drawerOpen, setDrawerOpen } = useNotificationCenter()
   const { isDesktop, isMobile } = useBreakpoint()
   const pathname = usePathname()
+  const { baseHref } = useNavigationBase()
+  const shouldReduceMotion = useReducedMotion()
+  const isPublicDemo = baseHref === "/demo-platform"
 
-  useKeyboardShortcuts({
-    "mod+k": open,
-    escape: () => {
-      close()
-      setDrawerOpen(false)
-    },
-    n: () => setDrawerOpen(true),
-  })
+  const shortcuts = useMemo(() => {
+    const bindings: Record<string, () => void> = {
+      escape: () => {
+        close()
+        setDrawerOpen(false)
+      },
+    }
 
-  const mobileNavItems = useMemo(() => [
-    { href: "/app", label: "Home", icon: Home },
-    { href: "/app/executive", label: "Executive", icon: Sparkles },
-    { href: "/app/intelligence", label: "Intelligence", icon: LineChart },
-    { href: "/app/agents", label: "Agents", icon: Bot },
-    { href: "/app/settings", label: "Settings", icon: Settings },
-  ], [])
+    if (!isPublicDemo) {
+      bindings["mod+k"] = open
+      bindings.n = () => setDrawerOpen(true)
+    }
+
+    return bindings
+  }, [close, isPublicDemo, open, setDrawerOpen])
+
+  useKeyboardShortcuts(shortcuts)
+
+  const mobileNavItems = useMemo(() => isPublicDemo
+    ? [
+        { href: "/demo-platform", label: "Home", icon: Home },
+        { href: "/demo-platform/executive", label: "Executive", icon: Sparkles },
+        { href: "/demo-platform/insights", label: "Insights", icon: LineChart },
+        { href: "/demo-platform/agents", label: "Agents", icon: Bot },
+        { href: "/demo-platform/settings", label: "Settings", icon: Settings },
+      ]
+    : [
+        { href: "/app", label: "Home", icon: Home },
+        { href: "/app/executive", label: "Executive", icon: Sparkles },
+        { href: "/app/intelligence", label: "Intelligence", icon: LineChart },
+        { href: "/app/agents", label: "Agents", icon: Bot },
+        { href: "/app/settings", label: "Settings", icon: Settings },
+      ], [isPublicDemo])
 
   return (
     <div className="min-h-screen bg-surface-app text-text-primary">
@@ -496,19 +529,19 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
           <WorkspaceHeader />
           <motion.main
             id="main-content"
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            className="min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0"
+            variants={shouldReduceMotion ? undefined : pageVariants}
+            initial={shouldReduceMotion ? false : "initial"}
+            animate={shouldReduceMotion ? { opacity: 1, y: 0, transition: { duration: 0 } } : "animate"}
+            className="min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0 motion-reduce:!transform-none motion-reduce:!opacity-100"
             aria-label="Main content area"
             tabIndex={-1}
           >
             {children}
           </motion.main>
-          <ShellStatusBar />
+          {!isPublicDemo ? <ShellStatusBar /> : null}
         </div>
 
-        <AIAssistantPanel mode="desktop" open={true} />
+        {!isPublicDemo ? <AIAssistantPanel mode="desktop" open={true} /> : null}
       </div>
 
       {/* Mobile bottom navigation */}
@@ -539,15 +572,17 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
         })}
       </nav>
 
-      <AIAssistantPanel
-        mode={isMobile ? "mobile" : "tablet"}
-        open={aiPanelOpen}
-        onClose={() => setAIPanelOpen(false)}
-      />
+      {!isPublicDemo ? (
+        <AIAssistantPanel
+          mode={isMobile ? "mobile" : "tablet"}
+          open={aiPanelOpen}
+          onClose={() => setAIPanelOpen(false)}
+        />
+      ) : null}
 
-      <CommandPalette />
-      <NotificationToastHost />
-      <GlobalLoadingOverlay />
+      {!isPublicDemo ? <CommandPalette /> : null}
+      {!isPublicDemo ? <NotificationToastHost /> : null}
+      {!isPublicDemo ? <GlobalLoadingOverlay /> : null}
     </div>
   )
 }

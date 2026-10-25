@@ -147,12 +147,6 @@ const resourcesBenefits = [
   { title: "Better conversion", body: "Clear learning journeys naturally guide toward demos and pilot interest." },
 ]
 
-const resourcesOutcomes = [
-  { label: "Time to understanding", value: "-46%", detail: "Reduced time for first-time visitors to grasp AIOS." },
-  { label: "Resource engagement", value: "+33%", detail: "Higher multi-page exploration across content categories." },
-  { label: "Demo intent", value: "+24%", detail: "More visitors transition from learning to contact actions." },
-]
-
 function categoryIcon(category: ResourceCategory) {
   if (category === "Videos") {
     return <PlayCircle size={16} />
@@ -203,7 +197,7 @@ export default function ResourcesPage() {
         actions={
           <>
             <PublicButtonLink href="/contact" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
             <PublicButtonLink href="/architecture" variant="secondary" size="lg">
               Review Architecture
@@ -298,7 +292,6 @@ export default function ResourcesPage() {
         title="Knowledge experience outcomes"
         body="A structured resource layer increases comprehension, trust, and conversion readiness."
         benefits={resourcesBenefits}
-        outcomes={resourcesOutcomes}
       />
 
       <PublicPilotProgramSection />

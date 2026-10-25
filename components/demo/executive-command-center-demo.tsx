@@ -2,8 +2,15 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { BrandLogo } from "@/components/branding";
 import { formatDemoEuro } from "@/lib/demo/currency";
+import {
+  answerDemoQuestion,
+  demoDepartmentSummaries,
+  demoExecutiveRoles,
+  type DemoExecutiveRole,
+} from "@/lib/demo/executive-command-center-model";
 import {
   Activity,
   ArrowDownRight,
@@ -61,33 +68,39 @@ type Opportunity = {
   amount: number;
   stage: string;
   intent: string;
+  account: string;
+  owner: string;
+  closeDate: string;
+  probability: number;
 };
 
 const initialOpportunities: Opportunity[] = [
-  { id: "sample-proposal", name: "Sample Opportunity A", amount: 2_100_000, stage: "Proposal", intent: "High intent" },
-  { id: "sample-negotiation", name: "Sample Opportunity B", amount: 1_800_000, stage: "Negotiation", intent: "High intent" },
-  { id: "sample-qualified", name: "Sample Opportunity C", amount: 1_200_000, stage: "Qualified", intent: "Medium intent" },
+  { id: "sample-proposal", name: "Sample Opportunity A", amount: 2_100_000, stage: "Proposal", intent: "High intent", account: "Sample Account A", owner: "Demo owner 1", closeDate: "2026-12-15", probability: 55 },
+  { id: "sample-negotiation", name: "Sample Opportunity B", amount: 1_800_000, stage: "Negotiation", intent: "High intent", account: "Sample Account B", owner: "Demo owner 2", closeDate: "2026-11-30", probability: 70 },
+  { id: "sample-qualified", name: "Sample Opportunity C", amount: 1_200_000, stage: "Qualified", intent: "Medium intent", account: "Sample Account C", owner: "Demo owner 3", closeDate: "2027-01-20", probability: 35 },
+  { id: "sample-qualified-d", name: "Sample Opportunity D", amount: 980_000, stage: "Qualified", intent: "Review intent", account: "Sample Account D", owner: "Demo owner 4", closeDate: "2027-02-10", probability: 25 },
 ];
 
 const pipelineStages = [
-  { stage: "Prospect", amount: 8_400_000, height: "h-9", color: "bg-blue-200" },
-  { stage: "Qualified", amount: 12_100_000, height: "h-14", color: "bg-blue-300" },
-  { stage: "Proposal", amount: 9_600_000, height: "h-12", color: "bg-blue-400" },
-  { stage: "Negotiation", amount: 5_300_000, height: "h-16", color: "bg-indigo-400" },
-  { stage: "Won", amount: 2_200_000, height: "h-20", color: "bg-emerald-400" },
+  { stage: "Prospect", amount: 8_400_000, count: 42, height: "h-9", color: "bg-blue-200" },
+  { stage: "Qualified", amount: 12_100_000, count: 35, height: "h-14", color: "bg-blue-300" },
+  { stage: "Proposal", amount: 9_600_000, count: 22, height: "h-12", color: "bg-blue-400" },
+  { stage: "Negotiation", amount: 5_300_000, count: 13, height: "h-16", color: "bg-indigo-400" },
+  { stage: "Closed Won", amount: 2_200_000, count: 9, height: "h-20", color: "bg-emerald-400" },
 ];
 
 const customerRisks = [
-  { id: "sample-account-a", name: "Sample Account A", score: 92 },
-  { id: "sample-account-b", name: "Sample Account B", score: 87 },
-  { id: "sample-account-c", name: "Sample Account C", score: 65 },
+  { id: "sample-account-a", name: "Sample Account A", score: 92, drivers: "Renewal within 45 days · support trend above sample baseline", owner: "Demo owner 1", renewal: "2026-12-01" },
+  { id: "sample-account-b", name: "Sample Account B", score: 87, drivers: "Product usage decline · two unresolved sample support cases", owner: "Demo owner 2", renewal: "2027-01-15" },
+  { id: "sample-account-c", name: "Sample Account C", score: 65, drivers: "Engagement below sample target · renewal in 90 days", owner: "Demo owner 3", renewal: "2027-01-30" },
 ];
 
+const DEMO_NOW = "2026-10-24T12:00:00.000Z";
 const activity = [
-  { id: "activity-a", label: "Sample signal summarized for Account A." },
-  { id: "activity-b", label: "Example opportunity stage reviewed." },
-  { id: "activity-c", label: "Sample retention signal flagged for review." },
-  { id: "activity-d", label: "Example onboarding workflow inspected." },
+  { id: "activity-a", label: "Sample signal summarized for Account A.", department: "Customer success", agent: "Retention review", status: "Reviewed", type: "Insight", minutesAgo: 8, href: "/demo-platform/customer-intelligence" },
+  { id: "activity-b", label: "Example opportunity stage reviewed.", department: "Sales", agent: "Pipeline monitor", status: "Proposed", type: "Opportunity", minutesAgo: 21, href: "/demo-platform/sales-intelligence" },
+  { id: "activity-c", label: "Sample retention signal flagged for review.", department: "Customer success", agent: "Health monitor", status: "Proposed", type: "Risk", minutesAgo: 37, href: "/demo-platform/customer-intelligence" },
+  { id: "activity-d", label: "Example onboarding workflow inspected.", department: "Operations", agent: "Workflow analyst", status: "Simulated", type: "Workflow", minutesAgo: 62, href: "/demo-platform/workflows" },
 ];
 
 const recommendations = [
@@ -132,43 +145,81 @@ const healthPoints = [
   [36, 72, "watch"], [52, 77, "watch"], [65, 73, "watch"], [78, 78, "risk"], [88, 68, "risk"],
 ] as const;
 
+const departmentConnections = [
+  { from: "sales", to: "marketing", relationship: "Lead conversion" },
+  { from: "sales", to: "customers", relationship: "Account and renewal context" },
+  { from: "sales", to: "finance", relationship: "Forecast and commercial context" },
+  { from: "customers", to: "product", relationship: "Feedback and product issues" },
+  { from: "finance", to: "operations", relationship: "Process cost and throughput" },
+];
+
 function focusStyle() {
   return "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 transition-colors duration-200 motion-reduce:transition-none";
 }
 
-function CityPlatformIllustration() {
+function MetricTrendChart({ id, label }: { id: string; label: string }) {
+  const seriesByMetric: Record<string, number[]> = {
+    revenue: [28, 33, 31, 42, 47, 45, 58, 64],
+    pipeline: [34, 39, 36, 45, 52, 49, 61, 69],
+    customers: [35, 38, 43, 45, 49, 54, 58, 64],
+    risk: [68, 61, 64, 55, 51, 47, 42, 38],
+    actions: [22, 29, 27, 38, 46, 51, 61, 72],
+  };
+  const values = seriesByMetric[id] ?? seriesByMetric.revenue!;
+  const points = values.map((value, index) => `${(index / (values.length - 1)) * 100},${90 - value}`).join(" ");
+
+  return (
+    <svg role="img" aria-label={`${label} sample eight-period trend`} viewBox="0 0 100 38" className="mt-2 h-8 w-full overflow-visible">
+      <path d="M0 31H100M0 18H100" stroke="#dbe7f3" strokeWidth="1" strokeDasharray="2 3" />
+      <polyline points={points} fill="none" stroke="#3285f6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      {values.map((value, index) => (
+        <circle key={`${id}-${index}`} cx={(index / (values.length - 1)) * 100} cy={90 - value} r="1.7" fill="#1d4ed8">
+        </circle>
+      ))}
+    </svg>
+  );
+}
+
+const cityProfiles: Record<string, { front: string; side: string; roof: string; accent: string; towers: Array<[number, number, number]> }> = {
+  sales: { front: "#90b9dc", side: "#5d88b0", roof: "#d6e9f8", accent: "#3b82f6", towers: [[34, 19, 12], [51, 31, 19], [70, 15, 28], [91, 24, 17], [110, 36, 12], [130, 22, 22], [147, 17, 13]] },
+  marketing: { front: "#b7a6df", side: "#8772b4", roof: "#e9e1fa", accent: "#8b5cf6", towers: [[34, 22, 14], [53, 14, 24], [73, 34, 14], [94, 23, 20], [114, 30, 13], [133, 18, 27], [150, 25, 12]] },
+  customers: { front: "#8fcbb4", side: "#5b9a82", roof: "#d8f2e8", accent: "#10b981", towers: [[34, 17, 13], [53, 27, 21], [74, 19, 15], [94, 33, 25], [115, 20, 16], [135, 29, 20], [152, 18, 12]] },
+  finance: { front: "#d9be83", side: "#a88c50", roof: "#f6e8c7", accent: "#d97706", towers: [[34, 18, 12], [53, 29, 20], [73, 20, 17], [93, 34, 24], [114, 15, 13], [133, 26, 18], [151, 20, 12]] },
+  operations: { front: "#80becb", side: "#4f8f9e", roof: "#d6f0f4", accent: "#0891b2", towers: [[34, 21, 13], [53, 31, 19], [74, 18, 26], [94, 27, 16], [115, 17, 14], [134, 34, 20], [151, 21, 12]] },
+  product: { front: "#9eadd9", side: "#6e7eae", roof: "#e0e7fb", accent: "#6366f1", towers: [[34, 16, 12], [53, 25, 19], [74, 20, 14], [94, 34, 24], [115, 18, 13], [134, 28, 22], [152, 19, 12]] },
+};
+
+function CityPlatformIllustration({ departmentId }: { departmentId: string }) {
+  const profile = cityProfiles[departmentId] ?? cityProfiles.sales!;
+
   return (
     <svg aria-hidden="true" viewBox="0 0 180 100" className="h-full w-full overflow-visible">
-      <ellipse cx="90" cy="82" rx="68" ry="12" fill="#9eb5c9" opacity="0.2" />
-      <path d="M17 61c0-10 33-18 73-18s73 8 73 18v8c0 10-33 18-73 18s-73-8-73-18z" fill="#c8d9e8" />
-      <ellipse cx="90" cy="61" rx="73" ry="19" fill="#edf5fb" stroke="#9dbbd4" strokeWidth="2" />
-      <ellipse cx="90" cy="59" rx="64" ry="14" fill="#f8fbff" stroke="#d7e7f4" />
-      <path d="M35 59h110" stroke="#b9d5e9" strokeDasharray="2 4" />
-      <g fill="#a9c9e2">
-        <path d="M53 53h13V34l-6-5-7 5z" />
-        <path d="M69 52h16V25l-8-7-8 7z" />
-        <path d="M91 53h12V31l-6-5-6 5z" />
-        <path d="M108 54h17V37l-8-6-9 6z" />
-        <path d="M43 56h9V43l-5-4-4 4z" />
-        <path d="M128 56h10V45l-5-4-5 4z" />
+      <ellipse cx="90" cy="83" rx="70" ry="11" fill="#8199ad" opacity="0.2" />
+      <path d="M18 60c0-10 32-18 72-18s72 8 72 18v9c0 10-32 18-72 18s-72-8-72-18z" fill="#b9ccdc" />
+      <ellipse cx="90" cy="60" rx="72" ry="19" fill="#e8f1f8" stroke="#91abc0" strokeWidth="1.6" />
+      <ellipse cx="90" cy="57" rx="64" ry="14" fill="#f7fbff" stroke="#c7d9e8" />
+      <path d="M29 59c22 12 100 14 122-1M40 50c17 8 76 9 99 0" fill="none" stroke={profile.accent} strokeOpacity=".35" strokeWidth="1" />
+      {profile.towers.map(([x, width, height], index) => {
+        const base = 56 - (index % 2) * 2;
+        const right = x + width;
+        const depth = 5;
+        const top = base - height;
+        return (
+          <g key={`${departmentId}-tower-${index}`}>
+            <path d={`M${x} ${base}V${top}l${depth} -4v${height}z`} fill={profile.side} />
+            <path d={`M${x} ${top}l${depth} -4h${width}l-${depth} 4z`} fill={profile.roof} stroke="#ffffff" strokeOpacity=".75" strokeWidth=".6" />
+            <path d={`M${x} ${base}V${top}h${width}v${height}z`} fill={profile.front} />
+            <path d={`M${x + 2} ${base - 4}V${top + 5}M${x + 7} ${base - 4}V${top + 5}`} stroke="#f7fbff" strokeOpacity=".72" strokeWidth="1.3" strokeDasharray="2 3" />
+            <path d={`M${right - 2} ${base}V${top + 4}`} stroke={profile.accent} strokeWidth="1" strokeOpacity=".7" />
+            {index === 2 || index === 5 ? <path d={`M${x + width / 2} ${top}v-5`} stroke={profile.accent} strokeWidth="1.4" /> : null}
+          </g>
+        );
+      })}
+      <g fill="#6fa58a">
+        <circle cx="26" cy="52" r="3.2" /><circle cx="153" cy="53" r="3.5" /><circle cx="46" cy="43" r="2.7" /><circle cx="138" cy="43" r="2.8" />
       </g>
-      <g fill="#6f9fc5">
-        <path d="M69 25h16l-8-7z" />
-        <path d="M53 34h13l-6-5z" />
-        <path d="M91 31h12l-6-5z" />
-        <path d="M108 37h17l-8-6z" />
-        <path d="M43 43h9l-5-4z" />
-        <path d="M128 45h10l-5-4z" />
-      </g>
-      <g fill="#f8fbff" opacity="0.9">
-        <path d="M73 30h2v3h-2zm5-5h2v3h-2zm-5 9h2v3h-2zm16 1h2v3h-2zm16 4h2v3h-2zm9-2h2v3h-2zm-68 8h2v3h-2z" />
-      </g>
-      <g fill="#74b995">
-        <circle cx="34" cy="52" r="4" /><circle cx="148" cy="55" r="4" />
-        <circle cx="61" cy="21" r="3" /><circle cx="132" cy="34" r="3" />
-      </g>
-      <g stroke="#5f9c7b" strokeWidth="1.5">
-        <path d="M34 56v5m114-2v5M61 24v4m71 9v4" />
+      <g stroke="#56826d" strokeWidth="1">
+        <path d="M26 55v5m127-3v5M46 46v4m92-4v4" />
       </g>
     </svg>
   );
@@ -176,8 +227,11 @@ function CityPlatformIllustration() {
 
 export function DemoExecutiveCommandCenter() {
   const [selectedDomainId, setSelectedDomainId] = useState("sales");
+  const [coreOverviewOpen, setCoreOverviewOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedHealthPoint, setSelectedHealthPoint] = useState<string | null>(null);
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [metricValues, setMetricValues] = useState(() => Object.fromEntries(metrics.map(({ id, value }) => [id, value])));
   const [metricDraft, setMetricDraft] = useState("");
@@ -186,6 +240,7 @@ export function DemoExecutiveCommandCenter() {
   const [selectedPipelineStage, setSelectedPipelineStage] = useState<string | null>(null);
   const [pipelineAmounts, setPipelineAmounts] = useState(() => Object.fromEntries(pipelineStages.map(({ stage, amount }) => [stage, amount])));
   const [opportunitySearch, setOpportunitySearch] = useState("");
+  const [opportunityOwnerFilter, setOpportunityOwnerFilter] = useState("All owners");
   const [reviewedOpportunity, setReviewedOpportunity] = useState<string | null>(null);
   const [customerScores, setCustomerScores] = useState(() => Object.fromEntries(customerRisks.map(({ id, score }) => [id, score])));
   const [customerDraft, setCustomerDraft] = useState("");
@@ -195,17 +250,66 @@ export function DemoExecutiveCommandCenter() {
   const [reviewedActivity, setReviewedActivity] = useState<string[]>([]);
   const [previewRecommendation, setPreviewRecommendation] = useState<string | null>(null);
   const [simulatedRecommendations, setSimulatedRecommendations] = useState<string[]>([]);
+  const [recommendationStatuses, setRecommendationStatuses] = useState<Record<string, "New" | "Reviewed" | "Approved" | "In Progress" | "Completed" | "Rejected">>({});
+  const [recommendationRejectionReason, setRecommendationRejectionReason] = useState("");
   const [askPreviewOpen, setAskPreviewOpen] = useState(false);
+  const [assistantQuestion, setAssistantQuestion] = useState("");
+  const [assistantAnswer, setAssistantAnswer] = useState<ReturnType<typeof answerDemoQuestion> | null>(null);
+  const [selectedRole, setSelectedRole] = useState<DemoExecutiveRole>("CEO");
+  const [activityDepartmentFilter, setActivityDepartmentFilter] = useState("All departments");
+  const [activityStatusFilter, setActivityStatusFilter] = useState("All statuses");
+  const [activityTypeFilter, setActivityTypeFilter] = useState("All types");
+  const [demoActivityEntries, setDemoActivityEntries] = useState<typeof activity>([]);
   const [actionMessage, setActionMessage] = useState("");
   const selectedDomain = domains.find((domain) => domain.id === selectedDomainId) ?? domains[0]!;
+  const selectedDepartmentSummary = demoDepartmentSummaries.find((department) => department.id === selectedDomainId) ?? demoDepartmentSummaries[0]!;
+  const rolePriority: Record<DemoExecutiveRole, string> = {
+    CEO: "sales",
+    CFO: "finance",
+    "Sales leader": "sales",
+    "Customer Success leader": "customers",
+    "Operations leader": "operations",
+  };
   const filteredOpportunities = opportunities.filter((opportunity) => {
     const matchesStage = selectedPipelineStage === null || opportunity.stage === selectedPipelineStage;
     const query = opportunitySearch.trim().toLowerCase();
-    const matchesQuery = !query || `${opportunity.name} ${opportunity.stage} ${opportunity.intent}`.toLowerCase().includes(query);
-    return matchesStage && matchesQuery;
+    const matchesQuery = !query || `${opportunity.name} ${opportunity.account} ${opportunity.stage} ${opportunity.intent} ${opportunity.owner}`.toLowerCase().includes(query);
+    return matchesStage && matchesQuery && (opportunityOwnerFilter === "All owners" || opportunity.owner === opportunityOwnerFilter);
   });
+  const activityEntries = [...demoActivityEntries, ...activity];
+  const recordDemoActivity = (label: string, department = selectedDomain.label, type = "Demo action", href = "/demo-platform/activity") => {
+    setDemoActivityEntries((current) => [{
+      id: `demo-action-${Date.now()}`,
+      label,
+      department,
+      agent: "Local demo preview",
+      status: "Simulated",
+      type,
+      minutesAgo: 0,
+      href,
+    }, ...current]);
+  };
+  const filteredActivity = activityEntries.filter((item) =>
+    (activityDepartmentFilter === "All departments" || item.department === activityDepartmentFilter) &&
+    (activityStatusFilter === "All statuses" || (reviewedActivity.includes(item.id) ? "Reviewed" : item.status) === activityStatusFilter) &&
+    (activityTypeFilter === "All types" || item.type === activityTypeFilter),
+  );
+  const filteredRiskAccounts = customerRisks.filter((customer) =>
+    `${customer.name} ${customer.owner} ${customer.drivers}`.toLowerCase().includes(customerSearch.trim().toLowerCase()),
+  );
+  const submitDemoQuestion = (question: string) => {
+    setAssistantQuestion(question);
+    setAssistantAnswer(answerDemoQuestion(question, {
+      revenueEur: metricValues.revenue ?? 0,
+      pipelineEur: metricValues.pipeline ?? 0,
+      activeCustomers: metricValues.customers ?? 0,
+      atRiskCustomers: metricValues.risk ?? 0,
+      selectedDepartment: selectedDomain.label,
+      selectedDepartmentFocus: selectedDomain.signal,
+    }));
+  };
   return (
-    <section className="relative isolate mx-auto w-full max-w-[1500px] px-0 pb-8 pt-4 text-slate-800 sm:px-2 lg:px-4">
+    <section className="aios-demo-executive relative isolate mx-auto w-full max-w-[1500px] px-0 pb-8 pt-4 text-slate-800 sm:px-2 lg:px-4">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_50%_35%,rgba(191,219,254,0.46),transparent_56%),linear-gradient(135deg,#f8fbff_0%,#eef5ff_52%,#f8fbff_100%)]" />
 
       <header className="flex flex-wrap items-end justify-between gap-4">
@@ -227,11 +331,37 @@ export function DemoExecutiveCommandCenter() {
       </header>
 
       {askPreviewOpen ? (
-        <div id="ask-aios-preview" className="mt-4 flex flex-wrap items-start gap-3 rounded-xl border border-blue-200 bg-white/90 p-4 text-sm shadow-sm" role="status" aria-live="polite">
-          <Lightbulb aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-blue-700" />
-          <p className="min-w-0 flex-1 text-slate-700">
-            Demo preview: AIOS would summarize the selected <strong>{selectedDomain.label}</strong> signal, “{selectedDomain.signal}.” No prompt is sent and no business data is accessed.
-          </p>
+        <div id="ask-aios-preview" className="mt-4 rounded-xl border border-blue-200 bg-white/95 p-4 text-sm shadow-sm">
+          <div className="flex items-start gap-3">
+            <Lightbulb aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-blue-700" />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-slate-900">Ask AIOS · deterministic demo assistant</p>
+              <p className="mt-1 text-xs text-slate-600">Answers are generated locally from the synthetic dashboard state. No prompt or business data is sent.</p>
+            </div>
+          </div>
+          <form className="mt-3 flex min-w-0 flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); submitDemoQuestion(assistantQuestion); }}>
+            <label className="sr-only" htmlFor="demo-assistant-question">Ask about sample business information</label>
+            <input
+              id="demo-assistant-question"
+              value={assistantQuestion}
+              onChange={(event) => setAssistantQuestion(event.target.value)}
+              placeholder="Ask about pipeline, revenue, customer risk, or priorities"
+              className="min-h-11 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
+            />
+            <button type="submit" className={`min-h-11 rounded-lg bg-blue-700 px-4 text-sm font-semibold text-white hover:bg-blue-800 ${focusStyle()}`}>Ask demo</button>
+          </form>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {["What are my priorities?", "Why are accounts at risk?", "What is the pipeline bottleneck?", "Summarize revenue"].map((question) => (
+              <button key={question} type="button" onClick={() => submitDemoQuestion(question)} className={`min-h-10 rounded-full border border-blue-100 bg-blue-50/70 px-3 text-xs font-medium text-blue-900 hover:bg-blue-100 ${focusStyle()}`}>{question}</button>
+            ))}
+          </div>
+          {assistantAnswer ? (
+            <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3" aria-live="polite">
+              <p className="font-semibold text-slate-900">{assistantAnswer.summary}</p>
+              <p className="mt-1 text-xs leading-5 text-slate-700"><strong>Basis:</strong> {assistantAnswer.evidence}</p>
+              <Link href={assistantAnswer.href} className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>{assistantAnswer.linkLabel}<ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -242,8 +372,36 @@ export function DemoExecutiveCommandCenter() {
         </div>
       ) : null}
 
+      <nav aria-label="Executive demo navigation" className="mt-4 flex min-w-0 flex-wrap gap-2 pb-1">
+        {[
+          { label: "Overview", href: "/demo-platform" },
+          { label: "Pipeline", href: "/demo-platform/sales-intelligence" },
+          { label: "Customers", href: "/demo-platform/customer-intelligence" },
+          { label: "AI Agents", href: "/demo-platform/agents" },
+          { label: "Insights", href: "/demo-platform/insights" },
+          { label: "Actions", href: "/demo-platform/activity" },
+          { label: "Settings", href: "/demo-platform/settings" },
+        ].map(({ label, href }) => (
+          <Link key={label} href={href} aria-current={label === "Overview" ? "page" : undefined} className={`inline-flex min-h-10 items-center justify-center rounded-lg border px-3 text-center text-xs font-semibold ${label === "Overview" ? "border-blue-300 bg-blue-50 text-blue-900" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"} ${focusStyle()}`}>{label}</Link>
+        ))}
+      </nav>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+        <label htmlFor="demo-role" className="font-semibold text-slate-700">Priority lens · demo role</label>
+        <select id="demo-role" value={selectedRole} onChange={(event) => {
+          const nextRole = demoExecutiveRoles.find((role) => role === event.target.value);
+          if (nextRole) {
+            setSelectedRole(nextRole);
+            setSelectedDomainId(rolePriority[nextRole]);
+          }
+        }} className="min-h-10 max-w-full rounded-md border border-slate-300 bg-white px-2 text-slate-800">
+          {demoExecutiveRoles.map((role) => <option key={role} value={role}>{role}</option>)}
+        </select>
+        <span className="text-slate-500">Synthetic prioritization only; does not grant or change permissions.</span>
+      </div>
+
       <section aria-label="Executive sample metrics" className="mt-5 overflow-hidden rounded-2xl border border-white/90 bg-white/75 shadow-[0_10px_35px_rgba(73,112,165,0.08)] backdrop-blur">
-        <div className="grid grid-cols-2 divide-y divide-blue-100 md:grid-cols-3 md:divide-x xl:grid-cols-5 xl:divide-y-0">
+        <div className="grid grid-cols-1 divide-y divide-blue-100 md:grid-cols-3 md:divide-x xl:grid-cols-5 xl:divide-y-0">
           {metrics.map(({ id, label, kind, change, Icon, positive }) => {
             const expanded = selectedMetric === id;
             const value = metricValues[id] ?? 0;
@@ -270,13 +428,21 @@ export function DemoExecutiveCommandCenter() {
                     {positive ? <ArrowUpRight aria-hidden="true" className="h-3.5 w-3.5" /> : <ArrowDownRight aria-hidden="true" className="h-3.5 w-3.5" />}
                     {change} · example
                   </span>
-                  <span className="mt-1 block text-[10px] text-blue-700">{expanded ? "Close sample editor" : "Inspect / edit sample"}</span>
+                  <MetricTrendChart id={id} label={label} />
+                  <span className="mt-1 block text-[10px] text-blue-700">{expanded ? "Close sample details" : "Inspect sample trend / edit"}</span>
                 </button>
                 {expanded ? (
-                  <form
-                    id={`metric-editor-${id}`}
-                    className="mt-2 space-y-2 rounded-lg bg-blue-50 p-2"
-                    onSubmit={(event) => {
+                  <div id={`metric-editor-${id}`} className="mt-2 space-y-2 rounded-lg bg-blue-50 p-2">
+                    <p className="text-[10px] leading-4 text-slate-700">
+                      Eight synthetic reporting periods · sample comparison: {change.replace(/[↑↓]\s*/, "")} · last updated {new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(DEMO_NOW))}
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-600">
+                      <span>Current sample: <strong className="text-slate-900">{kind === "currency" ? formatDemoEuro(value, true) : new Intl.NumberFormat("de-DE").format(value)}</strong></span>
+                      <span>Data source: <strong className="text-slate-900">synthetic demo</strong></span>
+                    </div>
+                    <form
+                      className="space-y-2 border-t border-blue-100 pt-2"
+                      onSubmit={(event) => {
                       event.preventDefault();
                       const nextValue = Number(metricDraft);
                       if (Number.isFinite(nextValue) && nextValue >= 0) {
@@ -291,28 +457,30 @@ export function DemoExecutiveCommandCenter() {
                           setPipelineAmounts(Object.fromEntries([...scaledStages, [lastStage.stage, Math.max(0, nextValue - allocatedTotal)]]));
                         }
                         setMetricValues((current) => ({ ...current, [id]: nextValue }));
+                        recordDemoActivity(`${label} changed to ${kind === "currency" ? formatDemoEuro(nextValue, true) : new Intl.NumberFormat("de-DE").format(nextValue)}.`, "Executive", "KPI");
                         setActionMessage(`${label} updated in this demo page only.`);
                         setSelectedMetric(null);
                       }
                     }}
-                  >
-                    <label className="block text-[10px] font-medium text-slate-700" htmlFor={`metric-value-${id}`}>
-                      {kind === "currency" ? "Sample amount (EUR)" : "Sample count"}
-                    </label>
-                    <input
-                      id={`metric-value-${id}`}
-                      type="number"
-                      min="0"
-                      step={kind === "currency" ? "1000" : "1"}
-                      value={metricDraft}
-                      onChange={(event) => setMetricDraft(event.target.value)}
-                      className="min-h-10 w-full min-w-0 rounded-md border border-blue-200 bg-white px-2 text-sm text-slate-900"
-                    />
-                    <div className="flex flex-wrap gap-2">
-                      <button type="submit" className={`min-h-10 rounded-md bg-blue-700 px-3 text-xs font-semibold text-white hover:bg-blue-800 ${focusStyle()}`}>Save sample</button>
-                      <button type="button" onClick={() => { setSelectedMetric(null); setActionMessage("Sample edit cancelled."); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-slate-700 hover:bg-white ${focusStyle()}`}>Cancel</button>
-                    </div>
-                  </form>
+                    >
+                      <label className="block text-[10px] font-medium text-slate-700" htmlFor={`metric-value-${id}`}>
+                        {kind === "currency" ? "Sample amount (EUR)" : "Sample count"}
+                      </label>
+                      <input
+                        id={`metric-value-${id}`}
+                        type="number"
+                        min="0"
+                        step={kind === "currency" ? "1000" : "1"}
+                        value={metricDraft}
+                        onChange={(event) => setMetricDraft(event.target.value)}
+                        className="min-h-10 w-full min-w-0 rounded-md border border-blue-200 bg-white px-2 text-sm text-slate-900"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        <button type="submit" className={`min-h-10 rounded-md bg-blue-700 px-3 text-xs font-semibold text-white hover:bg-blue-800 ${focusStyle()}`}>Save sample</button>
+                        <button type="button" onClick={() => { setSelectedMetric(null); setActionMessage("Sample edit cancelled."); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-slate-700 hover:bg-white ${focusStyle()}`}>Cancel</button>
+                      </div>
+                    </form>
+                  </div>
                 ) : null}
               </div>
             );
@@ -332,9 +500,18 @@ export function DemoExecutiveCommandCenter() {
             </span>
           </div>
 
-          <div className="mt-3 hidden aspect-[1.12] min-h-[360px] max-h-[490px] md:block">
+          <div className="aios-demo-spatial-stage mt-3 hidden aspect-[1.12] min-h-[360px] max-h-[490px] md:block">
             <div className="relative h-full w-full overflow-hidden rounded-[1.5rem] bg-[radial-gradient(ellipse_at_50%_50%,rgba(219,234,254,0.76),rgba(248,251,255,0.42)_62%,transparent_100%)]">
               <svg aria-hidden="true" className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                {departmentConnections.map(({ from, to }) => {
+                  const source = domains.find((domain) => domain.id === from);
+                  const target = domains.find((domain) => domain.id === to);
+                  if (!source || !target) return null;
+                  const active = from === selectedDomainId || to === selectedDomainId;
+                  return (
+                    <line key={`${from}-${to}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#7baed7" strokeWidth={active ? "0.45" : "0.25"} strokeDasharray="1 1.6" opacity={active ? "0.72" : "0.35"} />
+                  );
+                })}
                 {domains.map((domain) => {
                   const active = selectedDomainId === domain.id;
                   return (
@@ -351,17 +528,23 @@ export function DemoExecutiveCommandCenter() {
                   style={{ left: `${x}%`, top: `calc(${y}% + 1rem)` }}
                   className="pointer-events-none absolute z-[1] h-[4.5rem] w-[7.6rem] -translate-x-1/2"
                 >
-                  <CityPlatformIllustration />
+                  <CityPlatformIllustration departmentId={id} />
                 </div>
               ))}
 
-              <div className="absolute left-1/2 top-1/2 z-10 h-32 w-36 -translate-x-1/2 -translate-y-1/2">
+              <div className="aios-demo-spatial-hub absolute left-1/2 top-1/2 z-10 h-32 w-36 -translate-x-1/2 -translate-y-1/2">
                 <div aria-hidden="true" className="absolute inset-x-1 bottom-0 h-10 rounded-[50%] border border-blue-200 bg-gradient-to-b from-white to-blue-100 shadow-[0_12px_25px_rgba(37,99,235,0.2)]" />
                 <div aria-hidden="true" className="absolute inset-x-3 bottom-2 h-8 rounded-[50%] border border-blue-100 bg-gradient-to-b from-blue-50 to-white shadow-inner" />
-                <div className="absolute left-1/2 top-0 flex h-[5.5rem] w-[5.5rem] -translate-x-1/2 flex-col items-center justify-center rounded-[1.5rem] border border-blue-200 bg-white text-center shadow-[0_12px_35px_rgba(37,99,235,0.2)] sm:h-24 sm:w-24">
+                <button
+                  type="button"
+                  aria-expanded={coreOverviewOpen}
+                  aria-label="Open company-wide AIOS intelligence overview"
+                  onClick={() => setCoreOverviewOpen((open) => !open)}
+                  className={`absolute left-1/2 top-0 flex h-[5.5rem] w-[5.5rem] -translate-x-1/2 flex-col items-center justify-center rounded-[1.5rem] border border-blue-200 bg-white text-center shadow-[0_12px_35px_rgba(37,99,235,0.2)] hover:border-blue-500 hover:shadow-[0_14px_40px_rgba(37,99,235,0.28)] sm:h-24 sm:w-24 ${focusStyle()}`}
+                >
                   <BrandLogo variant="square" width={35} height={35} alt="AIOS Pilot" />
                   <span className="mt-0.5 text-[8px] font-bold tracking-[0.16em] text-blue-800">PILOT HUB</span>
-                </div>
+                </button>
               </div>
 
               {domains.map(({ id, label, signal, health, x, y, Icon, tone, edge }) => {
@@ -373,7 +556,7 @@ export function DemoExecutiveCommandCenter() {
                     aria-pressed={isSelected}
                     onClick={() => setSelectedDomainId(id)}
                     style={{ left: `${x}%`, top: `${y}%` }}
-                    className={`absolute z-20 flex min-h-[3.25rem] w-[7.3rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border px-1.5 py-1.5 text-center shadow-[0_5px_18px_rgba(71,104,151,0.1)] sm:w-[8.5rem] sm:px-2 ${edge} ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"} ${focusStyle()}`}
+                    className={`aios-demo-spatial-node absolute z-20 flex min-h-[3.25rem] w-[7.3rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border px-1.5 py-1.5 text-center shadow-[0_5px_18px_rgba(71,104,151,0.1)] sm:w-[8.5rem] sm:px-2 ${edge} ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"} ${focusStyle()}`}
                   >
                     <span className={`flex items-center gap-1 text-[10px] font-bold uppercase leading-tight sm:text-[11px] ${tone}`}><Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />{label}</span>
                     <span className="mt-1 text-[9px] leading-tight text-slate-600">{health}</span>
@@ -415,6 +598,30 @@ export function DemoExecutiveCommandCenter() {
           <p className="mt-3 rounded-xl border border-blue-100/80 bg-white/75 px-3 py-2.5 text-xs leading-5 text-slate-700" aria-live="polite">
             <strong className="text-slate-900">Selected · {selectedDomain.label}.</strong> {selectedDomain.signal} · {selectedDomain.health}. This is a synthetic demo signal.
           </p>
+          {coreOverviewOpen ? (
+            <div className="mt-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm" aria-live="polite">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold text-slate-900">Company-wide intelligence · {selectedRole} lens</h3>
+                <button type="button" onClick={() => setCoreOverviewOpen(false)} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Close overview</button>
+              </div>
+              <div className="mt-2 grid gap-3 text-xs sm:grid-cols-2">
+                <p><strong>Current evidence:</strong> {formatDemoEuro(metricValues.revenue ?? 0, true)} sample YTD revenue · {formatDemoEuro(metricValues.pipeline ?? 0, true)} sample pipeline · {metricValues.risk ?? 0} accounts flagged.</p>
+                <p><strong>Priority:</strong> {selectedDepartmentSummary.issue} <strong>Suggested review:</strong> {selectedDepartmentSummary.recommendation}</p>
+              </div>
+              <p className="mt-2 text-[10px] leading-4 text-slate-500">Cross-team context is illustrative; the role lens only reorders synthetic priorities and does not enforce or grant access.</p>
+              <Link href="/demo-platform/insights" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Review sample insights <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
+            </div>
+          ) : null}
+          <div className="mt-3 grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white/90 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{selectedDomain.label} department intelligence · synthetic</p>
+              <p className="mt-1 text-xs font-semibold text-slate-900">{selectedDepartmentSummary.kpi}</p>
+              <p className="mt-1 text-xs text-amber-800"><strong>Issue:</strong> {selectedDepartmentSummary.issue}</p>
+              <p className="mt-1 text-xs text-slate-600"><strong>Next review:</strong> {selectedDepartmentSummary.recommendation}</p>
+              <p className="mt-1 text-[10px] text-slate-500"><strong>Connected sample context:</strong> {selectedDepartmentSummary.relatedDepartmentIds.map((id) => domains.find((domain) => domain.id === id)?.label).filter(Boolean).join(", ") || "Company-wide"}.</p>
+            </div>
+            <Link href={selectedDepartmentSummary.href} className={`inline-flex min-h-11 items-center justify-center gap-1 rounded-lg border border-blue-200 px-3 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Open {selectedDomain.label}<ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
+          </div>
         </section>
 
         <section aria-labelledby="pipeline-heading" className="order-2 min-w-0 rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)] xl:order-1 xl:col-start-1">
@@ -437,8 +644,13 @@ export function DemoExecutiveCommandCenter() {
                 <span className="w-full break-words text-[8px] font-medium leading-tight text-slate-600 sm:text-[9px]">{formatDemoEuro(pipelineAmounts[item.stage] ?? item.amount, true)}</span>
                 <span aria-hidden="true" className={`mt-1 block w-full max-w-10 rounded-t-md ${item.height} ${item.color}`} />
                 <span className="mt-1 break-words text-[9px] leading-tight text-slate-600">{item.stage}</span>
+                <span className="mt-0.5 text-[9px] tabular-nums text-slate-500">{item.count} deals</span>
               </button>
             ))}
+          </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-2 text-[10px] text-slate-600">
+            <span>Unweighted sample value · stage bars are aggregates; opportunity rows below are selected examples.</span>
+            <Link href="/demo-platform/sales-intelligence" className={`inline-flex min-h-10 items-center gap-1 font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>View full pipeline <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
           </div>
           <div className="mt-4 border-t border-slate-100 pt-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -457,6 +669,11 @@ export function DemoExecutiveCommandCenter() {
                 placeholder="Search examples"
                 className="min-w-0 flex-1 bg-transparent text-xs text-slate-800 outline-none placeholder:text-slate-400"
               />
+            </label>
+            <label className="mt-2 block text-[10px] font-medium text-slate-600">Filter by sample owner
+              <select value={opportunityOwnerFilter} onChange={(event) => setOpportunityOwnerFilter(event.target.value)} className="mt-1 min-h-10 w-full rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-800">
+                {["All owners", ...Array.from(new Set(opportunities.map((opportunity) => opportunity.owner)))].map((owner) => <option key={owner}>{owner}</option>)}
+              </select>
             </label>
             <div className="mt-2 divide-y divide-slate-100">
               {filteredOpportunities.length === 0 ? (
@@ -487,7 +704,13 @@ export function DemoExecutiveCommandCenter() {
                     </button>
                     {expanded ? (
                       <div id={`opportunity-detail-${opportunity.id}`} className="mt-2 space-y-2 rounded-lg bg-blue-50/70 p-3">
-                        <p className="text-xs leading-5 text-slate-700">Synthetic {opportunity.stage.toLowerCase()} evidence. No opportunity record is opened or changed.</p>
+                        <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-700">
+                          <span>Account: <strong>{opportunity.account}</strong></span>
+                          <span>Owner: <strong>{opportunity.owner}</strong></span>
+                          <span>Probability: <strong>{opportunity.probability}% modeled</strong></span>
+                          <span>Expected close: <strong>{opportunity.closeDate}</strong></span>
+                        </div>
+                        <p className="text-[10px] leading-4 text-slate-600">Intent and probability are synthetic prioritization estimates, not calibrated predictions.</p>
                         {editing ? (
                           <form
                             className="space-y-2"
@@ -496,6 +719,11 @@ export function DemoExecutiveCommandCenter() {
                               const nextAmount = Number(opportunityDraft);
                               if (Number.isFinite(nextAmount) && nextAmount >= 0) {
                                 setOpportunities((current) => current.map((item) => item.id === opportunity.id ? { ...item, amount: nextAmount } : item));
+                                const stageDelta = nextAmount - opportunity.amount;
+                                setPipelineAmounts((current) => ({ ...current, [opportunity.stage]: Math.max(0, (current[opportunity.stage] ?? 0) + stageDelta) }));
+                                const nextTotal = Math.max(0, Object.values(pipelineAmounts).reduce((sum, amount) => sum + amount, 0) + stageDelta);
+                                setMetricValues((current) => ({ ...current, pipeline: nextTotal }));
+                                recordDemoActivity(`${opportunity.name} sample value edited locally.`, "Sales", "Opportunity", "/demo-platform/sales-intelligence");
                                 setActionMessage(`${opportunity.name} sample value updated locally.`);
                                 setOpportunityDraft("");
                               }
@@ -511,9 +739,11 @@ export function DemoExecutiveCommandCenter() {
                         ) : (
                           <div className="flex flex-wrap gap-2">
                             <button type="button" onClick={() => setOpportunityDraft(String(opportunity.amount))} className={`min-h-10 rounded-md border border-blue-200 bg-white px-3 text-xs font-semibold text-blue-800 ${focusStyle()}`}>Edit sample value</button>
-                            <button type="button" onClick={() => { setReviewedOpportunity(reviewedOpportunity === opportunity.id ? null : opportunity.id); setActionMessage(reviewedOpportunity === opportunity.id ? "Sample review undone locally." : "Sample opportunity review simulated locally."); }} className={`min-h-10 rounded-md px-3 text-xs font-semibold text-blue-800 hover:bg-white ${focusStyle()}`}>
+                            <button type="button" onClick={() => { setReviewedOpportunity(reviewedOpportunity === opportunity.id ? null : opportunity.id); if (reviewedOpportunity !== opportunity.id) recordDemoActivity(`Opportunity review recorded for ${opportunity.name}.`, "Sales", "Review", "/demo-platform/sales-intelligence"); setActionMessage(reviewedOpportunity === opportunity.id ? "Sample review undone locally." : "Sample opportunity review simulated locally."); }} className={`min-h-10 rounded-md px-3 text-xs font-semibold text-blue-800 hover:bg-white ${focusStyle()}`}>
                               {reviewedOpportunity === opportunity.id ? "Undo simulated review" : "Simulate review"}
                             </button>
+                            <Link href="/demo-platform/sales-intelligence" className={`inline-flex min-h-10 items-center px-2 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open sales view</Link>
+                            <button type="button" onClick={() => { recordDemoActivity(`Demo follow-up assigned for ${opportunity.name}.`, "Sales", "Task", "/demo-platform/sales-intelligence"); setActionMessage(`A demo-only follow-up was recorded for ${opportunity.name}.`); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 ${focusStyle()}`}>Create demo follow-up</button>
                           </div>
                         )}
                         {reviewedOpportunity === opportunity.id ? <p className="text-xs font-medium text-emerald-800" role="status"><Check aria-hidden="true" className="mr-1 inline h-3.5 w-3.5" />Review simulated locally only.</p> : null}
@@ -531,14 +761,38 @@ export function DemoExecutiveCommandCenter() {
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h2 id="health-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Customer health map</h2>
-                <p className="mt-1 text-xs text-slate-500">642 sample accounts · illustrative</p>
+                <p className="mt-1 text-xs text-slate-500">642 active sample accounts · 30 illustrative map points</p>
               </div>
               <HeartPulse aria-hidden="true" className="h-4 w-4 text-emerald-700" />
             </div>
-            <svg role="img" aria-label="Illustrative sample customer health map with mostly healthy accounts, several accounts to watch, and two high-risk clusters" className="mt-2 h-28 w-full rounded-xl bg-[linear-gradient(135deg,#f8fbff,#edf5ff)]" viewBox="0 0 100 100">
+            <div className="mt-3 space-y-1.5 text-[10px]">
+              {[
+                { label: "Healthy", count: 528, color: "bg-emerald-500" },
+                { label: "At risk", count: 91, color: "bg-amber-500" },
+                { label: "High risk", count: 23, color: "bg-rose-500" },
+              ].map((segment) => (
+                <div key={segment.label} className="grid grid-cols-[4.5rem_1fr_5rem] items-center gap-2">
+                  <span>{segment.label}</span>
+                  <span className="h-2 overflow-hidden rounded-sm bg-slate-100">
+                    <span className={`block h-full ${segment.color}`} style={{ width: `${segment.count / 642 * 100}%` }} />
+                  </span>
+                  <span className="text-right tabular-nums text-slate-600">{segment.count} · {(segment.count / 642 * 100).toFixed(1)}%</span>
+                </div>
+              ))}
+            </div>
+            <svg role="group" aria-label="Select a representative point in the synthetic customer-health map" className="mt-3 h-28 w-full rounded-xl bg-[linear-gradient(135deg,#f8fbff,#edf5ff)]" viewBox="0 0 100 100">
               <path d="M5 82H95M8 20V84" stroke="#cbdcf0" strokeWidth="0.7" strokeDasharray="2 2" />
-              {healthPoints.filter(([, , status]) => healthFilter === null || status === healthFilter).map(([x, y, status], index) => (
-                <circle key={`${x}-${y}-${index}`} cx={x} cy={y} r={status === "risk" ? 2.2 : 1.6} fill={status === "healthy" ? "#10b981" : status === "watch" ? "#f59e0b" : "#ef4444"} opacity="0.82" />
+              {healthPoints.map((point, index) => ({ point, index })).filter(({ point: [, , status] }) => healthFilter === null || status === healthFilter).map(({ point: [x, y, status], index }) => (
+                <circle
+                  key={`${x}-${y}-${index}`}
+                  cx={x}
+                  cy={y}
+                  r={selectedHealthPoint === `${status}-${index}` ? 3.5 : status === "risk" ? 2.2 : 1.6}
+                  fill={status === "healthy" ? "#10b981" : status === "watch" ? "#f59e0b" : "#ef4444"}
+                  stroke={selectedHealthPoint === `${status}-${index}` ? "#0f172a" : "#ffffff"}
+                  strokeWidth={selectedHealthPoint === `${status}-${index}` ? "1.2" : "0.5"}
+                  opacity="0.9"
+                />
               ))}
             </svg>
             <div className="mt-2 flex flex-wrap gap-1" role="group" aria-label="Filter customer health map">
@@ -552,25 +806,42 @@ export function DemoExecutiveCommandCenter() {
                   key={filter.id ?? "all"}
                   type="button"
                   aria-pressed={healthFilter === filter.id}
-                  onClick={() => setHealthFilter(filter.id)}
+                  onClick={() => {
+                    setHealthFilter(filter.id);
+                    if (filter.id !== null && selectedHealthPoint?.split("-")[0] !== filter.id) {
+                      setSelectedHealthPoint(null);
+                    }
+                  }}
                   className={`inline-flex min-h-10 items-center gap-1 rounded-md px-2 text-[10px] text-slate-700 ${healthFilter === filter.id ? "bg-blue-50 ring-1 ring-blue-300" : "hover:bg-slate-50"} ${focusStyle()}`}
                 >
                   <i aria-hidden="true" className={`h-2 w-2 rounded-full ${filter.marker}`} />{filter.label}
                 </button>
               ))}
             </div>
+            {selectedHealthPoint ? (
+              <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50/70 p-2 text-[10px] leading-4 text-slate-700" aria-live="polite">
+              Selected {selectedHealthPoint.split("-")[0] === "watch" ? "at-risk" : selectedHealthPoint.split("-")[0]} point. Plotted points are illustrative samples; the category counts above come from a separate synthetic aggregate.
+              <Link href="/demo-platform/customer-intelligence" className={`ml-1 font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open customer directory</Link>
+              </div>
+            ) : null}
           </section>
 
           <section aria-labelledby="risk-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
             <div className="flex items-center justify-between gap-2">
               <div>
                 <h2 id="risk-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Churn risk alerts</h2>
-                <p className="mt-1 text-xs text-slate-500">Example accounts · review only</p>
+                <p className="mt-1 text-xs text-slate-500">3 example records · 23 aggregate high-risk accounts</p>
               </div>
               <ShieldAlert aria-hidden="true" className="h-4 w-4 text-amber-700" />
             </div>
+            <label className="mt-2 flex min-h-10 items-center gap-2 rounded-md border border-slate-200 bg-white px-2">
+              <Search aria-hidden="true" className="h-3.5 w-3.5 text-slate-500" />
+              <span className="sr-only">Search sample at-risk accounts</span>
+              <input type="search" value={customerSearch} onChange={(event) => setCustomerSearch(event.target.value)} placeholder="Search sample accounts" className="min-w-0 flex-1 bg-transparent text-xs outline-none" />
+            </label>
             <div className="mt-2 divide-y divide-slate-100">
-              {customerRisks.map((customer) => {
+              {filteredRiskAccounts.length === 0 ? <p className="py-3 text-xs text-slate-600">No sample accounts match this search.</p> : null}
+              {filteredRiskAccounts.map((customer) => {
                 const expanded = selectedCustomer === customer.id;
                 const score = customerScores[customer.id] ?? customer.score;
                 const tone = score >= 80 ? "text-rose-700" : "text-amber-700";
@@ -584,6 +855,7 @@ export function DemoExecutiveCommandCenter() {
                       onClick={() => {
                         setSelectedCustomer(expanded ? null : customer.id);
                         setCustomerDraft(String(score));
+                        setSelectedHealthPoint(score >= 80 ? "risk-28" : "watch-24");
                       }}
                       className={`flex min-h-11 w-full min-w-0 items-center justify-between gap-2 text-left ${focusStyle()}`}
                     >
@@ -595,7 +867,10 @@ export function DemoExecutiveCommandCenter() {
                     </button>
                     {expanded ? (
                       <div id={`customer-detail-${customer.id}`} className="mt-1 space-y-2 rounded-lg bg-amber-50/70 p-3">
-                        <p className="text-[10px] leading-4 text-slate-600">Synthetic review signal only; this is not a live account assessment.</p>
+                        <p className="text-[10px] leading-4 text-slate-700"><strong>Drivers:</strong> {customer.drivers}</p>
+                        <p className="text-[10px] leading-4 text-slate-600">Owner: {customer.owner} · Renewal: {customer.renewal}</p>
+                        <p className="text-[10px] leading-4 text-slate-600">Risk trend: sample watchlist review required. Risk score is a 0–100 prioritization index, not a calibrated churn probability. Synthetic example only.</p>
+                        <Link href="/demo-platform/customer-intelligence" className={`inline-flex min-h-10 items-center text-[10px] font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open sample customer view</Link>
                         <form
                           className="space-y-2"
                           onSubmit={(event) => {
@@ -603,6 +878,7 @@ export function DemoExecutiveCommandCenter() {
                             const nextScore = Number(customerDraft);
                             if (Number.isFinite(nextScore) && nextScore >= 0 && nextScore <= 100) {
                               setCustomerScores((current) => ({ ...current, [customer.id]: nextScore }));
+                              recordDemoActivity(`${customer.name} sample risk score changed to ${nextScore}.`, "Customer success", "Risk", "/demo-platform/customer-intelligence");
                               setActionMessage(`${customer.name} sample score updated locally.`);
                             }
                           }}
@@ -612,9 +888,10 @@ export function DemoExecutiveCommandCenter() {
                           <div className="flex flex-wrap gap-2">
                             <button type="submit" className={`min-h-10 rounded-md bg-amber-700 px-3 text-xs font-semibold text-white ${focusStyle()}`}>Save score</button>
                             <button type="button" onClick={() => setCustomerDraft(String(score))} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-slate-700 ${focusStyle()}`}>Cancel edit</button>
-                            <button type="button" onClick={() => { setReviewedCustomer(reviewedCustomer === customer.id ? null : customer.id); setActionMessage(reviewedCustomer === customer.id ? "Sample account review undone locally." : "Sample account review simulated locally."); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 ${focusStyle()}`}>
+                            <button type="button" onClick={() => { setReviewedCustomer(reviewedCustomer === customer.id ? null : customer.id); if (reviewedCustomer !== customer.id) recordDemoActivity(`Sample account review recorded for ${customer.name}.`, "Customer success", "Review", "/demo-platform/customer-intelligence"); setActionMessage(reviewedCustomer === customer.id ? "Sample account review undone locally." : "Sample account review simulated locally."); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 ${focusStyle()}`}>
                               {reviewedCustomer === customer.id ? "Undo review" : "Simulate review"}
                             </button>
+                            <button type="button" onClick={() => { recordDemoActivity(`Demo follow-up task created for ${customer.name}.`, "Customer success", "Task", "/demo-platform/customer-intelligence"); setActionMessage(`Demo follow-up task created for ${customer.name}; no external task system was contacted.`); }} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 ${focusStyle()}`}>Create demo follow-up</button>
                           </div>
                         </form>
                         {reviewedCustomer === customer.id ? <p role="status" className="text-xs font-medium text-emerald-800">Review simulated locally only.</p> : null}
@@ -624,17 +901,57 @@ export function DemoExecutiveCommandCenter() {
                 );
               })}
             </div>
+            <Link href="/demo-platform/customer-intelligence" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-[10px] font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>View all churn risks <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
+          </section>
+
+          <section aria-labelledby="agent-status-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 id="agent-status-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">AIOS demo status</h2>
+                <p className="mt-1 text-xs text-emerald-800">Sample services available · synthetic status only</p>
+              </div>
+              <Bot aria-hidden="true" className="h-4 w-4 text-blue-700" />
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+              <div className="border-r border-slate-200"><strong className="block text-lg tabular-nums text-slate-900">122</strong><span className="text-[10px] text-slate-600">sample agents</span></div>
+              <div className="border-r border-slate-200"><strong className="block text-lg tabular-nums text-emerald-700">118</strong><span className="text-[10px] text-slate-600">ready</span></div>
+              <div><strong className="block text-lg tabular-nums text-amber-700">4</strong><span className="text-[10px] text-slate-600">review state</span></div>
+            </div>
+            <p className="mt-2 text-[10px] text-slate-500">Department totals reconcile: 32 + 18 + 24 + 12 + 20 + 16 = 122. Not production infrastructure health.</p>
+            <Link href="/demo-platform/agents" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open agent status <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
           </section>
 
           <section aria-labelledby="activity-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
-            <div className="flex items-center gap-2">
-              <Activity aria-hidden="true" className="h-4 w-4 text-blue-700" />
-              <h2 id="activity-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Sample activity</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Activity aria-hidden="true" className="h-4 w-4 text-blue-700" />
+                <h2 id="activity-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Sample activity</h2>
+              </div>
+              <Link href="/demo-platform/activity" className={`inline-flex min-h-10 items-center gap-1 text-[10px] font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>View full activity <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
+            </div>
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+              <label className="text-[10px] font-medium text-slate-600">Department
+                <select value={activityDepartmentFilter} onChange={(event) => setActivityDepartmentFilter(event.target.value)} className="mt-1 min-h-10 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-800">
+                  {["All departments", ...Array.from(new Set(activityEntries.map((item) => item.department)))].map((department) => <option key={department}>{department}</option>)}
+                </select>
+              </label>
+              <label className="text-[10px] font-medium text-slate-600">Status
+                <select value={activityStatusFilter} onChange={(event) => setActivityStatusFilter(event.target.value)} className="mt-1 min-h-10 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-800">
+                  {["All statuses", "Proposed", "Reviewed", "Simulated"].map((status) => <option key={status}>{status}</option>)}
+                </select>
+              </label>
+              <label className="text-[10px] font-medium text-slate-600">Event type
+                <select value={activityTypeFilter} onChange={(event) => setActivityTypeFilter(event.target.value)} className="mt-1 min-h-10 w-full min-w-0 rounded-md border border-slate-300 bg-white px-2 text-xs text-slate-800">
+                  {["All types", ...Array.from(new Set(activityEntries.map((item) => item.type)))].map((type) => <option key={type}>{type}</option>)}
+                </select>
+              </label>
             </div>
             <ul className="mt-2 space-y-2">
-              {activity.map((item) => {
+              {filteredActivity.length === 0 ? <li className="py-3 text-xs text-slate-600">No sample events match these filters.</li> : null}
+              {filteredActivity.map((item) => {
                 const expanded = expandedActivity === item.id;
                 const reviewed = reviewedActivity.includes(item.id);
+                const occurredAt = new Date(Date.parse(DEMO_NOW) - item.minutesAgo * 60_000);
                 return (
                   <li key={item.id} className="border-l-2 border-blue-200 pl-3">
                     <button
@@ -648,10 +965,13 @@ export function DemoExecutiveCommandCenter() {
                     </button>
                     {expanded ? (
                       <div id={`activity-detail-${item.id}`} className="mb-2 space-y-2 rounded-lg bg-blue-50/70 p-3">
-                        <p className="text-xs leading-5 text-slate-600">Synthetic activity example. No message, workflow, or account was changed.</p>
+                        <p className="text-xs leading-5 text-slate-700">{item.department} · {item.agent} · {reviewed ? "Reviewed" : item.status}</p>
+                        <p className="text-[10px] text-slate-600">{new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(occurredAt)} UTC · synthetic event</p>
+                        <p className="text-[10px] text-slate-600">This event represents a sample or local demo interaction; no external operation is implied.</p>
+                        <Link href={item.href} className={`inline-flex min-h-10 items-center text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open related demo view</Link>
                         <button
                           type="button"
-                          onClick={() => { setReviewedActivity((current) => reviewed ? current.filter((id) => id !== item.id) : [...current, item.id]); setActionMessage(reviewed ? "Sample activity review undone locally." : "Sample activity marked reviewed locally."); }}
+                          onClick={() => { setReviewedActivity((current) => reviewed ? current.filter((id) => id !== item.id) : [...current, item.id]); if (!reviewed) recordDemoActivity(`Activity event reviewed: ${item.label}`, item.department, "Review", item.href); setActionMessage(reviewed ? "Sample activity review undone locally." : "Sample activity marked reviewed locally."); }}
                           className={`min-h-10 rounded-md border border-blue-200 bg-white px-3 text-xs font-semibold text-blue-800 ${focusStyle()}`}
                         >
                           {reviewed ? "Undo local review" : "Mark reviewed locally"}
@@ -677,12 +997,16 @@ export function DemoExecutiveCommandCenter() {
           <div className="grid min-w-0 divide-y divide-blue-100 md:grid-cols-2 md:divide-x md:divide-y-0 xl:grid-cols-4">
             {recommendations.map((recommendation) => {
               const expanded = previewRecommendation === recommendation.id;
+              const status = recommendationStatuses[recommendation.id] ?? "New";
               const simulated = simulatedRecommendations.includes(recommendation.id);
               const linkedCustomer = recommendation.customerId ? customerRisks.find((customer) => customer.id === recommendation.customerId) : undefined;
               const linkedOpportunity = recommendation.opportunityId ? opportunities.find((opportunity) => opportunity.id === recommendation.opportunityId) : undefined;
               return (
                 <article key={recommendation.id} className="min-w-0 py-3 md:px-3 first:md:pl-0 last:md:pr-0 xl:px-4">
-                  <h3 className="text-sm font-semibold text-slate-900">{recommendation.title}</h3>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-slate-900">{recommendation.title}</h3>
+                    <span className="rounded-sm border border-slate-200 bg-slate-50 px-2 py-1 text-[9px] font-semibold text-slate-700">{status}</span>
+                  </div>
                   <p className="mt-1 text-xs leading-5 text-slate-700">
                     <strong>Observation:</strong> {recommendation.observation}
                     {linkedCustomer ? ` Current synthetic score: ${customerScores[linkedCustomer.id] ?? linkedCustomer.score}.` : null}
@@ -692,14 +1016,30 @@ export function DemoExecutiveCommandCenter() {
                   {expanded ? (
                     <div className="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-xs leading-5 text-slate-700" aria-live="polite">
                       <p><strong>Expected outcome:</strong> {recommendation.outcome}</p>
-                      <p className="mt-1 font-semibold text-blue-900">{simulated ? "Simulation complete in this page only; no business action was performed." : "Local demo preview only. No business action was performed."}</p>
-                      <button
-                        type="button"
-                        onClick={() => { setSimulatedRecommendations((current) => simulated ? current.filter((id) => id !== recommendation.id) : [...current, recommendation.id]); setActionMessage(simulated ? "Recommendation simulation undone locally." : "Recommendation simulated locally; no business action was performed."); }}
-                        className={`mt-2 min-h-11 rounded-md bg-blue-700 px-3 text-xs font-semibold text-white hover:bg-blue-800 ${focusStyle()}`}
-                      >
-                        {simulated ? "Undo simulation" : "Simulate recommendation"}
-                      </button>
+                      {recommendation.id === "retention" ? <p className="mt-1">Review timing: renewal window and synthetic support signals. Suggested intervention: assign a human account review. Confidence: illustrative, not calibrated.</p> : null}
+                      {recommendation.id === "expansion" ? <p className="mt-1">Potential value: €1.3M estimate. Assumption: a sample cross-sell scenario, subject to customer confirmation and commercial review.</p> : null}
+                      {recommendation.id === "workflow" ? <p className="mt-1">Proposal: inspect three sample manual handoffs; 12 hours/week is an estimate. A local simulation changes demo status only and does not connect to systems.</p> : null}
+                      {recommendation.id === "capacity" ? <p className="mt-1">Proposal: review two sample agent assignments; 18% response-time improvement is a modeled estimate with workload constraints to validate.</p> : null}
+                      <p className="mt-1 font-semibold text-blue-900">{simulated ? "Demo simulation finished locally; no real business action was performed." : "Synthetic recommendation preview; no business action has been performed."}</p>
+                      {linkedCustomer ? <Link href="/demo-platform/customer-intelligence" className={`mt-1 inline-flex min-h-10 items-center font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open linked customer</Link> : null}
+                      {linkedOpportunity ? <Link href="/demo-platform/sales-intelligence" className={`mt-1 inline-flex min-h-10 items-center font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open linked opportunity</Link> : null}
+                      <label className="mt-2 block text-[10px] font-semibold text-slate-700" htmlFor={`recommendation-reason-${recommendation.id}`}>Reason (required to reject)</label>
+                      <input id={`recommendation-reason-${recommendation.id}`} value={recommendationRejectionReason} onChange={(event) => setRecommendationRejectionReason(event.target.value)} className="min-h-10 w-full rounded-md border border-blue-200 bg-white px-2 text-xs" placeholder="Add a review note or rejection reason" />
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <button type="button" onClick={() => { setRecommendationStatuses((current) => ({ ...current, [recommendation.id]: "Reviewed" })); recordDemoActivity(`Recommendation reviewed: ${recommendation.title}.`, "Executive", "Recommendation"); setActionMessage("Recommendation marked reviewed in local demo state."); }} className={`min-h-10 rounded-md border border-blue-200 bg-white px-2 text-[10px] font-semibold text-blue-800 ${focusStyle()}`}>Mark reviewed</button>
+                        <button type="button" onClick={() => { setRecommendationStatuses((current) => ({ ...current, [recommendation.id]: "Approved" })); recordDemoActivity(`Recommendation approved in demo: ${recommendation.title}.`, "Executive", "Recommendation"); setActionMessage("Demo recommendation approval recorded locally; no external action was triggered."); }} className={`min-h-10 rounded-md border border-emerald-200 bg-white px-2 text-[10px] font-semibold text-emerald-800 ${focusStyle()}`}>Approve demo</button>
+                        <button type="button" onClick={() => {
+                          if (!recommendationRejectionReason.trim()) {
+                            setActionMessage("Add a reason before rejecting this sample recommendation.");
+                            return;
+                          }
+                          setRecommendationStatuses((current) => ({ ...current, [recommendation.id]: "Rejected" }));
+                          recordDemoActivity(`Recommendation rejected: ${recommendation.title}. Reason: ${recommendationRejectionReason.trim()}`, "Executive", "Recommendation");
+                          setActionMessage("Recommendation rejection recorded in local demo state.");
+                        }} className={`min-h-10 rounded-md border border-rose-200 bg-white px-2 text-[10px] font-semibold text-rose-800 ${focusStyle()}`}>Reject with reason</button>
+                        {status === "Approved" ? <button type="button" onClick={() => { setRecommendationStatuses((current) => ({ ...current, [recommendation.id]: "In Progress" })); setSimulatedRecommendations((current) => current.includes(recommendation.id) ? current : [...current, recommendation.id]); recordDemoActivity(`Demo simulation started: ${recommendation.title}.`, "Executive", "Simulation"); setActionMessage("A local demo simulation is in progress; no external system was changed."); }} className={`min-h-10 rounded-md bg-blue-700 px-2 text-[10px] font-semibold text-white ${focusStyle()}`}>Start demo simulation</button> : null}
+                        {status === "In Progress" ? <button type="button" onClick={() => { setRecommendationStatuses((current) => ({ ...current, [recommendation.id]: "Completed" })); recordDemoActivity(`Local demo simulation completed: ${recommendation.title}.`, "Executive", "Simulation"); setActionMessage("Local demo simulation completed. No external operation occurred."); }} className={`min-h-10 rounded-md bg-blue-700 px-2 text-[10px] font-semibold text-white ${focusStyle()}`}>Complete demo simulation</button> : null}
+                      </div>
                     </div>
                   ) : null}
                   <button

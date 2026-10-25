@@ -6,10 +6,10 @@
   --aios-platform-color-brand-soft: #4DA1FB;
   --aios-platform-color-brand-subtle: #EAF4FF;
 
-  --aios-public-color-primary: #1976FF;
-  --aios-public-color-primary-hover: #0F68EE;
-  --aios-public-color-primary-active: #0A58D1;
-  --aios-public-color-navy: #07133D;
+  --aios-public-color-primary: #1C82F2;
+  --aios-public-color-primary-hover: #176EEA;
+  --aios-public-color-primary-active: #125CC7;
+  --aios-public-color-navy: #02154A;
   --aios-public-color-text: #1E2E5A;
   --aios-public-color-text-muted: #5F6F97;
   --aios-public-color-text-soft: #7E8FB7;
@@ -32,6 +32,7 @@
   --aios-platform-font-sans: "Satoshi", "Plus Jakarta Sans", "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
   --aios-platform-font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
   --aios-public-font-sans: Inter, "Segoe UI", "SF Pro Text", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --aios-public-font-display: "Space Grotesk", Inter, "Segoe UI", "Helvetica Neue", Arial, system-ui, sans-serif;
 
   --aios-radius-sm: 8px;
   --aios-radius-md: 12px;
@@ -139,6 +140,7 @@
   --z-modal: var(--aios-z-modal);
 
   --public-font-sans: var(--aios-public-font-sans);
+  --public-font-display: var(--aios-public-font-display);
 
   --public-color-primary: var(--aios-public-color-primary);
   --public-color-primary-hover: var(--aios-public-color-primary-hover);

@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
 import { PublicButtonLink, PublicCard, PublicContainer, PublicPageShell, PublicSection, PublicSectionHeader } from "@/components/aios"
 import { PublicStructuredData } from "@/components/public-site/storytelling-sections"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = {
-  title: "Security | AIOS",
-  description: "Review the AIOS enterprise security posture, RBAC, governance, auditability, and trust controls.",
-  alternates: { canonical: "https://aios.layer/security" },
-}
+export const metadata: Metadata = publicPageMetadata(
+  "Security",
+  "Learn about the security and governance concepts that guide AIOS, including access control, approvals, and auditability.",
+  "/security",
+)
 
 export default function SecurityPage() {
   return (
@@ -45,7 +46,7 @@ export default function SecurityPage() {
         <PublicContainer>
           <div className="flex flex-wrap gap-4">
             <PublicButtonLink href="/architecture" size="lg">Review Architecture</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary" size="lg">Book Demo</PublicButtonLink>
+            <PublicButtonLink href="/contact" variant="secondary" size="lg">Contact</PublicButtonLink>
           </div>
         </PublicContainer>
       </PublicSection>

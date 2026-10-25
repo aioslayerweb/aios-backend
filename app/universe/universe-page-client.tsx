@@ -40,17 +40,17 @@ import {
 } from "@/components/public-site/storytelling-sections"
 
 const districts = [
-  { title: "Executive Center", href: "/app/executive", icon: Building2, x: "18%", y: "14%" },
-  { title: "Command Center", href: "/app/commands", icon: Radar, x: "76%", y: "12%" },
-  { title: "Memory Center", href: "/app/memory", icon: Database, x: "9%", y: "46%" },
-  { title: "Knowledge Center", href: "/app/knowledge", icon: Network, x: "81%", y: "45%" },
-  { title: "Workflow Builder", href: "/app/workflows", icon: Workflow, x: "17%", y: "76%" },
-  { title: "Agent Studio", href: "/app/agents", icon: Bot, x: "73%", y: "76%" },
-  { title: "Organization Center", href: "/app/corporate", icon: Briefcase, x: "34%", y: "90%" },
-  { title: "Developer Center", href: "/app/developer-center", icon: Wrench, x: "54%", y: "8%" },
-  { title: "Runtime Center", href: "/app/runtime-center", icon: Layers, x: "48%", y: "94%" },
-  { title: "Security Center", href: "/app/security", icon: ShieldCheck, x: "62%", y: "90%" },
-  { title: "Integrations", href: "/app/integrations", icon: Cable, x: "4%", y: "66%" },
+  { title: "Executive Center", href: "/demo-platform/executive", icon: <Building2 size={15} />, x: "18%", y: "14%" },
+  { title: "Command Center", href: "/demo-platform/commands", icon: <Radar size={15} />, x: "76%", y: "12%" },
+  { title: "Memory Center", href: "/demo-platform/memory", icon: <Database size={15} />, x: "9%", y: "46%" },
+  { title: "Knowledge Center", href: "/demo-platform/knowledge", icon: <Network size={15} />, x: "81%", y: "45%" },
+  { title: "Workflow Builder", href: "/demo-platform/workflows", icon: <Workflow size={15} />, x: "17%", y: "76%" },
+  { title: "Agent Studio", href: "/demo-platform/agents", icon: <Bot size={15} />, x: "73%", y: "76%" },
+  { title: "Organization Center", href: "/demo-platform/corporate", icon: <Briefcase size={15} />, x: "34%", y: "90%" },
+  { title: "Developer Center", href: "/demo-platform/developer-center", icon: <Wrench size={15} />, x: "54%", y: "8%" },
+  { title: "Runtime Center", href: "/demo-platform/runtime-center", icon: <Layers size={15} />, x: "48%", y: "94%" },
+  { title: "Security Center", href: "/demo-platform/security", icon: <ShieldCheck size={15} />, x: "62%", y: "90%" },
+  { title: "Integrations", href: "/demo-platform/integrations", icon: <Cable size={15} />, x: "4%", y: "66%" },
 ]
 
 const signalFlow = [
@@ -70,40 +70,40 @@ const rolePanels = [
     label: "CEO",
     title: "Strategic command narrative",
     body: "Executives see one evolving view of priorities, decisions, and systemic business motion.",
-    bullets: ["2 high-impact decisions", "4 expansion windows", "1 systemic risk", "Confidence 94%"],
-    icon: Sparkles,
+    bullets: ["Leadership priorities", "Decision context", "Cross-functional dependencies", "Suggested review"],
+    icon: <Sparkles size={18} />,
   },
   {
     key: "sales",
     label: "Sales",
     title: "Pipeline and revenue orchestration",
     body: "Revenue teams inherit the same operating language with deal risk, forecast drift, and expansion timing in one place.",
-    bullets: ["Forecast variance -7%", "3 deal interventions", "2 churn flags", "Confidence 89%"],
-    icon: Radar,
+    bullets: ["Pipeline context", "Account history", "Forecast assumptions", "Suggested review"],
+    icon: <Radar size={18} />,
   },
   {
     key: "finance",
     label: "Finance",
     title: "Capital and risk intelligence",
     body: "Finance decisions stay contextual, explainable, and linked to business memory rather than isolated snapshots.",
-    bullets: ["Margin drift isolated", "Cash runway stable", "Budget anomaly isolated", "Confidence 93%"],
-    icon: Briefcase,
+    bullets: ["Financial assumptions", "Resource decisions", "Variance context", "Suggested review"],
+    icon: <Briefcase size={18} />,
   },
   {
     key: "operations",
     label: "Operations",
     title: "Execution throughput control",
     body: "Operational bottlenecks, policy exceptions, and recovery actions are surfaced with ownership and confidence.",
-    bullets: ["Throughput +6%", "1 policy exception", "3 bottlenecks queued", "Confidence 88%"],
-    icon: Workflow,
+    bullets: ["Process dependencies", "Operational handoffs", "Policy considerations", "Suggested review"],
+    icon: <Workflow size={18} />,
   },
   {
     key: "customer-success",
     label: "Customer Success",
     title: "Customer continuity intelligence",
     body: "Renewal risk, service health, and expansion potential remain connected to shared organizational context.",
-    bullets: ["Renewal risk heatmap", "Escalation backlog down", "Knowledge hit-rate +14%", "Confidence 90%"],
-    icon: ShieldCheck,
+    bullets: ["Customer history", "Service context", "Account ownership", "Suggested review"],
+    icon: <ShieldCheck size={18} />,
   },
 ]
 
@@ -115,7 +115,7 @@ const operators = [
   { title: "HR Operator", body: "Hiring readiness, attrition signals, and capability mapping." },
 ]
 
-const integrations = ["CRM", "ERP", "Email", "Slack", "Teams", "HubSpot", "Salesforce", "Stripe", "Knowledge Base", "Databases", "MCP", "Workflow Engine"]
+const integrations = ["CRM", "ERP", "Finance", "Support", "Email", "Collaboration", "Knowledge", "Databases", "APIs", "MCP", "Workflows", "Other systems"]
 
 const timelineItems = signalFlow.map((title, index) => ({
   label: `Layer ${index + 1}`,
@@ -155,12 +155,6 @@ const universeBenefits = [
   { title: "Enterprise confidence", body: "Architecture remains explainable across technical and executive stakeholders." },
 ]
 
-const universeOutcomes = [
-  { label: "System visibility", value: "+63%", detail: "Improvement in architecture comprehension for pilot teams." },
-  { label: "Cross-team alignment", value: "+28%", detail: "Shared understanding of dependencies and decision pathways." },
-  { label: "Execution confidence", value: "91%", detail: "Teams can trace what happened, why, and what should happen next." },
-]
-
 export default function UniversePageClient() {
   return (
     <PublicPageShell activeHref="/universe">
@@ -179,30 +173,25 @@ export default function UniversePageClient() {
               Explore Platform
             </PublicButtonLink>
             <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Book Demo
+              Contact
             </PublicButtonLink>
           </>
         }
-        stats={[
-          { label: "Connected modules", value: "11", detail: "One system with shared memory and runtime" },
-          { label: "Business layers", value: "8", detail: "Signals through outcomes in one architecture" },
-          { label: "Enterprise integrations", value: "12+", detail: "Cross-system context without fragmentation" },
-        ]}
         visual={<PublicOrbitVisual label="AIOS Core" title="Operating Universe" nodes={districts} />}
       />
 
       <PublicProblemSolutionSection
         problemTitle="Most enterprise ecosystems are not truly connected"
-        problemBody="Architecture views are static, operators are fragmented, and module relationships are hard to understand in real time."
+        problemBody="Architecture views can be static, operators can be fragmented, and module relationships can be difficult to understand."
         problemItems={universeProblemCards}
         solutionTitle="Universe turns AIOS into a navigable intelligence map"
-        solutionBody="The ecosystem is visual, interactive, and continuously tied to how AIOS reasons, decides, and executes."
+        solutionBody="This interactive map illustrates how AIOS concepts can connect intelligence, memory, modules, and governed workflows."
         solutionItems={universeSolutionCards}
       />
 
       <PublicHowItWorksSection
         title="How intelligence moves across the AIOS universe"
-        body="Each ecosystem layer is connected to memory, role-based context, and workflow execution."
+        body="The illustrative model connects information, business memory, role context, and governed workflow concepts."
         steps={universeHowItWorks}
       />
 
@@ -211,7 +200,7 @@ export default function UniversePageClient() {
           <PublicSectionHeader
             eyebrow="Signal Flow"
             title="Everything in AIOS moves through one intelligence chain"
-            body="The Universe page now shares the same visual grammar as every public page while making the platform map easier to understand, compare, and extend."
+            body="The diagram explains the intended product model. It does not represent a live system connection or activity feed."
           />
           <div className="mt-14">
             <PublicTimeline items={timelineItems} />
@@ -224,7 +213,7 @@ export default function UniversePageClient() {
           <PublicSectionHeader
             eyebrow="Role Intelligence"
             title="Role-specific context without breaking system consistency"
-            body="Each function sees the same operating system through the decision lens that matters to them."
+            body="These synthetic examples show how decision context can vary by role without changing access permissions."
           />
           <div className="mt-14">
             <PublicTabbedPanel items={rolePanels} />
@@ -236,8 +225,8 @@ export default function UniversePageClient() {
         <PublicContainer>
           <PublicSectionHeader
             eyebrow="Operators And Integrations"
-            title="Operators collaborate with shared memory and external systems"
-            body="AIOS connects human teams, autonomous operators, and enterprise systems through one reusable visual and interaction system."
+            title="Business functions and system categories"
+            body="These illustrative examples describe possible areas of focus. They are not a list of connected services or active operators."
           />
           <div className="mt-14 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <PublicFeatureGrid items={operators.map((item) => ({ title: item.title, body: item.body }))} columns={3} />
@@ -253,10 +242,9 @@ export default function UniversePageClient() {
       </PublicSection>
 
       <PublicBenefitsOutcomesSection
-        title="A connected map leads to better enterprise decisions"
-        body="Universe helps leaders and builders align quickly on what the system is doing and where value is created."
+        title="A connected map makes the operating model easier to explore"
+        body="Universe is a conceptual guide to AIOS components and their relationships, not evidence of a production deployment."
         benefits={universeBenefits}
-        outcomes={universeOutcomes}
       />
 
       <PublicEnterpriseTrustMatrixSection />
@@ -267,10 +255,7 @@ export default function UniversePageClient() {
 
       <PublicTrustAndProofSection
         title="Designed for technical depth and executive clarity"
-        body="Universe supports enterprise storytelling, architecture reviews, and pilot onboarding from one consistent model."
-        quote="Universe helped us align architecture and operations in one session. Everyone saw the same system reality."
-        person="Enterprise Architect, Pilot Program"
-        role="Global Financial Services"
+        body="The universe overview connects the product concepts described across AIOS public pages. No customer endorsements or measured outcomes are represented here."
       />
 
       <PublicConversionRailSection />

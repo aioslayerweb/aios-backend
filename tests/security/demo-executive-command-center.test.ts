@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises"
 import { join } from "node:path"
 import { test } from "node:test"
 import { formatDemoEuro } from "@/lib/demo/currency"
+import { answerDemoQuestion, demoDepartmentSummaries } from "@/lib/demo/executive-command-center-model"
 
 const projectRoot = process.cwd()
 const componentPath = join(projectRoot, "components/demo/executive-command-center-demo.tsx")
@@ -27,9 +28,10 @@ test("synthetic command center has deterministic local fixtures and no live data
 
   assert.doesNotMatch(component, /Math\.random/)
   assert.doesNotMatch(component, /(?:supabase|runtime-live-context|executive-workspace-context|useBusinessMetrics)/i)
+  assert.doesNotMatch(component, /\bfetch\s*\(/)
   assert.match(component, /Sample network/)
-  assert.match(component, /Local demo preview only/)
-  assert.match(component, /No prompt is sent and no business data is accessed/)
+  assert.match(component, /deterministic demo assistant/)
+  assert.match(component, /No prompt or business data is sent/)
   assert.match(component, /flex-col items-start gap-2 sm:flex-row/)
 })
 
@@ -62,4 +64,31 @@ test("executive demo financial surfaces use the EUR formatter and synthetic labe
   assert.doesNotMatch(component, /Global Marine|Skyline Aviation|Northwind Logistics|BetaTech Industries/)
   assert.match(component, /Sample Opportunity A/)
   assert.match(component, /Sample Account A/)
+})
+
+test("demo assistant answers from current synthetic values and links to a demo route", () => {
+  const context = {
+    revenueEur: 24_800_000,
+    pipelineEur: 37_600_000,
+    activeCustomers: 642,
+    atRiskCustomers: 23,
+    selectedDepartment: "Sales",
+    selectedDepartmentFocus: "Pipeline acceleration",
+  }
+
+  const pipelineAnswer = answerDemoQuestion("What is the pipeline bottleneck?", context)
+  assert.match(pipelineAnswer.summary, /37,6\sMio\.\s€/)
+  assert.equal(pipelineAnswer.href, "/demo-platform/sales-intelligence")
+  assert.match(pipelineAnswer.evidence, /estimates/)
+
+  const riskAnswer = answerDemoQuestion("Why are accounts at risk?", context)
+  assert.match(riskAnswer.summary, /23 accounts/)
+  assert.match(riskAnswer.summary, /not calibrated churn probabilities/)
+  assert.equal(riskAnswer.href, "/demo-platform/customer-intelligence")
+})
+
+test("department intelligence is synthetic and routes within the public demo", () => {
+  assert.equal(demoDepartmentSummaries.length, 6)
+  assert.ok(demoDepartmentSummaries.every((department) => department.href.startsWith("/demo-platform/")))
+  assert.ok(demoDepartmentSummaries.every((department) => /sample|synthetic/i.test(`${department.kpi} ${department.issue} ${department.recommendation}`)))
 })

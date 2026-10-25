@@ -1,28 +1,12 @@
-import type { Metadata } from "next";
-import UniversePageClient from "./universe-page-client";
+import type { Metadata } from "next"
+import UniversePageClient from "./universe-page-client"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = {
-  title: "AIOS Universe | The AI Operating System for Businesses",
-  description:
-    "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
-  alternates: {
-    canonical: "https://aiospilot.com/universe",
-  },
-  openGraph: {
-    title: "AIOS Universe | The AI Operating System for Businesses",
-    description:
-      "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
-    type: "website",
-    images: [{ url: "/opengraph-image.png", width: 1200, height: 1200, alt: "AIOS Universe" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AIOS Universe | The AI Operating System for Businesses",
-    description:
-      "Explore the AIOS Universe — the Company Intelligence Layer that connects Business Memory, Role-Based Intelligence, AI Operators and autonomous workflows into one operating system.",
-    images: ["/opengraph-image.png"],
-  },
-};
+export const metadata: Metadata = publicPageMetadata(
+  "AIOS Universe",
+  "Explore an illustrative map of AIOS modules, business memory, role context, decision support, and governed workflows.",
+  "/universe",
+)
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -41,7 +25,7 @@ const structuredData = {
     name: "AIOS",
     url: "https://aiospilot.com",
   },
-};
+}
 
 export default function UniversePage() {
   return (
@@ -49,5 +33,5 @@ export default function UniversePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <UniversePageClient />
     </>
-  );
+  )
 }

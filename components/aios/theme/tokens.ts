@@ -101,14 +101,11 @@ export const aiosTheme = {
 
 export const aiosNavigationItems = [
   { label: "Home", href: "/" },
-  { label: "Universe", href: "/universe" },
   { label: "Platform", href: "/platform" },
   { label: "Architecture", href: "/architecture" },
-  { label: "Modules", href: "/modules" },
   { label: "Products", href: "/products" },
   { label: "Resources", href: "/resources" },
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
 ] as const
 
 export const aiosFooterGroups = [
@@ -119,14 +116,15 @@ export const aiosFooterGroups = [
       { label: "Platform", href: "/platform" },
       { label: "Architecture", href: "/architecture" },
       { label: "Modules", href: "/modules" },
+      { label: "Products", href: "/products" },
     ],
   },
   {
     title: "Resources",
     links: [
-      { label: "Products", href: "/products" },
       { label: "Resources", href: "/resources" },
       { label: "About", href: "/about" },
+      { label: "Pilot Program", href: "/pilot" },
       { label: "Legal", href: "/legal" },
     ],
   },
@@ -142,7 +140,7 @@ export const aiosFooterGroups = [
   {
     title: "Connect",
     links: [
-      { label: "Book Demo", href: "/contact" },
+      { label: "Contact", href: "/contact" },
       { label: "Launch AIOS", href: "/app" },
     ],
   },

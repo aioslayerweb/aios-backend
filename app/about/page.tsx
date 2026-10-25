@@ -1,5 +1,3 @@
-"use client"
-
 import {
   BrainCircuit,
   Briefcase,
@@ -29,27 +27,35 @@ import {
   PublicStructuredData,
   PublicTrustAndProofSection,
 } from "@/components/public-site/storytelling-sections"
+import type { Metadata } from "next"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "About AIOS",
+  "Learn why AIOS is designed to connect business signals, memory, decisions, and governed workflows in one intelligence layer.",
+  "/about",
+)
 
 const storyCards = [
   {
     title: "Mission",
     body: "Reduce executive cognitive load by transforming fragmented operations into one continuously intelligent system.",
-    icon: Target,
+    icon: <Target size={18} />,
   },
   {
     title: "The Problem",
     body: "Businesses run on disconnected tools, delayed reporting cycles, and automation without strategic understanding.",
-    icon: Landmark,
+    icon: <Landmark size={18} />,
   },
   {
     title: "Why AIOS Exists",
     body: "To create a new software category where intelligence, memory, and execution operate as one business operating surface.",
-    icon: Flag,
+    icon: <Flag size={18} />,
   },
   {
     title: "Our Vision",
     body: "A world where companies run with autonomous coordination, explainable decision systems, and continuous business learning.",
-    icon: Sparkles,
+    icon: <Sparkles size={18} />,
   },
 ]
 
@@ -57,17 +63,17 @@ const pillars = [
   {
     title: "AI-Native Company",
     body: "AIOS is designed from first principles as an AI-native operating model, not an AI layer on top of legacy software.",
-    icon: BrainCircuit,
+    icon: <BrainCircuit size={18} />,
   },
   {
     title: "Business Memory",
     body: "Every signal, decision, and outcome contributes to persistent memory that improves future reasoning quality.",
-    icon: Database,
+    icon: <Database size={18} />,
   },
   {
     title: "Role-Based Intelligence",
     body: "Intelligence adapts by role so CEOs, Finance, Operations, and Revenue teams each see decision-relevant context.",
-    icon: Briefcase,
+    icon: <Briefcase size={18} />,
   },
 ]
 

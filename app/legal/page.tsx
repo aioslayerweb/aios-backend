@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import {
   PublicContainer,
   PublicFooterCta,
@@ -5,6 +6,13 @@ import {
   PublicSection,
   PublicSectionHeader,
 } from "@/components/aios"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
+
+export const metadata: Metadata = publicPageMetadata(
+  "Legal & Trust",
+  "Find AIOS legal, privacy, and security information and contact the team with enterprise review questions.",
+  "/legal",
+)
 
 const legalCards = [
   {

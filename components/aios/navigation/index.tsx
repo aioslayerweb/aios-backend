@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { BrandLogo } from "@/components/branding"
 import { AIOSPrimaryButton, AIOSSecondaryButton } from "@/components/aios/buttons"
-import { aiosMotion, aiosMotionViewport } from "@/components/aios/animations"
+import { aiosMotion } from "@/components/aios/animations"
 import { AIOSContainer } from "@/components/aios/layout"
 import { cx } from "@/components/aios/layout/utils"
 import { aiosNavigationItems, aiosTheme } from "@/components/aios/theme/tokens"
@@ -25,7 +25,7 @@ function isActive(currentHref: string, itemHref: string) {
 export function AIOSNavbar({
   activeHref,
   ctaHref = "/contact",
-  ctaLabel = "Book Demo",
+  ctaLabel = "Contact",
   desktopNavigationItems = aiosNavigationItems,
   mobileNavigationItems,
 }: {
@@ -110,13 +110,11 @@ export function AIOSNavbar({
   return (
     <>
       <motion.header
-        className="sticky top-0 z-header border-b border-[rgba(220,229,246,0.8)] bg-[rgba(255,255,255,0.74)] backdrop-blur-xl"
-        variants={aiosMotion.navigationReveal}
-        initial={reduceMotion ? "show" : "hidden"}
+        className="public-nav sticky top-0 z-header border-b border-[rgba(220,229,246,0.8)] bg-[rgba(255,255,255,0.9)] backdrop-blur-xl"
+        initial={false}
         animate="show"
-        viewport={aiosMotionViewport}
       >
-        <AIOSContainer size="wide" className="flex h-20 items-center justify-between gap-4">
+        <AIOSContainer size="wide" className="flex h-[4.5rem] items-center justify-between gap-4 sm:h-[5rem]">
           <button
             ref={menuButtonRef}
             type="button"
@@ -130,14 +128,14 @@ export function AIOSNavbar({
           </button>
 
           <Link href="/" className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0" aria-label="AIOS home">
-            <BrandLogo width={132} height={31} priority />
+            <BrandLogo width={116} height={58} />
           </Link>
 
-          <nav className="hidden items-center gap-6 lg:flex" aria-label="Global navigation">
+          <nav className="hidden items-center gap-5 xl:gap-7 lg:flex" aria-label="Global navigation">
             {desktopNavigationItems.map((item) => {
               const active = isActive(activeHref ?? "", item.href)
               return (
-                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cx("public-link relative py-2 text-sm font-medium transition-colors duration-200", active ? "text-[color:var(--public-color-primary)]" : "text-[color:var(--public-color-text)] hover:text-[color:var(--public-color-primary)]")}>
+                <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cx("public-link relative py-2 text-[13px] font-medium transition-colors duration-200 xl:text-sm", active ? "text-[color:var(--public-color-primary)]" : "text-[color:var(--public-color-text)] hover:text-[color:var(--public-color-primary)]")}>
                   {item.label}
                   <span className={cx("absolute inset-x-0 -bottom-[13px] h-[2px] rounded-full bg-[color:var(--public-color-primary)] transition-opacity duration-200", active ? "opacity-100" : "opacity-0")} />
                 </Link>
@@ -145,9 +143,10 @@ export function AIOSNavbar({
             })}
           </nav>
 
-          <AIOSSecondaryButton href={ctaHref} size="sm" className="hidden sm:inline-flex">
-            {ctaLabel}
-          </AIOSSecondaryButton>
+          <div className="flex items-center gap-3">
+            <Link href="/demo-platform/executive" className="hidden text-sm font-medium text-[color:var(--public-color-text)] transition-colors hover:text-[color:var(--public-color-primary)] sm:inline-flex">View demo</Link>
+            <AIOSSecondaryButton href={ctaHref} size="sm" className="hidden sm:inline-flex">{ctaLabel}</AIOSSecondaryButton>
+          </div>
         </AIOSContainer>
       </motion.header>
 
@@ -168,7 +167,7 @@ export function AIOSNavbar({
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-center justify-between">
-                <BrandLogo width={128} height={30} priority />
+                <BrandLogo width={104} height={52} />
                 <button type="button" onClick={() => setMenuOpen(false)} className="public-button public-button-outline h-11 w-11 px-0" aria-label="Close navigation menu">
                   <X size={18} />
                 </button>
@@ -188,9 +187,14 @@ export function AIOSNavbar({
               </div>
 
               <div className="mt-auto pt-8">
+                <Link href="/demo-platform/executive" onClick={() => setMenuOpen(false)} className="public-button public-button-secondary w-full justify-center">
+                  Explore the demo
+                </Link>
+                <div className="mt-3">
                 <AIOSPrimaryButton href={ctaHref} className="w-full justify-center" size="lg">
                   {ctaLabel}
                 </AIOSPrimaryButton>
+                </div>
               </div>
             </motion.div>
           </motion.div>

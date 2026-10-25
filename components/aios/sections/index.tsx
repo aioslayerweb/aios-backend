@@ -1,6 +1,5 @@
 "use client"
 
-import type { LucideIcon } from "lucide-react"
 import type { ReactNode } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { aiosMotion, aiosMotionViewport } from "@/components/aios/animations"
@@ -26,7 +25,7 @@ export function AIOSSectionHeader({ eyebrow, title, body, align = "left", classN
   )
 }
 
-export type AIOSFeatureItem = { title: string; body: string; icon?: LucideIcon; detail?: string; badge?: string }
+export type AIOSFeatureItem = { title: string; body: string; icon?: ReactNode; detail?: string; badge?: string }
 
 export function AIOSFeatureGrid({ items, columns = 3 }: { items: AIOSFeatureItem[]; columns?: 2 | 3 | 4 }) {
   const reduceMotion = useReducedMotion()
@@ -35,12 +34,11 @@ export function AIOSFeatureGrid({ items, columns = 3 }: { items: AIOSFeatureItem
     <motion.div variants={aiosMotion.staggerChildren} initial={reduceMotion ? "show" : "hidden"} whileInView="show" viewport={aiosMotionViewport}>
       <AIOSGrid columns={columns}>
         {items.map((item) => {
-          const Icon = item.icon
           return (
             <motion.div key={item.title} variants={aiosMotion.fadeUp} className="public-motion-reveal">
               <AIOSCard variant="feature" hover className="h-full">
                 {item.badge ? <p className="public-eyebrow">{item.badge}</p> : null}
-                {Icon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]"><Icon size={18} /></span> : null}
+                {item.icon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">{item.icon}</span> : null}
                 <h3 className="public-h4">{item.title}</h3>
                 <p className="public-body mt-3">{item.body}</p>
                 {item.detail ? <p className="public-small mt-4">{item.detail}</p> : null}

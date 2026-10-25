@@ -33,7 +33,7 @@ export default function AppError({ error, reset }: AppErrorProps) {
                 <button type="button" onClick={reset} className="public-button public-button-primary px-6 py-3 text-base">
                   Try Again
                 </button>
-                <PublicButtonLink href="/contact" variant="secondary" size="lg">Book Demo</PublicButtonLink>
+                <PublicButtonLink href="/contact" variant="secondary" size="lg">Contact</PublicButtonLink>
               </div>
             </PublicCard>
           </div>

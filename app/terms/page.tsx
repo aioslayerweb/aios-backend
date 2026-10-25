@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
 import { PublicButtonLink, PublicCard, PublicContainer, PublicPageShell, PublicSection, PublicSectionHeader } from "@/components/aios"
 import { PublicStructuredData } from "@/components/public-site/storytelling-sections"
+import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = {
-  title: "Terms of Service | AIOS",
-  description: "Review the AIOS terms of service for enterprise use, pilot programs, and platform access.",
-  alternates: { canonical: "https://aios.layer/terms" },
-}
+export const metadata: Metadata = publicPageMetadata(
+  "Terms of Service",
+  "Review the terms that govern AIOS platform access, evaluation, and enterprise use.",
+  "/terms",
+)
 
 export default function TermsPage() {
   return (

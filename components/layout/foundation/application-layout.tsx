@@ -153,12 +153,21 @@ const workspaceLabels: Record<string, string> = {
   "/app/developer-center": "Developer Center",
 }
 
-function resolveWorkspaceLabel(pathname: string): string {
-  if (workspaceLabels[pathname]) {
-    return workspaceLabels[pathname]
-  }
+const demoNavigationGroups = [
+  { label: "Overview", keys: ["home", "executive"] },
+  { label: "Business intelligence", keys: ["corporate", "blueprint", "qbi", "sales-intelligence", "finance-intelligence", "operations", "hr", "customer-intelligence"] },
+  { label: "Memory & execution", keys: ["knowledge", "memory", "agents", "workflows", "orchestrator", "planning", "insights", "decisions", "reports"] },
+  { label: "Governance", keys: ["governance", "security", "organizations", "users", "teams", "roles", "permissions", "audit", "api-keys"] },
+  { label: "Platform", keys: ["integrations", "prompt-os", "mcp", "mcp-registry", "mcp-tools", "mcp-resources", "mcp-prompts", "mcp-health", "mcp-gateway", "runtime-center", "developer-center", "settings"] },
+] as const
 
-  const segments = pathname.split("/").filter(Boolean)
+function resolveWorkspaceLabel(pathname: string): string {
+  const normalizedPath = pathname.startsWith("/demo-platform")
+    ? pathname.replace(/^\/demo-platform/, "/app") || "/app"
+    : pathname
+  if (workspaceLabels[normalizedPath]) return workspaceLabels[normalizedPath]
+
+  const segments = normalizedPath.split("/").filter(Boolean)
   const last = segments[segments.length - 1] ?? "workspace"
   return last
     .split("-")
@@ -229,7 +238,7 @@ function ShellTopBar() {
 
   return (
     <>
-      <header className="sticky top-0 z-[var(--z-header)] border-b border-border bg-surface-canvas/90 backdrop-blur-sm">
+      <header className={cn("sticky top-0 z-[var(--z-header)] border-b border-border bg-surface-canvas/90 backdrop-blur-sm", isPublicDemo && "aios-demo-topbar")}>
         <div className="flex min-h-16 items-center gap-2 px-4 py-2 md:px-6 lg:px-8">
           {isMobile || isTablet ? (
             <Button
@@ -243,8 +252,8 @@ function ShellTopBar() {
           ) : null}
 
           <div className="min-w-0">
-            <AIOSSmall className="truncate font-semibold text-brand-navy">AIOS Workspace</AIOSSmall>
-            <AIOSCaption className="truncate text-text-muted">{currentWorkspaceTitle}</AIOSCaption>
+            <AIOSSmall className="truncate font-semibold text-brand-navy">{isPublicDemo ? "AIOS Pilot · Demo" : "AIOS Workspace"}</AIOSSmall>
+            <AIOSCaption className="truncate text-text-muted">{isPublicDemo ? `Synthetic preview · ${currentWorkspaceTitle}` : currentWorkspaceTitle}</AIOSCaption>
             <div className="hidden lg:block">
               <Breadcrumb items={breadcrumbs} />
             </div>
@@ -311,10 +320,9 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
   const pathname = usePathname()
   const { setWorkspace } = useWorkspace()
   const { baseHref } = useNavigationBase()
+  const isPublicDemo = baseHref === "/demo-platform"
 
-  return (
-    <nav className="flex-1 space-y-1 p-2" aria-label="Workspace modules">
-      {workspaceItems.map((item) => {
+  const renderItem = (item: (typeof workspaceItems)[number]) => {
         const Icon = iconByKey[item.icon as keyof typeof iconByKey] ?? Sparkles
         const href = item.href.replace(/^\/app/, baseHref)
         const isActive = pathname === href || pathname.startsWith(`${href}/`)
@@ -354,7 +362,21 @@ function SidebarNavContent({ compact = false, onNavigate }: { compact?: boolean;
             </Link>
           </motion.div>
         )
-      })}
+  }
+
+  return (
+    <nav className={cn("flex-1 space-y-1 overflow-y-auto p-2", isPublicDemo && "aios-demo-navigation")} aria-label="Workspace modules">
+      {isPublicDemo
+        ? demoNavigationGroups.map((group) => (
+            <section key={group.label} className="aios-demo-nav-group" aria-label={group.label}>
+              {!compact ? <h2 className="aios-demo-nav-heading">{group.label}</h2> : null}
+              {group.keys.map((key) => {
+                const item = workspaceItems.find((candidate) => candidate.key === key)
+                return item ? renderItem(item) : null
+              })}
+            </section>
+          ))
+        : workspaceItems.map(renderItem)}
     </nav>
   )
 }
@@ -369,12 +391,12 @@ function ShellSidebar() {
     <motion.aside
       layout
       transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-      className={cn("hidden border-r border-border bg-surface-canvas lg:flex lg:flex-col", collapsed ? "lg:w-20" : isPublicDemo ? "lg:w-48" : "lg:w-72")}
+      className={cn("hidden border-r border-border bg-surface-canvas lg:flex lg:flex-col", collapsed ? "lg:w-20" : isPublicDemo ? "lg:w-64" : "lg:w-72", isPublicDemo && "aios-demo-sidebar")}
       aria-label="Primary workspace navigation"
     >
       <div className="flex h-14 items-center justify-between px-3">
         <div className={cn("flex items-center", collapsed && "sr-only")}>
-          <BrandLogo width={110} height={26} />
+          <BrandLogo width={isPublicDemo ? 92 : 110} height={isPublicDemo ? 46 : 26} />
         </div>
         <button
           type="button"
@@ -398,6 +420,8 @@ function ShellMobileSidebarDrawer({
   open: boolean
   onClose: () => void
 }) {
+  const { baseHref } = useNavigationBase()
+  const isPublicDemo = baseHref === "/demo-platform"
   const shouldReduceMotion = useReducedMotion()
 
   return (
@@ -414,14 +438,14 @@ function ShellMobileSidebarDrawer({
             initial={shouldReduceMotion ? false : "initial"}
             animate={shouldReduceMotion ? { x: 0, opacity: 1, transition: { duration: 0 } } : "animate"}
             exit={shouldReduceMotion ? { x: 0, opacity: 0, transition: { duration: 0 } } : "exit"}
-            className="h-full w-80 max-w-[88vw] border-r border-border bg-surface-canvas"
+            className="h-full w-80 max-w-[88vw] border-r border-border bg-surface-canvas aios-demo-mobile-drawer"
             onClick={(event) => event.stopPropagation()}
             aria-label="Mobile workspace navigation drawer"
             aria-modal="true"
             role="dialog"
           >
             <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <BrandLogo width={102} height={24} />
+              <BrandLogo width={isPublicDemo ? 72 : 102} height={isPublicDemo ? 36 : 24} />
               <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close navigation drawer">
                 <X className="h-4 w-4" />
               </Button>
@@ -512,7 +536,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
       ], [isPublicDemo])
 
   return (
-    <div className="min-h-screen bg-surface-app text-text-primary">
+    <div className={cn("min-h-screen bg-surface-app text-text-primary", isPublicDemo && "aios-demo-app")} data-aios-demo={isPublicDemo ? "true" : undefined}>
       {/* Skip to main content link for keyboard users */}
       <a
         href="#main-content"
@@ -532,7 +556,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             variants={shouldReduceMotion ? undefined : pageVariants}
             initial={shouldReduceMotion ? false : "initial"}
             animate={shouldReduceMotion ? { opacity: 1, y: 0, transition: { duration: 0 } } : "animate"}
-            className="min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0 motion-reduce:!transform-none motion-reduce:!opacity-100"
+            className={cn("min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0 motion-reduce:!transform-none motion-reduce:!opacity-100", isPublicDemo && "aios-demo-main")}
             aria-label="Main content area"
             tabIndex={-1}
           >
@@ -546,7 +570,7 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
 
       {/* Mobile bottom navigation */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-[var(--z-header)] flex items-center justify-around border-t border-border bg-surface-canvas/95 pb-safe pt-2 backdrop-blur lg:hidden"
+        className={cn("fixed bottom-0 left-0 right-0 z-[var(--z-header)] flex items-center justify-around border-t border-border bg-surface-canvas/95 pb-safe pt-2 backdrop-blur lg:hidden", isPublicDemo && "aios-demo-bottom-nav")}
         aria-label="Mobile primary navigation"
       >
         {mobileNavItems.map((item) => {

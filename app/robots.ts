@@ -6,6 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        disallow: ["/app", "/api/", "/login", "/settings", "/unauthorized", "/offline"],
       },
     ],
     sitemap: "https://aiospilot.com/sitemap.xml",

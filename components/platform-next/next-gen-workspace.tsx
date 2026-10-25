@@ -330,13 +330,13 @@ export function NextGenWorkspace({
           </div>
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="aios-demo-primary-card-grid mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {enterpriseKpis.map((kpi) => (
             <motion.article
               key={kpi.label}
               whileHover={shouldReduceMotion ? undefined : { y: -2 }}
               transition={{ duration: 0.2 }}
-              className="rounded-2xl border border-white/80 bg-white/85 p-3 shadow-sm"
+              className="aios-demo-card rounded-2xl border border-white/80 bg-white/85 p-3 shadow-sm"
             >
               <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-600">{kpi.label}</p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">{kpi.value}</p>

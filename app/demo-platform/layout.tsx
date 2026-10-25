@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import "@/styles/demo-platform.css";
 import { AIOSRuntimeProvider } from "@/components/layout/AIOSRuntimeContext";
 import { WorkspaceLayout } from "@/components/layout/foundation";
 import { AppProviders } from "@/providers";

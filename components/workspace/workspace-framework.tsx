@@ -16,7 +16,7 @@ import type {
 } from "./types";
 
 export function WorkspaceShell({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("space-y-4 px-4 py-4 md:px-6 lg:px-8", className)}>{children}</div>;
+  return <div className={cn("aios-demo-workspace space-y-4 px-4 py-4 md:px-6 lg:px-8", className)}>{children}</div>;
 }
 
 export function WorkspaceGrid({
@@ -146,12 +146,12 @@ export function WorkspaceSection({ id, title, subtitle, actionLabel, children }:
 }
 
 export function WorkspaceCard({ children }: WorkspaceCardProps) {
-  return <Card className="overflow-hidden border-border bg-white shadow-sm">{children}</Card>;
+  return <Card className="aios-demo-card overflow-hidden border-border bg-white shadow-sm">{children}</Card>;
 }
 
 export function MetricCard({ metric }: { metric: WorkspaceMetric }) {
   return (
-    <article className="rounded-xl border border-border bg-surface-canvas p-3">
+    <article className="aios-demo-card rounded-xl border border-border bg-surface-canvas p-3">
       <p className="text-[11px] uppercase tracking-wide text-text-muted">{metric.label}</p>
       <p className="mt-1 text-lg font-semibold text-brand-navy">{metric.value}</p>
       {metric.detail ? <p className="text-xs text-text-secondary">{metric.detail}</p> : null}
@@ -161,7 +161,7 @@ export function MetricCard({ metric }: { metric: WorkspaceMetric }) {
 
 export function InfoCard({ title, detail, children }: { title: string; detail?: string; children?: ReactNode }) {
   return (
-    <article className="rounded-xl border border-border bg-surface-canvas p-3">
+    <article className="aios-demo-card rounded-xl border border-border bg-surface-canvas p-3">
       <p className="text-sm font-semibold text-brand-navy">{title}</p>
       {detail ? <p className="mt-1 text-xs text-text-secondary">{detail}</p> : null}
       {children}

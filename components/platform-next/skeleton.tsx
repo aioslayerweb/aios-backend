@@ -31,7 +31,7 @@ export const NextGenSkeleton = memo(function NextGenSkeleton() {
           <Bone className="h-10 w-36 rounded-2xl" />
         </div>
         {/* KPI strip */}
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="aios-demo-primary-card-grid mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="rounded-2xl border border-slate-100 bg-white/80 p-3 space-y-2">
               <Bone className="h-2.5 w-24" />

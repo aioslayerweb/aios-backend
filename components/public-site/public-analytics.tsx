@@ -63,11 +63,16 @@ function inferClickEvent(target: HTMLElement) {
 export function PublicAnalytics() {
   const pathname = usePathname()
   const trackedScroll = useRef(new Set<number>())
+  const lastTrackedPath = useRef<string | null>(null)
 
   useEffect(() => {
     const clickOptions: AddEventListenerOptions = { capture: true, passive: true }
     window.aiosTrackEvent = emit
-    emit("page_view", { path: pathname })
+    if (lastTrackedPath.current !== pathname) {
+      lastTrackedPath.current = pathname
+      trackedScroll.current.clear()
+      emit("page_view", { path: pathname })
+    }
 
     const onClick = (event: MouseEvent) => {
       const target = event.target instanceof HTMLElement ? event.target : null

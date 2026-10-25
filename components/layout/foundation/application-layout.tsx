@@ -545,10 +545,10 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
         Skip to main content
       </a>
 
-      <div className="flex min-h-screen">
+      <div className={cn("flex min-h-screen", isPublicDemo && "aios-demo-shell")}>
         <ShellSidebar />
 
-        <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col", drawerOpen && isDesktop && "pr-[360px]")}>
+        <div className={cn("flex min-h-screen min-w-0 flex-1 flex-col", isPublicDemo && "aios-demo-column", drawerOpen && isDesktop && "pr-[360px]")}>
           <ShellTopBar />
           <WorkspaceHeader />
           <motion.main
@@ -556,7 +556,10 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
             variants={shouldReduceMotion ? undefined : pageVariants}
             initial={shouldReduceMotion ? false : "initial"}
             animate={shouldReduceMotion ? { opacity: 1, y: 0, transition: { duration: 0 } } : "animate"}
-            className={cn("min-h-0 flex-1 overflow-y-auto bg-surface-app pb-20 lg:pb-0 motion-reduce:!transform-none motion-reduce:!opacity-100", isPublicDemo && "aios-demo-main")}
+            className={cn(
+              "bg-surface-app pb-20 lg:pb-0 motion-reduce:!transform-none motion-reduce:!opacity-100",
+              isPublicDemo ? "aios-demo-main" : "min-h-0 flex-1 overflow-y-auto"
+            )}
             aria-label="Main content area"
             tabIndex={-1}
           >
@@ -573,27 +576,29 @@ export function ApplicationLayout({ children }: ApplicationLayoutProps) {
         className={cn("fixed bottom-0 left-0 right-0 z-[var(--z-header)] flex items-center justify-around border-t border-border bg-surface-canvas/95 pb-safe pt-2 backdrop-blur lg:hidden", isPublicDemo && "aios-demo-bottom-nav")}
         aria-label="Mobile primary navigation"
       >
-        {mobileNavItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
-          const Icon = item.icon
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
-                isActive
-                  ? "text-brand-primary"
-                  : "text-text-muted hover:text-text-secondary"
-              )}
-              aria-current={isActive ? "page" : undefined}
-              aria-label={item.label}
-            >
-              <Icon className="h-5 w-5" aria-hidden="true" />
-              <span>{item.label}</span>
-            </Link>
-          )
-        })}
+        <div className={cn(isPublicDemo ? "aios-demo-bottom-nav-inner" : "flex w-full items-center justify-around")}>
+          {mobileNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "flex min-h-[44px] min-w-[44px] flex-col items-center justify-center gap-0.5 rounded-xl px-2 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary",
+                  isActive
+                    ? "text-brand-primary"
+                    : "text-text-muted hover:text-text-secondary"
+                )}
+                aria-current={isActive ? "page" : undefined}
+                aria-label={item.label}
+              >
+                <Icon className="h-5 w-5" aria-hidden="true" />
+                <span>{item.label}</span>
+              </Link>
+            )
+          })}
+        </div>
       </nav>
 
       {!isPublicDemo ? (

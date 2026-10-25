@@ -401,7 +401,7 @@ export function DemoExecutiveCommandCenter() {
       </div>
 
       <section aria-label="Executive sample metrics" className="mt-5 overflow-hidden rounded-2xl border border-white/90 bg-white/75 shadow-[0_10px_35px_rgba(73,112,165,0.08)] backdrop-blur">
-        <div className="grid grid-cols-1 divide-y divide-blue-100 md:grid-cols-3 md:divide-x xl:grid-cols-5 xl:divide-y-0">
+        <div className="aios-demo-primary-card-grid grid grid-cols-1 divide-y divide-blue-100 md:grid-cols-3 md:divide-x xl:grid-cols-5 xl:divide-y-0">
           {metrics.map(({ id, label, kind, change, Icon, positive }) => {
             const expanded = selectedMetric === id;
             const value = metricValues[id] ?? 0;

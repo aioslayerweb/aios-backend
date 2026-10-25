@@ -4,7 +4,7 @@ import "./globals.css"
 import { brandAssets, brandTheme } from "@/components/branding"
 import { PublicAnalytics } from "@/components/public-site/public-analytics"
 
-const GOOGLE_ANALYTICS_ID = process.env.NEXT_PUBLIC_GA4_ID ?? ""
+const GOOGLE_ANALYTICS_ID = process.env.NEXT_PUBLIC_GA4_ID || "G-49X8NYHD13"
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID ?? ""
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? ""
 const MICROSOFT_SITE_VERIFICATION = process.env.NEXT_PUBLIC_MICROSOFT_SITE_VERIFICATION ?? ""

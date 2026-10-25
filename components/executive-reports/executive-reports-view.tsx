@@ -26,7 +26,7 @@ export function ExecutiveReportsView() {
   const { boardReports, selectedReport, selectedReportId, setSelectedReportId } = useBoardReports()
 
   return (
-    <div className="space-y-4 px-4 py-4 md:px-6 lg:px-8">
+    <div className="aios-demo-workspace aios-demo-executive-reports space-y-4 px-4 py-4 md:px-6 lg:px-8">
       <motion.section
         initial={reduceMotion ? false : { opacity: 0, y: 18 }}
         animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
@@ -49,25 +49,25 @@ export function ExecutiveReportsView() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[500px]">
-              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
+            <div className="aios-demo-primary-card-grid grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[500px]">
+              <article className="aios-demo-card rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Board report templates</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{boardReports.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Weekly to annual reporting architecture is ready.</p>
               </article>
-              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
+              <article className="aios-demo-card rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Strategic KPI coverage</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{strategicKPIs.length}</p>
                 <p className="mt-1 text-xs text-text-secondary">Board-level performance indicators under active tracking.</p>
               </article>
-              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
+              <article className="aios-demo-card rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Reporting mode</p>
                 <div className="mt-2 flex items-center justify-between gap-3">
                   <StatusIndicator tone={liveMode ? "success" : "neutral"} label={liveMode ? "Live reporting" : "Paused"} />
                   <button type="button" onClick={() => setLiveMode(!liveMode)} className="rounded-md border border-border px-3 py-1.5 text-xs text-text-secondary hover:bg-surface-muted">{liveMode ? "Pause" : "Resume"}</button>
                 </div>
               </article>
-              <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
+              <article className="aios-demo-card rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Selected trend</p>
                 <p className="mt-2 text-sm font-semibold text-brand-navy">{selectedTrend?.title ?? "No trend selected"}</p>
                 <p className="mt-1 text-xs text-text-secondary">{selectedTrend?.summary ?? "Select a trend horizon to inspect."}</p>

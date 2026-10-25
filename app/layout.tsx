@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import Script from "next/script"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./globals.css"
 import { brandAssets, brandTheme } from "@/components/branding"
 import { PublicAnalytics } from "@/components/public-site/public-analytics"
@@ -109,6 +110,7 @@ export default function RootLayout({
       <body className="bg-surface-app text-text-primary antialiased">
         {children}
         <PublicAnalytics />
+        <SpeedInsights />
       </body>
     </html>
   )

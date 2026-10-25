@@ -29,22 +29,34 @@ import {
   memoryTimeline,
   savedSearches,
 } from "./mock-data";
-import { MetricCard, WorkspaceGrid, WorkspaceShell, WorkspaceCard } from "@/components/workspace";
+import { MetricCard, WorkspaceGrid, WorkspaceShell, WorkspaceCard, WorkspaceSection } from "@/components/workspace";
 import type { WorkspaceAction } from "@/components/workspace";
+import { useNavigationBase } from "@/contexts/navigation-context";
+import { useRoleContext } from "@/hooks/use-role-context";
+import { usePermissions } from "@/hooks/use-permissions";
+import { BusinessMemoryExplorer } from "./business-memory-explorer";
 
 const LazyMemoryGraph = lazy(async () => ({ default: MemoryGraph }));
-
-const headerActions: WorkspaceAction[] = [
-  { id: "new", label: "New Memory", icon: <Plus size={14} />, tone: "primary", onClick: () => undefined },
-  { id: "import", label: "Import", icon: <Import size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "search", label: "Search", icon: <Search size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "policies", label: "Policies", icon: <ShieldCheck size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => undefined },
-];
 
 export function MemoryCenterWorkspace() {
   const [selectedMemoryId, setSelectedMemoryId] = useState(memoryRecords.find((record) => record.selected)?.id ?? memoryRecords[0]?.id ?? "");
   const [searchValue, setSearchValue] = useState("");
+  const [notice, setNotice] = useState("");
+  const { baseHref } = useNavigationBase();
+  const { organization } = useRoleContext();
+  const { effectivePermissions, hasPermission } = usePermissions();
+  const isDemo = baseHref === "/demo-platform";
+  const jumpTo = (id: string, message?: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (message) setNotice(message);
+  };
+  const headerActions: WorkspaceAction[] = [
+    { id: "new", label: "New Memory", icon: <Plus size={14} />, tone: "primary", onClick: () => setNotice("Memory creation is not connected. The sample records are unchanged.") },
+    { id: "import", label: "Import", icon: <Import size={14} />, tone: "secondary", onClick: () => setNotice("Memory import is not connected. No files were imported.") },
+    { id: "search", label: "Search", icon: <Search size={14} />, tone: "secondary", onClick: () => jumpTo("semantic-search") },
+    { id: "policies", label: "Policies", icon: <ShieldCheck size={14} />, tone: "secondary", onClick: () => jumpTo("memory-health", "Showing sample memory health and governance metrics; no policy service is connected.") },
+    { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => jumpTo("memory-business-impact") },
+  ];
 
   const selectedMemory = useMemo(
     () => memoryRecords.find((record) => record.id === selectedMemoryId) ?? memoryRecords[0],
@@ -66,47 +78,47 @@ export function MemoryCenterWorkspace() {
   const sidebarSections = [
     {
       title: "Memory Collections",
-      items: memoryCollections.slice(0, 10).map((item) => ({ id: item.id, label: item.title, href: "#", meta: String(item.count) })),
+      items: memoryCollections.slice(0, 10).map((item) => ({ id: item.id, label: item.title, href: "#memory-collections", meta: String(item.count) })),
     },
     {
       title: "Departments",
-      items: ["Executive", "Finance", "Sales", "Marketing", "Legal", "Operations", "HR", "Engineering", "Customer Success"].map((item) => ({ id: item, label: item, href: "#", meta: "Memory" })),
+      items: ["Executive", "Finance", "Sales", "Marketing", "Legal", "Operations", "HR", "Engineering", "Customer Success"].map((item) => ({ id: item, label: item, href: "#memory-explorer", meta: "Memory" })),
     },
     {
       title: "Projects",
-      items: ["Q3 Planning", "Revenue Protection", "Compliance Modernization", "Workflow Builder", "Board Narrative"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Active" })),
+      items: ["Q3 Planning", "Revenue Protection", "Compliance Modernization", "Workflow Builder", "Board Narrative"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Active" })),
     },
     {
       title: "Customers",
-      items: ["North America Enterprise", "EMEA Strategic Accounts", "APAC Renewal Pool", "Top 20 At-Risk"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Tracked" })),
+      items: ["North America Enterprise", "EMEA Strategic Accounts", "APAC Renewal Pool", "Top 20 At-Risk"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Tracked" })),
     },
     {
       title: "Meetings",
-      items: ["Board Planning", "QBR Review", "Risk Council", "Executive Briefing"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Captured" })),
+      items: ["Board Planning", "QBR Review", "Risk Council", "Executive Briefing"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Captured" })),
     },
     {
       title: "Agents",
-      items: ["Executive Assistant", "Finance Agent", "Knowledge Curator", "Compliance Officer"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Active" })),
+      items: ["Executive Assistant", "Finance Agent", "Knowledge Curator", "Compliance Officer"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Active" })),
     },
     {
       title: "Workflows",
-      items: ["Board Briefing", "Churn Recovery", "Policy Validation", "Forecast Update"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Linked" })),
+      items: ["Board Briefing", "Churn Recovery", "Policy Validation", "Forecast Update"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Linked" })),
     },
     {
       title: "Decisions",
-      items: ["Budget Approval", "Policy Change", "Market Expansion", "Risk Escalation"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Logged" })),
+      items: ["Budget Approval", "Policy Change", "Market Expansion", "Risk Escalation"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Logged" })),
     },
     {
       title: "Knowledge Links",
-      items: ["Policy Library", "Board Pack", "Customer Playbooks", "Operational Runbooks"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Synced" })),
+      items: ["Policy Library", "Board Pack", "Customer Playbooks", "Operational Runbooks"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Synced" })),
     },
     {
       title: "Archived",
-      items: ["Q2 Notes", "Legacy Policies", "Expired Workflows"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Cold" })),
+      items: ["Q2 Notes", "Legacy Policies", "Expired Workflows"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Cold" })),
     },
     {
       title: "Favorites",
-      items: ["Executive Memory", "Finance Forecast", "Customer Risk", "Policy Review"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Pinned" })),
+      items: ["Executive Memory", "Finance Forecast", "Customer Risk", "Policy Review"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#memory-explorer", meta: "Pinned" })),
     },
   ];
 
@@ -117,16 +129,26 @@ export function MemoryCenterWorkspace() {
   return (
     <WorkspaceShell>
       <MemoryHeader
-        breadcrumbs={[{ label: "AIOS", href: "/app" }, { label: "Memory Center" }]}
+        breadcrumbs={[{ label: "AIOS", href: baseHref }, { label: "Memory Center" }]}
         actions={headerActions}
         searchValue={searchValue}
         onSearch={setSearchValue}
       />
+      {notice ? <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
       <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_360px]">
         <MemoryLeftRail sections={sidebarSections} />
 
         <motion.main initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="space-y-4" aria-label="Memory center main panel">
+          {isDemo && hasPermission("view_dashboard") ? (
+            <WorkspaceSection id="business-memory-context" title="Business Memory & Context" subtitle="Traceable evidence, lifecycle, and authorized retrieval" actionLabel="AIOS">
+              <BusinessMemoryExplorer
+                organizationId={organization?.id}
+                grantedPermissions={effectivePermissions}
+                canManageMemory={hasPermission("manage_memory")}
+              />
+            </WorkspaceSection>
+          ) : null}
           <WorkspaceCard>
             <MemorySummaryStrip record={selectedMemory} />
           </WorkspaceCard>
@@ -140,13 +162,13 @@ export function MemoryCenterWorkspace() {
             </div>
           </section>
 
-          <section>
+          <section id="memory-explorer">
             <SectionTitle title="Memory Explorer" subtitle="Searchable enterprise memory" />
             <MemoryExplorer records={filteredRecords} selectedId={selectedMemory.id} onSelect={setSelectedMemoryId} filters={memoryFilters} />
           </section>
 
-          <section>
-            <SectionTitle title="Semantic Search" subtitle="Natural language exploration" />
+          <section id="semantic-search">
+            <SectionTitle title="Deterministic Memory Search" subtitle="Literal matching over sample fields" />
             <SemanticSearch
               value={searchValue}
               onChange={setSearchValue}
@@ -173,12 +195,12 @@ export function MemoryCenterWorkspace() {
             </Suspense>
           </section>
 
-          <section>
+          <section id="memory-collections">
             <SectionTitle title="Memory Collections" subtitle="Governed collection centers" />
             <MemoryCollectionsPanel collections={memoryCollections} />
           </section>
 
-          <section>
+          <section id="memory-health">
             <SectionTitle title="Memory Health" subtitle="Coverage and governance quality" />
             <MemoryHealthPanel metrics={memoryMetrics.slice(0, 8)} />
           </section>
@@ -193,7 +215,7 @@ export function MemoryCenterWorkspace() {
             <MemoryTimeline events={memoryTimeline} />
           </section>
 
-          <section>
+          <section id="memory-business-impact">
             <SectionTitle title="Business Impact" subtitle="Executive value metrics" />
             <BusinessImpactPanel metrics={memoryMetrics.slice(0, 8)} />
           </section>

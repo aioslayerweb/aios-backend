@@ -137,21 +137,21 @@ export const orgSidebarSections: OrgSidebarSection[] = [
   {
     title: "Organization Views",
     items: [
-      { id: "overview", label: "Organization Overview", href: "#", meta: "Live" },
-      { id: "chart", label: "Interactive Chart", href: "#", meta: "Hierarchy" },
-      { id: "departments", label: "Departments", href: "#", meta: "18" },
-      { id: "units", label: "Business Units", href: "#", meta: "7" },
-      { id: "directory", label: "People Directory", href: "#", meta: "4,280" },
+      { id: "overview", label: "Organization Overview", href: "#organization-overview", meta: "Live" },
+      { id: "chart", label: "Interactive Chart", href: "#organization-chart", meta: "Hierarchy" },
+      { id: "departments", label: "Departments", href: "#departments", meta: "18" },
+      { id: "units", label: "Business Units", href: "#business-units", meta: "7" },
+      { id: "directory", label: "People Directory", href: "#people-directory", meta: "4,280" },
     ],
   },
   {
     title: "Intelligence",
     items: [
-      { id: "workforce", label: "AI Workforce", href: "#", meta: "236" },
-      { id: "raci", label: "Responsibility Matrix", href: "#", meta: "RACI" },
-      { id: "permissions", label: "Permissions Overview", href: "#", meta: "RBAC" },
-      { id: "analytics", label: "Organization Analytics", href: "#", meta: "Live" },
-      { id: "timeline", label: "Activity Timeline", href: "#", meta: "Today" },
+      { id: "workforce", label: "AI Workforce", href: "#ai-workforce", meta: "236" },
+      { id: "raci", label: "Responsibility Matrix", href: "#responsibility-matrix", meta: "RACI" },
+      { id: "permissions", label: "Permissions Overview", href: "#permissions-overview", meta: "RBAC" },
+      { id: "analytics", label: "Organization Analytics", href: "#organization-analytics", meta: "Live" },
+      { id: "timeline", label: "Activity Timeline", href: "#activity-timeline", meta: "Today" },
     ],
   },
 ];

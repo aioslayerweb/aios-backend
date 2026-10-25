@@ -33,21 +33,27 @@ import {
 } from "./mock-data";
 import { WorkspaceGrid, WorkspaceShell, WorkspaceCard, WorkspaceSection, MetricCard } from "@/components/workspace";
 import type { WorkspaceAction } from "@/components/workspace";
+import { useNavigationBase } from "@/contexts/navigation-context";
 
 const LazyKnowledgeConstellation = lazy(async () => ({ default: KnowledgeConstellation }));
-
-const headerActions: WorkspaceAction[] = [
-  { id: "new", label: "New Knowledge", icon: <Plus size={14} />, tone: "primary", onClick: () => undefined },
-  { id: "import", label: "Import", icon: <Import size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "graph", label: "Knowledge Graph", icon: <LibraryBig size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "policies", label: "Policies", icon: <ShieldCheck size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "assistant", label: "AI Assistant", icon: <Bot size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => undefined },
-];
 
 export function KnowledgeCenterWorkspace() {
   const [selectedKnowledgeId, setSelectedKnowledgeId] = useState(knowledgeRecords.find((record) => record.id === "n1")?.id ?? knowledgeRecords[0]?.id ?? "");
   const [searchValue, setSearchValue] = useState("");
+  const [notice, setNotice] = useState("");
+  const { baseHref } = useNavigationBase();
+  const jumpTo = (id: string, message?: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (message) setNotice(message);
+  };
+  const headerActions: WorkspaceAction[] = [
+    { id: "new", label: "New Knowledge", icon: <Plus size={14} />, tone: "primary", onClick: () => setNotice("Knowledge creation is not connected. The sample records are unchanged.") },
+    { id: "import", label: "Import", icon: <Import size={14} />, tone: "secondary", onClick: () => setNotice("Knowledge import is not connected. No files were imported.") },
+    { id: "graph", label: "Knowledge Graph", icon: <LibraryBig size={14} />, tone: "secondary", onClick: () => jumpTo("constellation") },
+    { id: "policies", label: "Policies", icon: <ShieldCheck size={14} />, tone: "secondary", onClick: () => jumpTo("governance", "Showing sample governance controls; no policy service is connected.") },
+    { id: "assistant", label: "AI Assistant", icon: <Bot size={14} />, tone: "secondary", onClick: () => jumpTo("search", "Showing deterministic sample search. No AI assistant service was invoked.") },
+    { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => jumpTo("business-impact") },
+  ];
 
   const selectedKnowledge = useMemo(
     () => knowledgeRecords.find((record) => record.id === selectedKnowledgeId) ?? knowledgeRecords[0],
@@ -82,31 +88,31 @@ export function KnowledgeCenterWorkspace() {
   const sidebarSections = [
     {
       title: "Knowledge Domains",
-      items: knowledgeDomains.slice(0, 12).map((item) => ({ id: item.id, label: item.title, href: "#", meta: String(item.documents) })),
+      items: knowledgeDomains.slice(0, 12).map((item) => ({ id: item.id, label: item.title, href: "#domains", meta: String(item.documents) })),
     },
     {
       title: "Executive",
-      items: ["Executive", "Corporate", "Finance", "Sales", "Marketing"].map((item) => ({ id: item, label: item, href: "#", meta: "Core" })),
+      items: ["Executive", "Corporate", "Finance", "Sales", "Marketing"].map((item) => ({ id: item, label: item, href: "#explorer", meta: "Core" })),
     },
     {
       title: "Operations",
-      items: ["Operations", "Engineering", "Legal", "Compliance", "HR"].map((item) => ({ id: item, label: item, href: "#", meta: "Active" })),
+      items: ["Operations", "Engineering", "Legal", "Compliance", "HR"].map((item) => ({ id: item, label: item, href: "#explorer", meta: "Active" })),
     },
     {
       title: "Knowledge Types",
-      items: ["AI Playbooks", "Business Rules", "Policies", "Standards", "Processes", "Templates"].map((item) => ({ id: item, label: item, href: "#", meta: "Governed" })),
+      items: ["AI Playbooks", "Business Rules", "Policies", "Standards", "Processes", "Templates"].map((item) => ({ id: item, label: item, href: "#explorer", meta: "Governed" })),
     },
     {
       title: "Customers",
-      items: ["Customer Success", "Customer Onboarding", "Renewal Playbooks", "Escalations"].map((item) => ({ id: item, label: item, href: "#", meta: "Linked" })),
+      items: ["Customer Success", "Customer Onboarding", "Renewal Playbooks", "Escalations"].map((item) => ({ id: item, label: item, href: "#explorer", meta: "Linked" })),
     },
     {
       title: "Favorites",
-      items: ["Executive Operating Principles", "AI Governance Framework", "Financial Controls", "Business Continuity Framework"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Pinned" })),
+      items: ["Executive Operating Principles", "AI Governance Framework", "Financial Controls", "Business Continuity Framework"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#explorer", meta: "Pinned" })),
     },
     {
       title: "Archived",
-      items: ["Legacy Playbooks", "Deprecated Standards", "Old Procedures"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#", meta: "Cold" })),
+      items: ["Legacy Playbooks", "Deprecated Standards", "Old Procedures"].map((item, index) => ({ id: `${item}-${index}`, label: item, href: "#explorer", meta: "Cold" })),
     },
   ];
 
@@ -117,11 +123,12 @@ export function KnowledgeCenterWorkspace() {
   return (
     <WorkspaceShell>
       <KnowledgeHeader
-        breadcrumbs={[{ label: "AIOS", href: "/app" }, { label: "Knowledge Center" }]}
+        breadcrumbs={[{ label: "AIOS", href: baseHref }, { label: "Knowledge Center" }]}
         actions={headerActions}
         searchValue={searchValue}
         onSearch={setSearchValue}
       />
+      {notice ? <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
       <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_360px]">
         <KnowledgeLeftRail sections={sidebarSections} />
@@ -154,7 +161,7 @@ export function KnowledgeCenterWorkspace() {
           </section>
 
           <section>
-            <WorkspaceSection id="search" title="Semantic Search" subtitle="Natural language exploration" actionLabel="AIOS">
+            <WorkspaceSection id="search" title="Deterministic Knowledge Search" subtitle="Literal matching over sample fields" actionLabel="AIOS">
               <KnowledgeSearch
                 value={searchValue}
                 onChange={setSearchValue}

@@ -493,7 +493,15 @@ export function BusinessInsightsPanel({ insights }: { insights: IntelligenceInsi
   );
 }
 
-export function RecommendationEngine({ recommendations, onAction }: { recommendations: IntelligenceRecommendation[]; onAction: (id: string) => void }) {
+export function RecommendationEngine({
+  recommendations,
+  onAction,
+  actionFeedback,
+}: {
+  recommendations: IntelligenceRecommendation[];
+  onAction?: (id: string, action: "approve" | "delegate" | "workflow" | "schedule") => void;
+  actionFeedback?: Record<string, string>;
+}) {
   return (
     <Card className="border-border bg-white">
       <CardHeader className="py-3">
@@ -519,11 +527,12 @@ export function RecommendationEngine({ recommendations, onAction }: { recommenda
               {item.evidence.map((evidence) => <p key={evidence}>{evidence}</p>)}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <Button size="sm" variant="primary" onClick={() => onAction(item.id)}>Approve</Button>
-              <Button size="sm" variant="secondary" onClick={() => onAction(item.id)}>Delegate</Button>
-              <Button size="sm" variant="secondary" onClick={() => onAction(item.id)}>Create Workflow</Button>
-              <Button size="sm" variant="ghost" onClick={() => onAction(item.id)}>Schedule</Button>
+              <Button type="button" size="sm" variant="primary" disabled={!onAction} title={!onAction ? "No recommendation action service is connected." : undefined} onClick={() => onAction?.(item.id, "approve")}>Preview approve</Button>
+              <Button type="button" size="sm" variant="secondary" disabled={!onAction} title={!onAction ? "No delegation service is connected." : undefined} onClick={() => onAction?.(item.id, "delegate")}>Preview delegate</Button>
+              <Button type="button" size="sm" variant="secondary" disabled={!onAction} title={!onAction ? "No workflow service is connected." : undefined} onClick={() => onAction?.(item.id, "workflow")}>Preview workflow</Button>
+              <Button type="button" size="sm" variant="ghost" disabled={!onAction} title={!onAction ? "No scheduling service is connected." : undefined} onClick={() => onAction?.(item.id, "schedule")}>Preview schedule</Button>
             </div>
+            {actionFeedback?.[item.id] ? <p className="mt-2 text-xs text-blue-800" role="status">{actionFeedback[item.id]}</p> : null}
           </article>
         ))}
       </CardContent>

@@ -37,21 +37,38 @@ import {
 import { WorkspaceGrid, WorkspaceSection, WorkspaceShell } from "@/components/workspace";
 import type { WorkspaceAction } from "@/components/workspace";
 import type { IntelligenceRole } from "./types";
-
-const headerActions: WorkspaceAction[] = [
-  { id: "generate", label: "Generate Intelligence", icon: <Plus size={14} />, tone: "primary", onClick: () => undefined },
-  { id: "briefing", label: "Executive Briefing", icon: <ClipboardList size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "predict", label: "Predict", icon: <Radar size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "recommendations", label: "Recommendations", icon: <History size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "scenario", label: "Scenario Analysis", icon: <Radar size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "reports", label: "Reports", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => undefined },
-];
+import { useNavigationBase } from "@/contexts/navigation-context";
+import { useRoleContext } from "@/hooks/use-role-context";
+import { usePermissions } from "@/hooks/use-permissions";
+import { RbiIntelligencePanel } from "./rbi-intelligence-panel";
+import { intelligenceRoleToRoleId, syntheticRbiIntelligence } from "./rbi-data";
+import { demoBusinessMemory } from "@/lib/business-memory/demo-fixtures";
 
 export function IntelligenceCenterWorkspace() {
   const [selectedCardId, setSelectedCardId] = useState(intelligenceCards[0]?.id ?? "");
   const [selectedNodeId, setSelectedNodeId] = useState(intelligenceGraphNodes[0]?.id ?? "");
   const [searchValue, setSearchValue] = useState("");
   const [activeRole, setActiveRole] = useState<IntelligenceRole>("CEO");
+  const [actionFeedback, setActionFeedback] = useState<Record<string, string>>({});
+  const [notice, setNotice] = useState("");
+  const { baseHref } = useNavigationBase();
+  const { organization } = useRoleContext();
+  const { effectivePermissions, hasPermission } = usePermissions();
+  const isDemo = baseHref === "/demo-platform";
+
+  const jumpTo = (id: string, message?: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (message) setNotice(message);
+  };
+
+  const headerActions: WorkspaceAction[] = [
+    { id: "generate", label: "Generate Intelligence", icon: <Plus size={14} />, tone: "primary", onClick: () => jumpTo("intelligence-cards", "No intelligence-generation service is connected. The existing sample insights are unchanged.") },
+    { id: "briefing", label: "Executive Briefing", icon: <ClipboardList size={14} />, tone: "secondary", onClick: () => jumpTo("intelligence-cards", "Review the existing sample intelligence before preparing a briefing.") },
+    { id: "predict", label: "Predict", icon: <Radar size={14} />, tone: "secondary", onClick: () => jumpTo("intelligence-scenarios", "Showing scenario examples; no prediction model was run.") },
+    { id: "recommendations", label: "Recommendations", icon: <History size={14} />, tone: "secondary", onClick: () => jumpTo("intelligence-recommendations") },
+    { id: "scenario", label: "Scenario Analysis", icon: <Radar size={14} />, tone: "secondary", onClick: () => jumpTo("intelligence-scenarios") },
+    { id: "reports", label: "Reports", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => jumpTo("intelligence-insights") },
+  ];
 
   const selectedCard = useMemo(
     () => intelligenceCards.find((card) => card.id === selectedCardId) ?? intelligenceCards[0],
@@ -87,11 +104,18 @@ export function IntelligenceCenterWorkspace() {
   return (
     <WorkspaceShell>
       <IntelligenceHeader
-        breadcrumbs={[{ label: "AIOS", href: "/app" }, { label: "Intelligence Center" }]}
+        breadcrumbs={[{ label: "AIOS", href: baseHref }, { label: "Intelligence Center" }]}
         actions={headerActions}
         searchValue={searchValue}
         onSearch={setSearchValue}
       />
+
+      {isDemo ? (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="note">
+          Synthetic intelligence examples. Preview actions are local only; no model, approval, or workflow service is connected.
+        </div>
+      ) : null}
+      {notice ? <p className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
       <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_360px]">
         <IntelligenceLeftRail sections={intelligenceWorkspaceSections} />
@@ -109,8 +133,29 @@ export function IntelligenceCenterWorkspace() {
             <IntelligenceExplorer records={filteredCards} selectedId={selectedCard.id} onSelect={setSelectedCardId} signals={intelligenceSignals} />
           </WorkspaceSection>
 
+          {isDemo && hasPermission("view_dashboard") ? (
+            <WorkspaceSection id="role-based-business-intelligence" title="Role-Based Business Intelligence" subtitle="Explainable, permission-filtered sample signals" actionLabel="AIOS">
+              <RbiIntelligencePanel
+                items={syntheticRbiIntelligence}
+                roleId={intelligenceRoleToRoleId(activeRole)}
+                grantedPermissions={effectivePermissions}
+                memoryRecords={demoBusinessMemory}
+                organizationId={organization?.id}
+              />
+            </WorkspaceSection>
+          ) : null}
+
           <WorkspaceSection id="intelligence-recommendations" title="AI Recommendation Engine" subtitle="Enterprise recommendations and actions" actionLabel="AIOS">
-            <RecommendationEngine recommendations={intelligenceRecommendations} onAction={setSelectedCardId} />
+            <RecommendationEngine
+              recommendations={intelligenceRecommendations}
+              onAction={isDemo ? (id, action) => {
+                const label = { approve: "approval", delegate: "delegation", workflow: "workflow creation", schedule: "scheduling" }[action];
+                const message = `Local ${label} preview selected for this recommendation. No business action was sent.`;
+                setActionFeedback((current) => ({ ...current, [id]: message }));
+                setNotice(message);
+              } : undefined}
+              actionFeedback={actionFeedback}
+            />
           </WorkspaceSection>
 
           <WorkspaceSection id="intelligence-graph" title="Predictive Intelligence Graph" subtitle="Connected business intelligence topology" actionLabel="AIOS">

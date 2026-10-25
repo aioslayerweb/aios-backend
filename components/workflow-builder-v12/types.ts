@@ -81,6 +81,7 @@ export type ToolAction = {
   id: string;
   label: string;
   icon: LucideIcon;
+  onClick?: () => void;
 };
 
 export type WorkflowBuilderData = {

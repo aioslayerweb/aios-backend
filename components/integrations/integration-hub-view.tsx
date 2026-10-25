@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, Cable, Clock3, KeyRound, ShieldCheck, Workflow } from "lucide-react"
 import {
   useAvailableIntegrations,
-  useConnectionManager,
   useIntegrationHealth,
   useIntegrationLogs,
   useIntegrations,
@@ -14,6 +13,8 @@ import {
 import { integrationAuthLabel, integrationHealthLabel, integrationHealthTone, type IntegrationCategory } from "@/lib/integrations"
 import { Button, StatusIndicator } from "@/components/ui"
 import { cn } from "@/utils"
+import { useNavigationBase } from "@/contexts/navigation-context"
+import { SyntheticConnectorWorkbench } from "./synthetic-connector-workbench"
 
 const categoryLabels: Record<IntegrationCategory, string> = {
   communication: "Communication",
@@ -61,11 +62,12 @@ function syncBarClass(status: "queued" | "running" | "completed" | "failed") {
 
 export function IntegrationHubView() {
   const reduceMotion = useReducedMotion()
+  const { baseHref } = useNavigationBase()
+  const isDemo = baseHref === "/demo-platform"
   const { filteredAvailableIntegrations, selectedCategory, setSelectedCategory } = useAvailableIntegrations()
   const { connectedSystems, healthSummary } = useIntegrationHealth()
-  const { connectSystem, pauseSystem } = useConnectionManager()
-  const { syncJobs, syncSummary, triggerSync } = useSyncStatus()
-  const { logs, retryLog } = useIntegrationLogs()
+  const { syncJobs, syncSummary } = useSyncStatus()
+  const { logs } = useIntegrationLogs()
   const { activities, touchpoints, developerMode, toggleDeveloperMode, developerTools } = useIntegrations()
 
   const categoryOptions = useMemo(
@@ -111,28 +113,28 @@ export function IntegrationHubView() {
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <span className="rounded-full bg-[var(--color-semantic-info-soft)] px-3 py-1 text-xs font-medium text-[var(--color-semantic-info-text)] ring-1 ring-sky-100">Adapter architecture</span>
-                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Runtime Engine linked</span>
-                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Memory Layer linked</span>
-                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Prompt OS linked</span>
-                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Workflow Builder linked</span>
+                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Runtime Engine planned</span>
+                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Memory Layer not connected</span>
+                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Prompt OS planned</span>
+                <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200">Workflow Builder planned</span>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2 xl:min-w-[420px] xl:max-w-[460px]">
               <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
-                <p className="text-xs uppercase tracking-wide text-text-muted">Connected systems</p>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Registered mock providers</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{connectedSystems.length}</p>
-                <p className="mt-1 text-xs text-text-secondary">Extensible adapters registered in the integration provider.</p>
+                <p className="mt-1 text-xs text-text-secondary">Catalog examples only; none is a verified external connection.</p>
               </article>
               <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
-                <p className="text-xs uppercase tracking-wide text-text-muted">High attention</p>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Illustrative attention states</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{highRiskSystems}</p>
-                <p className="mt-1 text-xs text-text-secondary">Warnings, offline systems, rate limits, or auth-required states.</p>
+                <p className="mt-1 text-xs text-text-secondary">Catalog definitions only; no provider health has been measured.</p>
               </article>
               <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
-                <p className="text-xs uppercase tracking-wide text-text-muted">Synchronization</p>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Active sync jobs</p>
                 <p className="mt-2 text-3xl font-semibold text-brand-navy">{syncSummary.running}</p>
-                <p className="mt-1 text-xs text-text-secondary">Running sync pipelines now across adapter queues.</p>
+                <p className="mt-1 text-xs text-text-secondary">No verified external synchronization is running.</p>
               </article>
               <article className="rounded-2xl border border-[var(--color-semantic-info)] bg-white/90 p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-wide text-text-muted">Developer mode</p>
@@ -148,6 +150,13 @@ export function IntegrationHubView() {
         </div>
       </motion.section>
 
+      <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" aria-label="Connector availability notice">
+        {isDemo
+          ? "Provider cards, connection states, counts, activity, and logs below are illustrative mock fixtures. No external provider is verified or connected. Only the synthetic opportunity test adapter performs a local fixture sync."
+          : "No external connector is configured or verified for this organization. Provider cards and operational metrics below are illustrative mock fixtures; connect, sync, pause, and retry actions are unavailable."}
+      </section>
+      {isDemo ? <SyntheticConnectorWorkbench /> : null}
+
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.6fr)_minmax(320px,0.9fr)]">
         <main className="space-y-4" aria-label="Integration center primary content">
           <motion.section
@@ -155,18 +164,18 @@ export function IntegrationHubView() {
             animate={reduceMotion ? undefined : surfaceMotion.animate}
             transition={{ duration: 0.3, delay: 0.04 }}
             className="rounded-2xl border border-border bg-white p-4 shadow-sm"
-            aria-label="Connected systems"
+            aria-label="Mock provider examples"
           >
             <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wide text-text-muted">Connected Systems</p>
-                <h2 className="mt-1 text-xl font-semibold text-brand-navy">Live connection control across the organization</h2>
-                <p className="mt-1 text-sm text-text-secondary">Every card tracks health, authentication, synchronization depth, and linked AIOS surfaces.</p>
+                <p className="text-xs uppercase tracking-wide text-text-muted">Mock Provider Examples</p>
+                <h2 className="mt-1 text-xl font-semibold text-brand-navy">Illustrative adapter states, not live connections</h2>
+                <p className="mt-1 text-sm text-text-secondary">Health, authentication, sync depth, and linked AIOS surfaces are sample data only.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {healthSummary.map((item) => (
                   <span key={item.state} className={cn("rounded-full px-3 py-1 text-xs font-medium capitalize", toneClass(integrationHealthTone(item.state)))}>
-                    {integrationHealthLabel(item.state)} {item.count}
+                    Example: {integrationHealthLabel(item.state)} {item.count}
                   </span>
                 ))}
               </div>
@@ -197,29 +206,29 @@ export function IntegrationHubView() {
                         </div>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-medium capitalize", toneClass(tone))}>{integrationHealthLabel(system.health)}</span>
+                        <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-medium capitalize", toneClass(tone))}>Example: {integrationHealthLabel(system.health)}</span>
                         {system.mock ? <span className="text-[11px] text-text-muted">Mock adapter state</span> : null}
                       </div>
                     </div>
 
-                    <p className="mt-3 min-h-[40px] text-xs leading-5 text-text-secondary">{system.statusDetail}</p>
+                    <p className="mt-3 min-h-[40px] text-xs leading-5 text-text-secondary">{system.mock ? "Illustrative status only. No external provider credentials or service are configured." : system.statusDetail}</p>
 
                     <div className="mt-3 grid gap-2 sm:grid-cols-2">
                       <div className="rounded-xl bg-slate-50 p-2">
-                        <p className="text-[11px] uppercase tracking-wide text-text-muted">Last sync</p>
+                        <p className="text-[11px] uppercase tracking-wide text-text-muted">Example timestamp</p>
                         <p className="mt-1 text-sm font-medium text-brand-navy">{system.lastSync}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2">
-                        <p className="text-[11px] uppercase tracking-wide text-text-muted">Objects synchronized</p>
-                        <p className="mt-1 text-sm font-medium text-brand-navy">{system.synchronizedObjects.toLocaleString()}</p>
+                        <p className="text-[11px] uppercase tracking-wide text-text-muted">Illustrative object count</p>
+                        <p className="mt-1 text-sm font-medium text-brand-navy">{system.mock ? "Not available" : system.synchronizedObjects.toLocaleString()}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2">
                         <p className="text-[11px] uppercase tracking-wide text-text-muted">Authentication</p>
-                        <p className="mt-1 text-sm font-medium capitalize text-brand-navy">{integrationAuthLabel(system.authState)}</p>
+                        <p className="mt-1 text-sm font-medium capitalize text-brand-navy">{system.mock ? "Not verified (fixture)" : integrationAuthLabel(system.authState)}</p>
                       </div>
                       <div className="rounded-xl bg-slate-50 p-2">
                         <p className="text-[11px] uppercase tracking-wide text-text-muted">Errors</p>
-                        <p className="mt-1 text-sm font-medium text-brand-navy">{system.errors}</p>
+                        <p className="mt-1 text-sm font-medium text-brand-navy">{system.mock ? "Not measured" : system.errors}</p>
                       </div>
                     </div>
 
@@ -231,16 +240,12 @@ export function IntegrationHubView() {
                       ))}
                     </div>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <Button variant="primary" size="sm" onClick={() => connectSystem(system.id)}>
-                        Connect
-                      </Button>
-                      <Button variant="secondary" size="sm" onClick={() => triggerSync(system.id, system.supportedObjects[0])}>
-                        Sync now
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => pauseSystem(system.id)}>
-                        {system.health === "paused" ? "Resume" : "Pause"}
-                      </Button>
+                    <div className="mt-4 space-y-2">
+                      <div className="flex flex-wrap gap-2">
+                        <Button variant="primary" size="sm" disabled title="Live provider authorization is not implemented">Connect unavailable</Button>
+                        <Button variant="secondary" size="sm" disabled title="No provider synchronization service is configured">Sync unavailable</Button>
+                      </div>
+                      <p className="text-[11px] text-text-muted">Live authorization, synchronization, and pause controls are not implemented for this catalog example.</p>
                     </div>
                   </motion.article>
                 )
@@ -300,8 +305,8 @@ export function IntegrationHubView() {
                             <h4 className="text-sm font-semibold text-brand-navy">{integration.name}</h4>
                             <p className="mt-1 text-xs leading-5 text-text-secondary">{integration.description}</p>
                           </div>
-                          <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", integration.status === "connected" ? "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]" : "bg-slate-100 text-slate-700")}>
-                            {integration.status}
+                          <span className={cn("rounded-full px-2 py-1 text-[11px] font-medium", !integration.mock && integration.status === "connected" ? "bg-[var(--color-semantic-success-soft)] text-[var(--color-semantic-success-text)]" : "bg-slate-100 text-slate-700")}>
+                            {integration.mock ? "Example only · not verified" : integration.status}
                           </span>
                         </div>
                         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -330,8 +335,8 @@ export function IntegrationHubView() {
             >
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-text-muted">Synchronization</p>
-                  <h2 className="mt-1 text-xl font-semibold text-brand-navy">Queue and object flow visibility</h2>
+                  <p className="text-xs uppercase tracking-wide text-text-muted">Active sync jobs</p>
+                  <h2 className="mt-1 text-xl font-semibold text-brand-navy">External sync job status</h2>
                 </div>
                 <div className="flex flex-wrap gap-2 text-xs text-text-muted">
                   <span>Queued {syncSummary.queued}</span>
@@ -374,6 +379,7 @@ export function IntegrationHubView() {
                     </article>
                   )
                 })}
+                {!syncJobs.length ? <p className="rounded-xl bg-slate-50 p-3 text-sm text-text-secondary">No external synchronization jobs are configured or running.</p> : null}
               </div>
             </motion.section>
 
@@ -413,7 +419,7 @@ export function IntegrationHubView() {
             aria-label="AIOS touchpoints"
           >
             <p className="text-xs uppercase tracking-wide text-text-muted">AIOS Integration Touchpoints</p>
-            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Internal systems already connected</h2>
+            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Planned AIOS integration touchpoints</h2>
             <div className="mt-4 space-y-3">
               {touchpoints.map((touchpoint, index) => (
                 <motion.article
@@ -428,9 +434,9 @@ export function IntegrationHubView() {
                       <p className="text-sm font-semibold text-brand-navy">{touchpoint.name}</p>
                       <p className="mt-1 text-xs leading-5 text-text-secondary">{touchpoint.description}</p>
                     </div>
-                    <StatusIndicator tone={touchpoint.state === "ready" ? "success" : touchpoint.state === "replaying" ? "warning" : "info"} label={touchpoint.state} />
+                    <StatusIndicator tone={touchpoint.state === "ready" ? "success" : touchpoint.state === "replaying" ? "warning" : "info"} label={touchpoint.state === "planned" ? "Planned" : `Example: ${touchpoint.state}`} />
                   </div>
-                  <p className="mt-2 text-[11px] text-text-muted">{touchpoint.adapterCount} adapters share this control path.</p>
+                  <p className="mt-2 text-[11px] text-text-muted">{touchpoint.adapterCount} adapters are configured for this control path.</p>
                 </motion.article>
               ))}
             </div>
@@ -444,7 +450,8 @@ export function IntegrationHubView() {
             aria-label="Recent activity"
           >
             <p className="text-xs uppercase tracking-wide text-text-muted">Activity</p>
-            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Recent integration activity</h2>
+            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Recent provider activity</h2>
+            <p className="mt-1 text-xs text-text-muted">Only verified external provider events will appear here.</p>
             <div className="mt-4 space-y-3">
               {activities.map((activity) => (
                 <article key={activity.id} className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3">
@@ -458,6 +465,7 @@ export function IntegrationHubView() {
                   <p className="mt-2 text-[11px] uppercase tracking-wide text-text-muted">Source {activity.source}</p>
                 </article>
               ))}
+              {!activities.length ? <p className="rounded-xl bg-slate-50 p-3 text-sm text-text-secondary">No verified external integration activity is available.</p> : null}
             </div>
           </motion.section>
 
@@ -469,7 +477,8 @@ export function IntegrationHubView() {
             aria-label="Integration logs"
           >
             <p className="text-xs uppercase tracking-wide text-text-muted">Logs</p>
-            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Integration execution log</h2>
+            <h2 className="mt-1 text-lg font-semibold text-brand-navy">Provider execution logs</h2>
+            <p className="mt-1 text-xs text-text-muted">No provider request or background execution is configured.</p>
             <div className="mt-4 space-y-3">
               {logs.map((log) => (
                 <article key={log.id} className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3">
@@ -484,13 +493,10 @@ export function IntegrationHubView() {
                     <span>{log.timestamp}</span>
                     <span>{log.duration}</span>
                   </div>
-                  {log.retryable ? (
-                    <Button className="mt-3" variant="secondary" size="sm" onClick={() => retryLog(log.id)}>
-                      Retry
-                    </Button>
-                  ) : null}
+                  {log.retryable ? <p className="mt-2 text-[11px] text-text-muted">Retry unavailable: no provider request or queue is configured.</p> : null}
                 </article>
               ))}
+              {!logs.length ? <p className="rounded-xl bg-slate-50 p-3 text-sm text-text-secondary">No provider execution logs are available.</p> : null}
             </div>
           </motion.section>
 

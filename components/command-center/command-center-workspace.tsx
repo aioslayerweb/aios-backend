@@ -49,46 +49,46 @@ export function CommandCenterWorkspace() {
         </motion.aside>
 
         <motion.main variants={fadeIn} initial="hidden" animate="show" className="space-y-4" aria-label="Command Center main panel">
-          <CommandComposer chips={data.chips} suggestions={data.suggestions} quickActions={data.quickActions} />
+          <CommandComposer chips={data.chips} suggestions={data.suggestions} quickActions={data.quickActions} agents={data.agents} />
 
           <div className="grid gap-4 2xl:grid-cols-2">
-            <IntelligenceCard title="Executive Priorities" action="View all">
+            <IntelligenceCard title="Executive Priorities" action="View all" actionHref="/app/executive">
               {data.priorities.map((item) => (
                 <PriorityCard key={item.id} item={item} />
               ))}
             </IntelligenceCard>
 
-            <IntelligenceCard title="Decision Queue" action="Review">
+            <IntelligenceCard title="Decision Queue" action="Review" actionHref="/app/decisions">
               {data.decisions.map((item) => (
                 <DecisionCard key={item.id} item={item} />
               ))}
             </IntelligenceCard>
 
-            <IntelligenceCard title="Active Workflows" action="Open queue">
+            <IntelligenceCard title="Active Workflows" action="Open queue" actionHref="/app/workflows">
               {data.workflows.map((item) => (
                 <WorkflowCard key={item.id} item={item} />
               ))}
             </IntelligenceCard>
 
-            <IntelligenceCard title="AI Recommendations" action="Prioritize">
+            <IntelligenceCard title="AI Recommendations" action="Prioritize" actionHref="/app/insights">
               {data.recommendations.map((item) => (
                 <SuggestionCard key={item.id} title={item.label} meta={item.meta || ""} />
               ))}
             </IntelligenceCard>
 
-            <IntelligenceCard title="Recent Activity" action="Explore">
+            <IntelligenceCard title="Recent Activity" action="Explore" actionHref="/app/activity">
               <LinkList items={data.recentActivity} />
             </IntelligenceCard>
 
-            <IntelligenceCard title="Memory Summary" action="Memory explorer">
+            <IntelligenceCard title="Memory Summary" action="Memory explorer" actionHref="/app/memory">
               <LinkList items={data.memorySummary} />
             </IntelligenceCard>
 
-            <IntelligenceCard title="Knowledge Summary" action="Knowledge graph">
+            <IntelligenceCard title="Knowledge Summary" action="Knowledge graph" actionHref="/app/knowledge">
               <LinkList items={data.knowledgeSummary} />
             </IntelligenceCard>
 
-            <IntelligenceCard title="Business Alerts" action="Escalate">
+            <IntelligenceCard title="Business Alerts" action="Escalate" actionHref="/app/security">
               {data.notifications.slice(0, 2).map((item) => (
                 <NotificationCard key={item.id} item={item} />
               ))}
@@ -100,25 +100,25 @@ export function CommandCenterWorkspace() {
           <OrganizationSnapshot metrics={data.metrics} />
           <RuntimeHealthCard metrics={data.metrics} />
 
-          <IntelligenceCard title="Active Agents" action="Manage">
+          <IntelligenceCard title="Active Agents" action="Manage" actionHref="/app/agents">
             {data.agents.map((agent) => (
               <AgentStatusCard key={agent.id} item={agent} />
             ))}
           </IntelligenceCard>
 
-          <IntelligenceCard title="Notifications" action="All notifications">
+          <IntelligenceCard title="Notifications" action="All notifications" actionHref="/app/activity">
             {data.notifications.map((notification) => (
               <NotificationCard key={notification.id} item={notification} />
             ))}
           </IntelligenceCard>
 
-          <IntelligenceCard title="Calendar" action="Open calendar">
+          <IntelligenceCard title="Calendar" action="Open calendar" actionHref="/app/planning">
             {data.meetings.map((meeting) => (
               <UpcomingMeetingCard key={meeting.id} item={meeting} />
             ))}
           </IntelligenceCard>
 
-          <IntelligenceCard title="Connected Systems" action="Connections">
+          <IntelligenceCard title="Connected Systems" action="Connections" actionHref="/app/integrations">
             {data.connectedSystems.map((item) => (
               <ConnectedSystemCard key={item.id} item={item} />
             ))}

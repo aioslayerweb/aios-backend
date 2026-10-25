@@ -3,6 +3,7 @@
 import { lazy, Suspense, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { WorkspaceGrid, WorkspaceShell } from "@/components/workspace";
+import { useNavigationBase } from "@/contexts/navigation-context";
 import {
   AgentDetailsPanel,
   AgentGrid,
@@ -35,11 +36,20 @@ const blockMotion = {
 
 export function AgentStudioWorkspace() {
   const [selectedAgentId, setSelectedAgentId] = useState(agentStudioData.agents[0]?.id || "");
+  const [searchValue, setSearchValue] = useState("");
+  const [notice, setNotice] = useState("");
+  const { baseHref } = useNavigationBase();
 
-  const selectedAgent = useMemo(
-    () => agentStudioData.agents.find((agent) => agent.id === selectedAgentId) || agentStudioData.agents[0],
-    [selectedAgentId]
-  );
+  const filteredAgents = useMemo(() => {
+    const query = searchValue.trim().toLowerCase();
+    if (!query) return agentStudioData.agents;
+    return agentStudioData.agents.filter((agent) =>
+      [agent.name, agent.role, agent.status, agent.team, agent.objective].some((value) => value.toLowerCase().includes(query))
+    );
+  }, [searchValue]);
+
+  const selectedAgent = filteredAgents.find((agent) => agent.id === selectedAgentId) ?? filteredAgents[0];
+  const jumpTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   const templateLinks = useMemo(
     () =>
@@ -47,27 +57,104 @@ export function AgentStudioWorkspace() {
         id: template.id,
         label: template.name,
         meta: template.usageCount,
-        href: "#",
+        href: "#agent-templates",
       })),
     []
   );
 
+  const handleQuickAction = (action: "collaborate" | "export" | "assign-workflow") => {
+    if (action === "collaborate") {
+      jumpTo("agent-collaboration");
+      setNotice("Showing the sample collaboration graph. No agent was contacted.");
+      return;
+    }
+    if (action === "assign-workflow") {
+      setNotice("Workflow assignment is not connected. No workflow was changed.");
+      return;
+    }
+
+    const escapeCsv = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    const rows = [
+      ["Name", "Role", "Team", "Status", "Confidence", "Health"],
+      ...agentStudioData.agents.map((agent) => [agent.name, agent.role, agent.team, agent.status, `${agent.confidence}%`, `${agent.health}%`]),
+    ];
+    const csv = rows.map((row) => row.map(escapeCsv).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "aios-sample-agents.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+    setNotice("Exported the synthetic sample agent list as a CSV file.");
+  };
+
   if (!selectedAgent) {
-    return null;
+    return (
+      <WorkspaceShell>
+        <StudioHeader
+          searchValue={searchValue}
+          onSearch={setSearchValue}
+          onAction={(action) => {
+            if (action === "templates") {
+              jumpTo("agent-templates");
+            } else {
+              setNotice(`${action === "new" ? "Agent creation" : "Import"} is not connected. No agent data was changed.`);
+            }
+          }}
+        />
+        <div className="rounded-xl border border-border bg-white p-6 text-center">
+          <p className="text-sm text-text-secondary">No sample agents match this search.</p>
+          <button type="button" className="mt-3 rounded-lg border border-border px-3 py-2 text-sm font-medium text-brand-navy" onClick={() => setSearchValue("")}>
+            Clear search
+          </button>
+        </div>
+      </WorkspaceShell>
+    );
   }
+
+  const navigationLinks = agentStudioData.leftNavigation.map((item) => ({
+    ...item,
+    href: item.href.replace(/^\/app/, baseHref),
+  }));
 
   return (
     <WorkspaceShell>
-      <StudioHeader />
+      <StudioHeader
+        searchValue={searchValue}
+        onSearch={setSearchValue}
+        onAction={(action) => {
+          if (action === "templates") {
+            jumpTo("agent-templates");
+          } else {
+            setNotice(`${action === "new" ? "Agent creation" : "Import"} is not connected. No agent data was changed.`);
+          }
+        }}
+      />
+      {notice ? <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
       <WorkspaceGrid className="2xl:grid-cols-[280px_minmax(0,1fr)_340px]">
         <AgentStudioLeftRail
-          nav={agentStudioData.leftNavigation}
+          nav={navigationLinks}
           categories={agentStudioData.categories}
           favorites={agentStudioData.favorites}
           templates={templateLinks}
           teams={agentStudioData.teams}
           recent={agentStudioData.recentAgents}
+          onCategorySelect={(item) => {
+            setSearchValue(item.label);
+            jumpTo("agent-list");
+          }}
+          onAgentSelect={(item) => {
+            const agent = agentStudioData.agents.find((candidate) => candidate.name === item.label);
+            if (agent) setSelectedAgentId(agent.id);
+            setSearchValue(item.label);
+            jumpTo("agent-list");
+          }}
+          onTeamSelect={(item) => {
+            setSearchValue(item.label);
+            jumpTo("agent-list");
+          }}
+          onTemplates={() => jumpTo("agent-templates")}
         />
 
         <motion.main variants={blockMotion} initial="hidden" animate="show" className="space-y-4" aria-label="Agent Studio main dashboard">
@@ -80,15 +167,19 @@ export function AgentStudioWorkspace() {
             </div>
           </section>
 
-          <section>
+          <section id="agent-list">
             <SectionTitle title="Featured Agents" subtitle="Active AI Employees" />
-            <QuickActionBar />
+            <QuickActionBar onAction={handleQuickAction} />
             <div className="mt-3">
-              <AgentGrid agents={agentStudioData.agents} selectedAgentId={selectedAgent.id} onSelect={setSelectedAgentId} />
+              {filteredAgents.length ? (
+                <AgentGrid agents={filteredAgents} selectedAgentId={selectedAgent.id} onSelect={setSelectedAgentId} />
+              ) : (
+                <p className="rounded-xl border border-border bg-white p-4 text-sm text-text-secondary">No sample agents match this search.</p>
+              )}
             </div>
           </section>
 
-          <section>
+          <section id="agent-collaboration">
             <SectionTitle title="Agent Details" subtitle={selectedAgent.name} />
             <AgentDetailsPanel
               selectedAgent={selectedAgent}
@@ -112,7 +203,9 @@ export function AgentStudioWorkspace() {
 
           <section className="grid gap-4 xl:grid-cols-2">
             <div>
-              <SectionTitle title="Templates" subtitle="Reusable agent blueprints" />
+              <div id="agent-templates">
+                <SectionTitle title="Templates" subtitle="Reusable agent blueprints" />
+              </div>
               <TemplatePanel templates={agentStudioData.templates} />
             </div>
             <div>

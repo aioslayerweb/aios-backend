@@ -7,13 +7,26 @@ export interface EnterpriseIntegrationAdapter {
 }
 
 export class MockEnterpriseIntegrationAdapter implements EnterpriseIntegrationAdapter {
-  constructor(readonly definition: IntegrationAdapterDefinition) {}
+  readonly definition: IntegrationAdapterDefinition
+
+  constructor(definition: IntegrationAdapterDefinition) {
+    this.definition = {
+      ...definition,
+      health: "auth-required",
+      authState: "required",
+      lastSync: "never",
+      synchronizedObjects: 0,
+      errors: 0,
+      statusDetail: "Catalog example only. Provider credentials and synchronization infrastructure are not configured.",
+      mock: true,
+    }
+  }
 
   async connect(): Promise<{ state: "connected" | "configured" }> {
-    return { state: this.definition.authState === "required" ? "configured" : "connected" }
+    throw new Error("Connect unavailable: this mock adapter has no provider authorization implementation.")
   }
 
   async sync(): Promise<{ accepted: boolean }> {
-    return { accepted: true }
+    throw new Error("Sync unavailable: this mock adapter has no provider synchronization implementation.")
   }
 }

@@ -46,7 +46,7 @@ function statusTone(status: WorkflowNodeModel["status"]): "success" | "warning" 
   return "info";
 }
 
-export function SidebarSection({ title, items }: { title: string; items: SidebarLink[] }) {
+export function SidebarSection({ title, items, onSelect }: { title: string; items: SidebarLink[]; onSelect?: (item: SidebarLink) => void }) {
   return (
     <Card className="border-border bg-white">
       <CardHeader className="py-3">
@@ -54,17 +54,32 @@ export function SidebarSection({ title, items }: { title: string; items: Sidebar
       </CardHeader>
       <CardContent className="space-y-1.5 p-3">
         {items.map((item) => (
-          <Link key={item.id} href={item.href} className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/30">
-            <span className="font-medium text-brand-navy">{item.label}</span>
-            <span className="text-[11px] text-text-muted">{item.meta}</span>
-          </Link>
+          onSelect ? (
+            <button key={item.id} type="button" onClick={() => onSelect(item)} className="flex w-full items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-left text-sm hover:border-brand-primary/30">
+              <span className="font-medium text-brand-navy">{item.label}</span>
+              <span className="text-[11px] text-text-muted">{item.meta}</span>
+            </button>
+          ) : (
+            <Link key={item.id} href={item.href} className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/30">
+              <span className="font-medium text-brand-navy">{item.label}</span>
+              <span className="text-[11px] text-text-muted">{item.meta}</span>
+            </Link>
+          )
         ))}
       </CardContent>
     </Card>
   );
 }
 
-export function WorkflowHeader({ actions }: { actions: ToolAction[] }) {
+export function WorkflowHeader({
+  actions,
+  searchValue,
+  onSearch,
+}: {
+  actions: ToolAction[];
+  searchValue: string;
+  onSearch: (value: string) => void;
+}) {
   return (
     <Card className="border-border bg-white">
       <CardContent className="space-y-4 p-4 md:p-5">
@@ -80,7 +95,7 @@ export function WorkflowHeader({ actions }: { actions: ToolAction[] }) {
             {actions.map((action, index) => {
               const Icon = action.icon;
               return (
-                <Button key={action.id} variant={index === actions.length - 2 ? "primary" : "secondary"} size="sm">
+                <Button key={action.id} variant={index === actions.length - 2 ? "primary" : "secondary"} size="sm" onClick={action.onClick}>
                   <Icon size={14} />
                   {action.label}
                 </Button>
@@ -91,7 +106,7 @@ export function WorkflowHeader({ actions }: { actions: ToolAction[] }) {
 
         <label className="flex items-center gap-2 rounded-xl border border-border bg-surface-canvas px-3 py-2">
           <Search className="h-4 w-4 text-text-muted" />
-          <Input className="h-auto border-0 bg-transparent p-0 shadow-none" placeholder="Search workflows, nodes, templates" aria-label="Search workflows" />
+          <Input value={searchValue} onChange={(event) => onSearch(event.target.value)} className="h-auto border-0 bg-transparent p-0 shadow-none" placeholder="Search workflow nodes" aria-label="Search workflow nodes" />
         </label>
       </CardContent>
     </Card>
@@ -112,6 +127,7 @@ export function WorkflowToolbar({ actions }: { actions: ToolAction[] }) {
                 "inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-semibold",
                 index === 6 ? "border-brand-primary bg-brand-subtle text-brand-navy" : "border-border bg-surface-canvas text-text-secondary"
               )}
+              onClick={action.onClick}
             >
               <Icon size={13} />
               {action.label}

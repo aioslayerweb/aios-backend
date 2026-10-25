@@ -48,10 +48,10 @@ export const commandCenterData: CommandCenterData = {
     { id: "a4", label: "Ops Agent", href: "/app/agents", meta: "Execution" },
   ],
   quickActions: [
-    { id: "qa1", label: "Board Briefing", href: "#" },
-    { id: "qa2", label: "Launch Workflow", href: "#" },
-    { id: "qa3", label: "Escalate Alert", href: "#" },
-    { id: "qa4", label: "Sync Memory", href: "#" },
+    { id: "qa1", label: "Board Briefing", href: "/app/reports" },
+    { id: "qa2", label: "Launch Workflow", href: "/app/workflows" },
+    { id: "qa3", label: "Escalate Alert", href: "/app/security" },
+    { id: "qa4", label: "Sync Memory", href: "/app/memory" },
   ],
   metrics: [
     { id: "m1", label: "Active Agents", value: "12", trend: "+2", tone: "good" },
@@ -77,22 +77,22 @@ export const commandCenterData: CommandCenterData = {
     { id: "w3", name: "Compliance Evidence Collection", stage: "Policy Mapping", owner: "Legal Agent", progress: 63 },
   ],
   recommendations: [
-    { id: "r1", label: "Shift 8% budget from low-converting channels into enterprise ABM", href: "#", meta: "Confidence 89%" },
-    { id: "r2", label: "Launch retention playbook for top 20 at-risk accounts", href: "#", meta: "Expected ARR protection: €1.1M" },
-    { id: "r3", label: "Escalate vendor security review before expansion launch", href: "#", meta: "Risk severity: High" },
+    { id: "r1", label: "Shift 8% budget from low-converting channels into enterprise ABM", href: "/app/finance-intelligence", meta: "Confidence 89%" },
+    { id: "r2", label: "Launch retention playbook for top 20 at-risk accounts", href: "/app/customer-intelligence", meta: "Expected ARR protection: €1.1M" },
+    { id: "r3", label: "Escalate vendor security review before expansion launch", href: "/app/security", meta: "Risk severity: High" },
   ],
   recentActivity: [
-    { id: "ra1", label: "Finance Agent published Q3 variance insight", href: "#", meta: "9m ago" },
-    { id: "ra2", label: "Workflow Queue added 4 execution items", href: "#", meta: "21m ago" },
-    { id: "ra3", label: "Legal Agent flagged GDPR processing clause", href: "#", meta: "33m ago" },
+    { id: "ra1", label: "Finance Agent published Q3 variance insight", href: "/app/finance-intelligence", meta: "9m ago" },
+    { id: "ra2", label: "Workflow Queue added 4 execution items", href: "/app/workflows", meta: "21m ago" },
+    { id: "ra3", label: "Legal Agent flagged GDPR processing clause", href: "/app/governance", meta: "33m ago" },
   ],
   memorySummary: [
-    { id: "ms1", label: "Revenue slowdown pattern detected across 3 regions", href: "#", meta: "Memory confidence 91%" },
-    { id: "ms2", label: "Procurement bottleneck recurring in onboarding", href: "#", meta: "Memory depth 6 cycles" },
+    { id: "ms1", label: "Revenue slowdown pattern detected across 3 regions", href: "/app/memory", meta: "Memory confidence 91%" },
+    { id: "ms2", label: "Procurement bottleneck recurring in onboarding", href: "/app/memory", meta: "Memory depth 6 cycles" },
   ],
   knowledgeSummary: [
-    { id: "ks1", label: "12 policy documents updated in Governance domain", href: "#", meta: "Today" },
-    { id: "ks2", label: "New board compliance template synced", href: "#", meta: "Yesterday" },
+    { id: "ks1", label: "12 policy documents updated in Governance domain", href: "/app/governance", meta: "Today" },
+    { id: "ks2", label: "New board compliance template synced", href: "/app/knowledge", meta: "Yesterday" },
   ],
   agents: [
     { id: "ag1", name: "Finance Agent", role: "Forecasting", status: "active", tasks: 7 },
@@ -119,8 +119,8 @@ export const commandCenterData: CommandCenterData = {
     { id: "cs6", name: "Alert Stream", state: "connected", icon: BellRing },
   ],
   enterpriseInsights: [
-    { id: "ei1", label: "Operating margin expected to improve 2.3% if workflow backlog drops below 20", href: "#" },
-    { id: "ei2", label: "Customer expansion likelihood up 11% in accounts with weekly executive touchpoints", href: "#" },
-    { id: "ei3", label: "Top strategic risk this week: delayed legal review in EMEA contracts", href: "#" },
+    { id: "ei1", label: "Operating margin expected to improve 2.3% if workflow backlog drops below 20", href: "/app/operations" },
+    { id: "ei2", label: "Customer expansion likelihood up 11% in accounts with weekly executive touchpoints", href: "/app/customer-intelligence" },
+    { id: "ei3", label: "Top strategic risk this week: delayed legal review in EMEA contracts", href: "/app/governance" },
   ],
 };

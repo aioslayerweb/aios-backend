@@ -322,13 +322,14 @@ export function KnowledgeSearch({
   return (
     <Card className="border-border bg-white">
       <CardHeader className="py-3">
-        <h3 className="text-sm font-semibold text-brand-navy">Semantic Search</h3>
+        <h3 className="text-sm font-semibold text-brand-navy">Deterministic Knowledge Search</h3>
       </CardHeader>
       <CardContent className="space-y-3 p-4">
         <label className="flex items-center gap-2 rounded-xl border border-border bg-surface-canvas px-3 py-2">
           <Search className="h-4 w-4 text-text-muted" />
-          <Input value={value} onChange={(event) => onChange(event.target.value)} className="h-auto border-0 bg-transparent p-0 shadow-none" placeholder="Natural language search" aria-label="Semantic knowledge search" />
+          <Input value={value} onChange={(event) => onChange(event.target.value)} className="h-auto border-0 bg-transparent p-0 shadow-none" placeholder="Search terms" aria-label="Search knowledge terms" />
         </label>
+        <p className="text-xs text-text-muted">Literal text matching over available sample fields. Semantic or vector retrieval is not connected.</p>
 
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-[0.18em] text-text-muted">Recent searches</p>

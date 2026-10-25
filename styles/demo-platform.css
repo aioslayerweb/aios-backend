@@ -350,3 +350,22 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Keep demo page surfaces full-bleed without changing nested component styling. */
+@media (max-width: 767px) {
+  .aios-demo-root,
+  .aios-demo-app main .aios-demo-workspace,
+  .aios-demo-app main .aios-demo-executive,
+  .aios-demo-app main .aios-demo-executive-reports {
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .aios-demo-app main .aios-demo-card {
+    width: 100% !important;
+    max-width: none;
+    min-width: 0;
+    margin-inline: 0;
+  }
+}

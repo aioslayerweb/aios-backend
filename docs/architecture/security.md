@@ -64,6 +64,12 @@ This keeps the role experience coupled to the actual tenant and identity state i
 
 Role intelligence remains the adaptive experience layer, but its inputs now come from the enterprise security foundation. That allows role switching, workspace switching, and permission-aware behavior to stay consistent across AIOS.
 
+The demo-only Role-Based Intelligence (RBI) panel follows the same boundary: effective permissions filter synthetic signals before ranking, while the selected role affects relevance ranking only. RBI is a deterministic triage aid, not a permission grant or measured business outcome. See [Role-Based Intelligence](./role-based-intelligence.md) for its inputs, scoring, and demo interaction limits.
+
+The Business Memory and Context Engine currently runs only over synthetic, in-memory demo records. Client-side permission filtering is not a server authorization control; do not use the demo operations for production data. See [Business Memory and Context Engine](./business-memory.md) for the architecture audit and production prerequisites.
+
+The connector workbench likewise runs only a synthetic opportunity fixture in the demo route. Its permission and organization checks are client-side and are not an authorization boundary; no external provider, secret storage, or durable connector store is configured. Production connectors require server-verified permissions, verified provider-to-tenant binding, managed secrets, database-enforced tenant isolation, and auditable sync operations. See [Secure Business Data Connectors](./data-connectors.md) for the current contract and prerequisites.
+
 ## Audit And Security
 
 The foundation is designed for immutable audit logs and security event tracking, including:

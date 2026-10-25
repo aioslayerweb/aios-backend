@@ -15,6 +15,7 @@ import {
   SendHorizonal,
   Sparkles,
 } from "lucide-react";
+import { useNavigationBase } from "@/contexts/navigation-context";
 import {
   Card,
   CardContent,
@@ -111,14 +112,17 @@ export function SidebarSection({
 export function QuickActionButton({
   label,
   onClick,
+  disabled = false,
 }: {
   label: string;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className="inline-flex items-center justify-center rounded-md border border-border bg-surface-canvas px-3 py-2 text-xs font-semibold text-text-secondary transition hover:-translate-y-0.5 hover:border-brand-primary/30 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary"
     >
       {label}
@@ -130,14 +134,36 @@ export const CommandComposer = memo(function CommandComposer({
   chips,
   suggestions,
   quickActions,
+  agents,
 }: {
   chips: CommandChip[];
   suggestions: CommandSuggestion[];
   quickActions: WorkspaceLink[];
+  agents: AgentItem[];
 }) {
   const [value, setValue] = useState("Show today's executive priorities");
+  const [selectedAgentIndex, setSelectedAgentIndex] = useState(0);
+  const [contextItems, setContextItems] = useState<string[]>([]);
+  const [previewMessage, setPreviewMessage] = useState("");
+  const { baseHref } = useNavigationBase();
 
   const topSuggestions = useMemo(() => suggestions.slice(0, 7), [suggestions]);
+  const selectedAgent = agents[selectedAgentIndex];
+  const routeHref = (href: string) => href.replace(/^\/app(?=\/|$)/, baseHref);
+
+  const addContext = (context: string) => {
+    setContextItems((current) => current.includes(context) ? current : [...current, context]);
+    setPreviewMessage(`${context} added to the local command context.`);
+  };
+
+  const previewCommand = () => {
+    const command = value.trim();
+    if (!command) {
+      setPreviewMessage("Enter a command before requesting a preview.");
+      return;
+    }
+    setPreviewMessage(`Preview only: "${command}" is ready for review. No command was executed and no business data was changed.`);
+  };
 
   return (
     <Card className="overflow-hidden border-border bg-white shadow-sm">
@@ -159,7 +185,10 @@ export const CommandComposer = memo(function CommandComposer({
           <span className="sr-only">Command input</span>
           <textarea
             value={value}
-            onChange={(event) => setValue(event.target.value)}
+            onChange={(event) => {
+              setValue(event.target.value);
+              setPreviewMessage("");
+            }}
             rows={4}
             placeholder="Compose enterprise command..."
             className="w-full resize-none bg-transparent text-sm text-text-primary outline-none placeholder:text-text-muted"
@@ -173,54 +202,90 @@ export const CommandComposer = memo(function CommandComposer({
               {chip.label}
             </span>
           ))}
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <QuickActionButton label="Agent Selector" onClick={() => undefined} />
-          <QuickActionButton label="Organization Selector" onClick={() => undefined} />
-          <QuickActionButton label="Attach Context" onClick={() => undefined} />
-          <QuickActionButton label="Insert Template" onClick={() => undefined} />
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {quickActions.map((action) => (
+          {contextItems.map((context) => (
             <button
-              key={action.id}
+              key={context}
               type="button"
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium text-text-secondary transition hover:border-brand-primary/30 hover:text-brand-navy"
+              onClick={() => setContextItems((current) => current.filter((item) => item !== context))}
+              className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-800"
+              aria-label={`Remove ${context} context`}
             >
-              <Sparkles size={14} />
-              {action.label}
+              {context} ×
             </button>
           ))}
         </div>
 
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <QuickActionButton
+            label={selectedAgent ? `Agent: ${selectedAgent.name}` : "Agent unavailable"}
+            disabled={!selectedAgent}
+            onClick={() => {
+              if (agents.length > 0) {
+                const nextIndex = (selectedAgentIndex + 1) % agents.length;
+                setSelectedAgentIndex(nextIndex);
+                setPreviewMessage(`Sample agent context changed to ${agents[nextIndex]?.name}.`);
+              }
+            }}
+          />
+          <QuickActionButton
+            label="Organization Selector"
+            onClick={() => addContext("Sample organization")}
+          />
+          <QuickActionButton
+            label="Attach Context"
+            onClick={() => addContext("Executive priorities")}
+          />
+          <QuickActionButton
+            label="Insert Template"
+            onClick={() => {
+              setValue("Review the following business signal. Summarize evidence, explain its impact, and recommend a human-reviewed next step.");
+              setPreviewMessage("A review template was inserted into the composer.");
+            }}
+          />
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          {quickActions.map((action) => (
+            <Link
+              key={action.id}
+              href={routeHref(action.href)}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium text-text-secondary transition hover:border-brand-primary/30 hover:text-brand-navy"
+            >
+              <Sparkles size={14} />
+              {action.label}
+            </Link>
+          ))}
+        </div>
+
         <div className="flex flex-wrap items-center gap-2">
-          <Button variant="primary" size="sm" className="rounded-lg">
+          <Button variant="primary" size="sm" className="rounded-lg" onClick={previewCommand}>
             <SendHorizonal size={14} />
-            Execute Command
+            Preview Command
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-lg">
+          <Button variant="secondary" size="sm" className="rounded-lg" onClick={() => setValue((current) => current.startsWith("/") ? current : `/ ${current}`)}>
             <Command size={14} />
             Slash
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-lg">
+          <Button variant="secondary" size="sm" className="rounded-lg" disabled title="Voice input is unavailable in this preview.">
             <Mic size={14} />
             Voice
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-lg">
+          <Button variant="secondary" size="sm" className="rounded-lg" disabled title="File attachments are unavailable in this preview.">
             <FileUp size={14} />
             Attachment
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-lg">
+          <Button variant="secondary" size="sm" className="rounded-lg" onClick={() => addContext("Executive priorities")}>
             <AtSign size={14} />
             Context Chips
           </Button>
-          <Button variant="secondary" size="sm" className="rounded-lg">
+          <Button variant="secondary" size="sm" className="rounded-lg" disabled title="Live briefing requires a connected briefing service.">
             <AudioLines size={14} />
             Live Brief
           </Button>
         </div>
+
+        <p className="text-xs text-text-muted">Sample context only. Voice, file upload, and live briefing require integrations unavailable in this preview.</p>
+        {previewMessage ? <p role="status" aria-live="polite" className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-900">{previewMessage}</p> : null}
 
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-text-muted">Suggested Commands</p>
@@ -247,16 +312,20 @@ export function IntelligenceCard({
   title,
   children,
   action,
+  actionHref,
 }: {
   title: string;
   children: React.ReactNode;
   action?: string;
+  actionHref?: string;
 }) {
+  const { baseHref } = useNavigationBase();
+  const href = actionHref?.replace(/^\/app(?=\/|$)/, baseHref);
   return (
     <Card className="overflow-hidden border-border bg-white">
       <CardHeader className="flex items-center justify-between py-3">
         <h3 className="text-sm font-semibold text-brand-navy">{title}</h3>
-        {action ? <button className="text-xs font-medium text-brand-primary">{action}</button> : null}
+        {action && href ? <Link href={href} className="text-xs font-medium text-brand-primary hover:underline">{action}</Link> : null}
       </CardHeader>
       <CardContent className="space-y-3 p-4">{children}</CardContent>
     </Card>
@@ -412,12 +481,13 @@ export function ConnectedSystemCard({ item }: { item: ConnectedSystem }) {
 }
 
 export function LinkList({ items }: { items: WorkspaceLink[] }) {
+  const { baseHref } = useNavigationBase();
   return (
     <motion.ul variants={staggerList} initial="hidden" animate="show" className="space-y-2">
       {items.map((item) => (
         <motion.li key={item.id} variants={itemMotion}>
           <Link
-            href={item.href}
+            href={item.href.replace(/^\/app(?=\/|$)/, baseHref)}
             className="group flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm transition hover:border-brand-primary/30"
           >
             <span className="font-medium text-brand-navy">{item.label}</span>
@@ -433,13 +503,14 @@ export function LinkList({ items }: { items: WorkspaceLink[] }) {
 }
 
 export function LeftRailLinks({ title, items }: { title: string; items: WorkspaceLink[] }) {
+  const { baseHref } = useNavigationBase();
   return (
     <SidebarSection title={title}>
       <ul className="space-y-1.5">
         {items.map((item) => (
           <li key={item.id}>
             <Link
-              href={item.href}
+              href={item.href.replace(/^\/app(?=\/|$)/, baseHref)}
               className="group flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/30"
             >
               <span className="font-medium text-brand-navy">{item.label}</span>

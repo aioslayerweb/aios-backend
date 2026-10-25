@@ -35,17 +35,20 @@ import {
 } from "./mock-data";
 import { WorkspaceGrid, WorkspaceSection, WorkspaceShell } from "@/components/workspace";
 import type { WorkspaceAction } from "@/components/workspace";
-
-const headerActions: WorkspaceAction[] = [
-  { id: "new", label: "New Team", icon: <Plus size={14} />, tone: "primary", onClick: () => undefined },
-  { id: "structure", label: "Org Structure", icon: <Building2 size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "directory", label: "People Directory", icon: <Users size={14} />, tone: "secondary", onClick: () => undefined },
-  { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => undefined },
-];
+import { useNavigationBase } from "@/contexts/navigation-context";
 
 export function OrganizationCenterWorkspace() {
   const [searchValue, setSearchValue] = useState("");
   const [peopleQuery, setPeopleQuery] = useState("");
+  const [notice, setNotice] = useState("");
+  const { baseHref } = useNavigationBase();
+  const jumpTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const headerActions: WorkspaceAction[] = [
+    { id: "new", label: "New Team", icon: <Plus size={14} />, tone: "primary", onClick: () => setNotice("Team creation is not connected. No organization data was changed.") },
+    { id: "structure", label: "Org Structure", icon: <Building2 size={14} />, tone: "secondary", onClick: () => jumpTo("organization-chart") },
+    { id: "directory", label: "People Directory", icon: <Users size={14} />, tone: "secondary", onClick: () => jumpTo("people-directory") },
+    { id: "analytics", label: "Analytics", icon: <BarChart3 size={14} />, tone: "secondary", onClick: () => jumpTo("organization-analytics") },
+  ];
 
   const filteredPeople = useMemo(() => {
     const query = peopleQuery.trim().toLowerCase();
@@ -81,11 +84,12 @@ export function OrganizationCenterWorkspace() {
   return (
     <WorkspaceShell>
       <OrganizationHeader
-        breadcrumbs={[{ label: "AIOS", href: "/app" }, { label: "Organization Center" }]}
+        breadcrumbs={[{ label: "AIOS", href: baseHref }, { label: "Organization Center" }]}
         actions={headerActions}
         searchValue={searchValue}
         onSearch={setSearchValue}
       />
+      {notice ? <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
       <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_360px]">
         <OrganizationLeftRail sections={orgSidebarSections} />

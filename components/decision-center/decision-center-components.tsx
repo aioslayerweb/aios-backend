@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { memo, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -124,7 +123,17 @@ export function DecisionHeader({
   );
 }
 
-export function DecisionLeftRail({ sections }: { sections: DecisionSidebarSection[] }) {
+export function DecisionLeftRail({
+  sections,
+  activeFilter,
+  onSelectFilter,
+  onClearFilter,
+}: {
+  sections: DecisionSidebarSection[];
+  activeFilter: string | null;
+  onSelectFilter: (id: string) => void;
+  onClearFilter: () => void;
+}) {
   return (
     <WorkspaceSidebar ariaLabel="Decision center left sidebar">
       {sections.map((section) => (
@@ -134,14 +143,28 @@ export function DecisionLeftRail({ sections }: { sections: DecisionSidebarSectio
           </CardHeader>
           <CardContent className="space-y-1.5 p-3">
             {section.items.map((item) => (
-              <Link key={item.id} href={item.href} className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/35">
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelectFilter(item.id)}
+                aria-pressed={activeFilter === item.id}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm hover:border-brand-primary/35",
+                  activeFilter === item.id ? "border-brand-primary bg-brand-subtle/40" : "border-border bg-surface-canvas"
+                )}
+              >
                 <span className="font-medium text-brand-navy">{item.label}</span>
                 <span className="text-[11px] text-text-muted">{item.meta}</span>
-              </Link>
+              </button>
             ))}
           </CardContent>
         </Card>
       ))}
+      {activeFilter ? (
+        <Button type="button" variant="secondary" size="sm" onClick={onClearFilter} className="w-full">
+          Clear decision filter
+        </Button>
+      ) : null}
     </WorkspaceSidebar>
   );
 }
@@ -249,7 +272,19 @@ export function DecisionConfidenceMatrix({ decision }: { decision: DecisionRecor
   );
 }
 
-export function DecisionCard({ decision, selected, onSelect }: { decision: DecisionRecord; selected: boolean; onSelect: (id: string) => void }) {
+export function DecisionCard({
+  decision,
+  selected,
+  onSelect,
+  onAction,
+  actionFeedback,
+}: {
+  decision: DecisionRecord;
+  selected: boolean;
+  onSelect: (id: string) => void;
+  onAction?: (id: string, action: "approve" | "reject" | "review") => void;
+  actionFeedback?: string;
+}) {
   return (
     <motion.article variants={cardMotion} className={cn("rounded-2xl border bg-white p-4 shadow-sm", selected ? "border-brand-primary bg-brand-subtle/20" : "border-border")}>
       <div className="flex items-start justify-between gap-2">
@@ -292,18 +327,33 @@ export function DecisionCard({ decision, selected, onSelect }: { decision: Decis
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button size="sm" variant="primary">Approve</Button>
-        <Button size="sm" variant="secondary">Reject</Button>
-        <Button size="sm" variant="secondary">Review</Button>
+        <Button type="button" size="sm" variant="primary" disabled={!onAction} title={!onAction ? "No decision service is connected." : undefined} onClick={() => onAction?.(decision.id, "approve")}>Preview approve</Button>
+        <Button type="button" size="sm" variant="secondary" disabled={!onAction} title={!onAction ? "No decision service is connected." : undefined} onClick={() => onAction?.(decision.id, "reject")}>Preview reject</Button>
+        <Button type="button" size="sm" variant="secondary" disabled={!onAction} title={!onAction ? "No decision service is connected." : undefined} onClick={() => onAction?.(decision.id, "review")}>Mark reviewed</Button>
         <Button size="sm" variant="ghost" onClick={() => onSelect(decision.id)}>
           Open Details
         </Button>
       </div>
+      {actionFeedback ? <p className="mt-2 text-xs text-blue-800" role="status">{actionFeedback}</p> : null}
     </motion.article>
   );
 }
 
-export const DecisionExplorer = memo(function DecisionExplorer({ decisions, selectedId, onSelect, filters }: { decisions: DecisionRecord[]; selectedId: string; onSelect: (id: string) => void; filters: DecisionFilter[]; }) {
+export const DecisionExplorer = memo(function DecisionExplorer({
+  decisions,
+  selectedId,
+  onSelect,
+  filters,
+  onAction,
+  actionFeedback,
+}: {
+  decisions: DecisionRecord[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+  filters: DecisionFilter[];
+  onAction?: (id: string, action: "approve" | "reject" | "review") => void;
+  actionFeedback?: Record<string, string>;
+}) {
   return (
     <Card className="border-border bg-white">
       <CardHeader className="py-3">
@@ -319,7 +369,7 @@ export const DecisionExplorer = memo(function DecisionExplorer({ decisions, sele
         <DecisionFilterBar filters={filters} />
         <div className="max-h-[860px] space-y-3 overflow-y-auto pr-1">
           {decisions.length > 0 ? (
-            decisions.map((decision) => <DecisionCard key={decision.id} decision={decision} selected={decision.id === selectedId} onSelect={onSelect} />)
+            decisions.map((decision) => <DecisionCard key={decision.id} decision={decision} selected={decision.id === selectedId} onSelect={onSelect} onAction={onAction} actionFeedback={actionFeedback?.[decision.id]} />)
           ) : (
             <EmptyState title="No Decisions" description="No matching decisions found for the current filter and search." />
           )}

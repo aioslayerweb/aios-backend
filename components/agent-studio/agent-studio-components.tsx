@@ -65,7 +65,15 @@ function collaborationTone(type: AgentCollaborationLink["type"]): string {
   return "from-amber-200 to-amber-500";
 }
 
-export function StudioHeader() {
+export function StudioHeader({
+  searchValue,
+  onSearch,
+  onAction,
+}: {
+  searchValue: string;
+  onSearch: (value: string) => void;
+  onAction: (action: "new" | "import" | "templates") => void;
+}) {
   return (
     <Card className="border-border bg-white">
       <CardContent className="space-y-4 p-4 md:p-5">
@@ -78,15 +86,15 @@ export function StudioHeader() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="sm" onClick={() => onAction("new")}>
               <Plus size={14} />
               New Agent
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => onAction("import")}>
               <FileUp size={14} />
               Import
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" onClick={() => onAction("templates")}>
               <Sparkles size={14} />
               Templates
             </Button>
@@ -96,6 +104,8 @@ export function StudioHeader() {
         <label className="flex items-center gap-2 rounded-xl border border-border bg-surface-canvas px-3 py-2">
           <Search className="h-4 w-4 text-text-muted" />
           <Input
+            value={searchValue}
+            onChange={(event) => onSearch(event.target.value)}
             className="h-auto border-0 bg-transparent p-0 shadow-none"
             placeholder="Search agents, templates, teams, workflows"
             aria-label="Search Agent Studio"
@@ -106,7 +116,7 @@ export function StudioHeader() {
   );
 }
 
-export function SidebarSection({ title, links }: { title: string; links: StudioSidebarLink[] }) {
+export function SidebarSection({ title, links, onSelect }: { title: string; links: StudioSidebarLink[]; onSelect?: (link: StudioSidebarLink) => void }) {
   return (
     <Card className="border-border bg-white">
       <CardHeader className="py-3">
@@ -114,10 +124,17 @@ export function SidebarSection({ title, links }: { title: string; links: StudioS
       </CardHeader>
       <CardContent className="space-y-1.5 p-3">
         {links.map((link) => (
-          <Link key={link.id} href={link.href} className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/35">
-            <span className="font-medium text-brand-navy">{link.label}</span>
-            <span className="text-[11px] text-text-muted">{link.meta}</span>
-          </Link>
+          onSelect ? (
+            <button key={link.id} type="button" onClick={() => onSelect(link)} className="flex w-full items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-left text-sm hover:border-brand-primary/35">
+              <span className="font-medium text-brand-navy">{link.label}</span>
+              <span className="text-[11px] text-text-muted">{link.meta}</span>
+            </button>
+          ) : (
+            <Link key={link.id} href={link.href} className="flex items-center justify-between rounded-lg border border-border bg-surface-canvas px-3 py-2 text-sm hover:border-brand-primary/35">
+              <span className="font-medium text-brand-navy">{link.label}</span>
+              <span className="text-[11px] text-text-muted">{link.meta}</span>
+            </Link>
+          )
         ))}
       </CardContent>
     </Card>
@@ -143,18 +160,18 @@ export function AgentHealthBadge({ confidence, health }: { confidence: number; h
   );
 }
 
-export function QuickActionBar() {
+export function QuickActionBar({ onAction }: { onAction: (action: "collaborate" | "export" | "assign-workflow") => void }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button variant="secondary" size="sm">
+      <Button variant="secondary" size="sm" onClick={() => onAction("collaborate")}>
         <Users size={14} />
         Collaborate
       </Button>
-      <Button variant="secondary" size="sm">
+      <Button variant="secondary" size="sm" onClick={() => onAction("export")}>
         <Download size={14} />
         Export
       </Button>
-      <Button variant="secondary" size="sm">
+      <Button variant="secondary" size="sm" onClick={() => onAction("assign-workflow")}>
         <Command size={14} />
         Assign Workflow
       </Button>
@@ -569,6 +586,10 @@ export function AgentStudioLeftRail({
   templates,
   teams,
   recent,
+  onCategorySelect,
+  onAgentSelect,
+  onTeamSelect,
+  onTemplates,
 }: {
   nav: StudioSidebarLink[];
   categories: StudioSidebarLink[];
@@ -576,15 +597,19 @@ export function AgentStudioLeftRail({
   templates: StudioSidebarLink[];
   teams: StudioSidebarLink[];
   recent: StudioSidebarLink[];
+  onCategorySelect: (link: StudioSidebarLink) => void;
+  onAgentSelect: (link: StudioSidebarLink) => void;
+  onTeamSelect: (link: StudioSidebarLink) => void;
+  onTemplates: () => void;
 }) {
   return (
     <motion.aside variants={panelReveal} initial="hidden" animate="show" className="space-y-3" aria-label="Agent Studio left sidebar">
       <SidebarSection title="AIOS Navigation" links={nav} />
-      <SidebarSection title="Agent Categories" links={categories} />
-      <SidebarSection title="Favorites" links={favorites} />
-      <SidebarSection title="Templates" links={templates} />
-      <SidebarSection title="Teams" links={teams} />
-      <SidebarSection title="Recent Agents" links={recent} />
+      <SidebarSection title="Agent Categories" links={categories} onSelect={onCategorySelect} />
+      <SidebarSection title="Favorites" links={favorites} onSelect={onAgentSelect} />
+      <SidebarSection title="Templates" links={templates} onSelect={onTemplates} />
+      <SidebarSection title="Teams" links={teams} onSelect={onTeamSelect} />
+      <SidebarSection title="Recent Agents" links={recent} onSelect={onAgentSelect} />
     </motion.aside>
   );
 }

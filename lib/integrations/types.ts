@@ -120,7 +120,7 @@ export type IntegrationTouchpoint = {
   name: string
   description: string
   adapterCount: number
-  state: "ready" | "observing" | "replaying"
+  state: "ready" | "observing" | "replaying" | "planned"
 }
 
 export type IntegrationDeveloperTool = {

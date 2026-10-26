@@ -82,6 +82,7 @@ function createCityScene(
       colorWrite: false,
       depthWrite: false,
     });
+    const emphasisByCity = new Map<string, { value: number; target: number; materials: Map<THREE.MeshStandardMaterial, { intensity: number; glowing: boolean }> }>();
     const cityAnimators: Array<(seconds: number) => void> = [];
     const interactionTargets: THREE.Mesh[] = [];
     const selectionRings = new Map<string, THREE.Mesh<THREE.TorusGeometry, THREE.MeshBasicMaterial>>();
@@ -117,6 +118,13 @@ function createCityScene(
       cityGroups.set(department.id, city);
 
       cityAnimators.push(buildDepartmentCity(THREE, city, department.id));
+      const emphasisMaterials = new Map<THREE.MeshStandardMaterial, { intensity: number; glowing: boolean }>();
+      city.traverse((object) => {
+        if (!(object instanceof THREE.Mesh) || !(object.material instanceof THREE.MeshStandardMaterial)) return;
+        if (object.material.transparent && object.material.opacity < 0.7) return;
+        emphasisMaterials.set(object.material, { intensity: object.material.emissiveIntensity, glowing: object.material.emissive.getHex() !== 0 });
+      });
+      emphasisByCity.set(department.id, { value: 0, target: 0, materials: emphasisMaterials });
 
       const badgeCanvas = document.createElement("canvas");
       badgeCanvas.width = 420;
@@ -233,7 +241,7 @@ function createCityScene(
     let reducedMotion = mediaQuery.matches;
     let isInViewport = true;
     let frameId: number | null = null;
-    let selectedId = departments[0]?.id ?? "";
+    let selectedId = "";
     let hoveredId: string | null = null;
     let targetRotationX = 0.16;
     let targetRotationY = 0;
@@ -247,10 +255,33 @@ function createCityScene(
     canvas.style.touchAction = "pan-y";
 
     const render = () => renderer.render(scene, camera);
+    // Selected city gains a gentle emissive lift; everyone else stays subdued.
+    const applyEmphasis = (emphasis: { value: number; materials: Map<THREE.MeshStandardMaterial, { intensity: number; glowing: boolean }> }) => {
+      emphasis.materials.forEach(({ intensity, glowing }, material) => {
+        if (!glowing) material.emissive.copy(material.color);
+        material.emissiveIntensity = glowing ? intensity * (1 + emphasis.value * 0.5) : emphasis.value * 0.2;
+      });
+    };
+    const stepEmphasis = (immediate: boolean) => {
+      let changed = false;
+      emphasisByCity.forEach((emphasis) => {
+        const next = immediate ? emphasis.target : emphasis.value + (emphasis.target - emphasis.value) * 0.06;
+        const settled = Math.abs(next - emphasis.target) < 0.004 ? emphasis.target : next;
+        if (settled === emphasis.value) return;
+        emphasis.value = settled;
+        applyEmphasis(emphasis);
+        changed = true;
+      });
+      return changed;
+    };
     const setHighlight = () => {
       selectionRings.forEach((ring, id) => {
-        ring.material.opacity = id === selectedId ? 0.95 : id === hoveredId ? 0.72 : 0.38;
+        ring.material.opacity = id === selectedId ? 0.95 : id === hoveredId ? 0.6 : 0.28;
       });
+      emphasisByCity.forEach((emphasis, id) => {
+        emphasis.target = id === selectedId ? 1 : 0;
+      });
+      if (reducedMotion) stepEmphasis(true);
     };
     const startAnimation = () => {
       if (!isInViewport || document.hidden || reducedMotion || frameId !== null) return;
@@ -267,14 +298,15 @@ function createCityScene(
       world.rotation.y += (targetRotationY - world.rotation.y) * 0.07;
       world.rotation.x += (targetRotationX - world.rotation.x) * 0.07;
       if (!drag) targetRotationY += 0.00035;
+      stepEmphasis(false);
       emblem.update(seconds);
       cityAnimators.forEach((animateCity) => animateCity(seconds));
       cityGroups.forEach((city) => {
         const { baseY, floatPhase } = city.userData as { baseY: number; floatPhase: number; hoverScale: number; targetScale: number };
         city.position.y = baseY + Math.sin(seconds * 0.8 + floatPhase) * 0.045;
         city.rotation.y = Math.sin(seconds * 0.24 + floatPhase) * 0.045;
-        city.userData.targetScale = city === cityGroups.get(hoveredId ?? "") ? 1.07 : city === cityGroups.get(selectedId) ? 1.025 : 1;
-        city.userData.hoverScale += (city.userData.targetScale - city.userData.hoverScale) * 0.1;
+        city.userData.targetScale = city === cityGroups.get(hoveredId ?? "") ? 1.07 : city === cityGroups.get(selectedId) ? 1.03 : 1;
+        city.userData.hoverScale += (city.userData.targetScale - city.userData.hoverScale) * 0.05;
         city.scale.setScalar(city.userData.hoverScale);
       });
       pulseMarkers.forEach(({ curve, marker, offset }) => {
@@ -288,11 +320,15 @@ function createCityScene(
       const width = Math.max(mount.clientWidth, 1);
       const height = Math.max(mount.clientHeight, 1);
       const aspect = width / height;
-      const viewHeight = Math.max(20, 25 / aspect);
+      // On wide desktop the floating cards cover the outer ~20% on each side, so fit the cities in the centre band.
+      const desktopOverlay = window.matchMedia("(min-width: 1280px)").matches;
+      const viewHeight = Math.max(20, (desktopOverlay ? 43 : 25) / aspect);
+      // Lift the world above the bottom recommendations card on desktop.
+      const verticalShift = desktopOverlay ? 2.6 : 0;
       camera.left = -(viewHeight * aspect) / 2;
       camera.right = (viewHeight * aspect) / 2;
-      camera.top = viewHeight / 2;
-      camera.bottom = -viewHeight / 2;
+      camera.top = viewHeight / 2 - verticalShift;
+      camera.bottom = -viewHeight / 2 - verticalShift;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
       render();

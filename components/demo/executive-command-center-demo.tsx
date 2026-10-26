@@ -30,6 +30,7 @@ import {
   ShieldAlert,
   ShoppingBag,
   Users,
+  X,
   type LucideIcon,
 } from "lucide-react";
 
@@ -182,6 +183,7 @@ function MetricTrendChart({ id, label }: { id: string; label: string }) {
 export function DemoExecutiveCommandCenter() {
   const [selectedDomainId, setSelectedDomainId] = useState("sales");
   const [coreOverviewOpen, setCoreOverviewOpen] = useState(false);
+  const [departmentCardOpen, setDepartmentCardOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState<string | null>(null);
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [customerSearch, setCustomerSearch] = useState("");
@@ -217,6 +219,23 @@ export function DemoExecutiveCommandCenter() {
   const [actionMessage, setActionMessage] = useState("");
   const selectedDomain = domains.find((domain) => domain.id === selectedDomainId) ?? domains[0]!;
   const selectedDepartmentSummary = demoDepartmentSummaries.find((department) => department.id === selectedDomainId) ?? demoDepartmentSummaries[0]!;
+  // One authoritative selection: the card is open for the selected department, or nothing is emphasised.
+  const handleDepartmentSelect = React.useCallback((id: string) => {
+    if (departmentCardOpen && id === selectedDomainId) {
+      setDepartmentCardOpen(false);
+      return;
+    }
+    setSelectedDomainId(id);
+    setDepartmentCardOpen(true);
+  }, [departmentCardOpen, selectedDomainId]);
+  React.useEffect(() => {
+    if (!departmentCardOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDepartmentCardOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [departmentCardOpen]);
   const rolePriority: Record<DemoExecutiveRole, string> = {
     CEO: "sales",
     CFO: "finance",
@@ -457,8 +476,8 @@ export function DemoExecutiveCommandCenter() {
           <DepartmentCities
             departments={domains}
             connections={departmentConnections}
-            selectedDepartmentId={selectedDomainId}
-            onDepartmentSelect={setSelectedDomainId}
+            selectedDepartmentId={departmentCardOpen ? selectedDomainId : ""}
+            onDepartmentSelect={handleDepartmentSelect}
             onCoreSelect={() => setCoreOverviewOpen((open) => !open)}
             coreOverviewOpen={coreOverviewOpen}
           />
@@ -480,17 +499,34 @@ export function DemoExecutiveCommandCenter() {
               <Link href="/demo-platform/insights" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Review sample insights <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
             </div>
           ) : null}
-          <div className="aios-demo-city-detail mt-3 grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white/90 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
-            <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{selectedDomain.label} department intelligence · synthetic</p>
-              <p className="mt-1 text-xs font-semibold text-slate-900">{selectedDepartmentSummary.kpi}</p>
+        </section>
+
+        {departmentCardOpen ? (
+          <section
+            role="region"
+            aria-labelledby="department-card-heading"
+            data-department-id={selectedDomain.id}
+            className="aios-demo-department-card min-w-0 rounded-[1.5rem] border border-blue-100 bg-white/95 p-4 shadow-[0_18px_48px_rgba(30,62,104,0.22)] backdrop-blur-md"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Department intelligence · synthetic sample</p>
+                <h3 id="department-card-heading" className="mt-1 break-words text-base font-semibold text-slate-900">{selectedDomain.label}</h3>
+                <p className="mt-0.5 text-xs text-slate-600">{selectedDomain.signal} · {selectedDomain.health}</p>
+              </div>
+              <button type="button" onClick={() => setDepartmentCardOpen(false)} className={`inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-700 hover:bg-slate-50 ${focusStyle()}`} aria-label={`Close ${selectedDomain.label} department card`}>
+                <X aria-hidden="true" className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-3 min-w-0">
+              <p className="text-xs font-semibold text-slate-900">{selectedDepartmentSummary.kpi}</p>
               <p className="mt-1 text-xs text-amber-800"><strong>Issue:</strong> {selectedDepartmentSummary.issue}</p>
               <p className="mt-1 text-xs text-slate-600"><strong>Next review:</strong> {selectedDepartmentSummary.recommendation}</p>
               <p className="mt-1 text-[10px] text-slate-500"><strong>Connected sample context:</strong> {selectedDepartmentSummary.relatedDepartmentIds.map((id) => domains.find((domain) => domain.id === id)?.label).filter(Boolean).join(", ") || "Company-wide"}.</p>
             </div>
-            <Link href={selectedDepartmentSummary.href} className={`inline-flex min-h-11 items-center justify-center gap-1 rounded-lg border border-blue-200 px-3 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Open {selectedDomain.label}<ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
-          </div>
-        </section>
+            <Link href={selectedDepartmentSummary.href} className={`mt-3 inline-flex min-h-11 items-center justify-center gap-1 rounded-lg border border-blue-200 px-3 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Open {selectedDomain.label}<ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
+          </section>
+        ) : null}
 
         <section aria-labelledby="pipeline-heading" className="aios-demo-floating-card aios-demo-pipeline-card order-2 min-w-0 rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)] xl:order-1 xl:col-start-1">
           <div className="flex items-start justify-between gap-2">

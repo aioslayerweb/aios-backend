@@ -2446,8 +2446,7 @@ pre {
     height: auto;
   }
 
-  .aios-demo-city-landscape .aios-demo-city-selected,
-  .aios-demo-city-landscape .aios-demo-city-detail {
+  .aios-demo-city-landscape .aios-demo-city-selected {
     display: none;
   }
 
@@ -2474,11 +2473,24 @@ pre {
     scrollbar-width: thin;
   }
 
+  .aios-demo-app main section.aios-demo-department-card[aria-labelledby] {
+    position: absolute;
+    z-index: 35;
+    top: 9.5rem;
+    right: 1rem;
+    bottom: auto;
+    left: auto;
+    width: clamp(235px, 25%, 340px);
+    max-height: calc(100% - 29rem);
+    margin: 0;
+    transform: none;
+  }
+
   .aios-demo-pipeline-card {
     top: 9.5rem;
     bottom: 19.25rem;
     left: 1rem;
-    width: clamp(235px, 25%, 340px);
+    width: clamp(235px, 20%, 340px);
     max-height: none;
   }
 
@@ -2486,7 +2498,7 @@ pre {
     top: 9.5rem;
     right: 1rem;
     bottom: 19.25rem;
-    width: clamp(235px, 25%, 340px);
+    width: clamp(235px, 20%, 340px);
     max-height: none;
     overflow: auto;
     padding: 0.4rem;
@@ -2511,6 +2523,19 @@ pre {
     min-width: 0;
   }
 
+  .aios-demo-app main section.aios-demo-department-card[aria-labelledby] {
+    position: fixed;
+    z-index: 60;
+    right: auto;
+    bottom: calc(0.5rem + env(safe-area-inset-bottom));
+    left: max(0.5rem, calc((100vw - 36rem) / 2));
+    width: min(36rem, calc(100vw - 1rem));
+    max-width: none;
+    max-height: min(60svh, 28rem);
+    margin: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 }
 
 @media (max-width: 639px) {

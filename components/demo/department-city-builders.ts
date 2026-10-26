@@ -17,8 +17,15 @@ const GROUND = 0.43;
 
 function createKit(THREE: ThreeModule, city: THREE.Group) {
   const animators: Animator[] = [];
-  const material = (color: number, options: THREE.MeshStandardMaterialParameters = {}) =>
-    new THREE.MeshStandardMaterial({ color, roughness: 0.5, ...options });
+  let speedScale = 0.45;
+  // Default palette is restrained; the selected city is lifted through emissive emphasis at runtime.
+  const material = (color: number, options: THREE.MeshStandardMaterialParameters = {}) => {
+    const muted = new THREE.Color(color);
+    const hsl = { h: 0, s: 0, l: 0 };
+    muted.getHSL(hsl);
+    muted.setHSL(hsl.h, hsl.s * 0.78, Math.min(hsl.l, 0.86) * 0.94);
+    return new THREE.MeshStandardMaterial({ roughness: 0.5, ...options, color: muted });
+  };
 
   const add = (geometry: THREE.BufferGeometry, mat: THREE.Material, x: number, y: number, z: number) => {
     const mesh = new THREE.Mesh(geometry, mat);
@@ -55,7 +62,7 @@ function createKit(THREE: ThreeModule, city: THREE.Group) {
     }));
     animators.push((seconds) => {
       pods.forEach(({ mesh, offset }) => {
-        const angle = offset + seconds * speed;
+        const angle = offset + seconds * speed * speedScale;
         mesh.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
         mesh.rotation.y = -angle;
       });
@@ -69,7 +76,7 @@ function createKit(THREE: ThreeModule, city: THREE.Group) {
     }
   };
 
-  return { THREE, city, animators, material, add, box, cylinder, ring, dome, flyover, base, traffic, trees };
+  return { THREE, city, animators, setSpeed: (scale: number) => { speedScale = scale; }, material, add, box, cylinder, ring, dome, flyover, base, traffic, trees };
 }
 
 type Kit = ReturnType<typeof createKit>;
@@ -105,6 +112,7 @@ const builders: Record<string, (kit: Kit) => void> = {
   // Marketing: creative river island with coral blocks, a turquoise river and a white obelisk.
   marketing: (k) => {
     const { THREE } = k;
+    k.setSpeed(0.2);
     k.base(0x7dd3fc, 0xfef08a);
     k.cylinder(k.material(0x4ade80, { roughness: 0.85 }), 0, 0, 2.05, 2.1, 0.08, GROUND - 0.08);
     const river = new THREE.CatmullRomCurve3([
@@ -170,10 +178,10 @@ const builders: Record<string, (kit: Kit) => void> = {
   // Finance: obsidian and gold with neon rings, cantilevered skyboxes and hexagonal towers.
   finance: (k) => {
     const { THREE } = k;
-    const obsidian = k.material(0x090d16, { roughness: 0.25, metalness: 0.8 });
-    const gold = k.material(0xf59e0b, { roughness: 0.2, metalness: 0.85 });
-    const amber = k.material(0xfbbf24, { emissive: 0xd97706, emissiveIntensity: 0.65, roughness: 0.3 });
-    k.base(0x090d16, 0x1e293b, 0.8);
+    const obsidian = k.material(0x3b4a63, { roughness: 0.42, metalness: 0.3 });
+    const gold = k.material(0xd9a441, { roughness: 0.35, metalness: 0.4 });
+    const amber = k.material(0xfbbf24, { emissive: 0xd97706, emissiveIntensity: 0.4, roughness: 0.3 });
+    k.base(0x334155, 0x64748b, 0.3);
     [2.0, 1.55, 1.05].forEach((radius, index) => k.ring(gold, radius - 0.02, radius + 0.02, GROUND + 0.01 + index * 0.005));
     k.box(obsidian, 0, 0, 0.5, 2.8, 0.5).castShadow = true;
     for (let fin = -2; fin <= 2; fin += 1) k.box(gold, fin * 0.1, 0.26, 0.016, 2.8, 0.03);
@@ -183,10 +191,10 @@ const builders: Record<string, (kit: Kit) => void> = {
       k.cylinder(obsidian, x!, z!, 0.28, 0.35, height!, GROUND, 6);
       k.add(new THREE.ConeGeometry(0.29, 0.5, 6), gold, x!, GROUND + height! + 0.25, z!);
     });
-    k.flyover(k.material(0x334155), [-1.4, 0.55, -0.9], [0, 1.2, -0.2], [1.4, 0.55, 0.8]);
+    k.flyover(k.material(0x64748b), [-1.4, 0.55, -0.9], [0, 1.2, -0.2], [1.4, 0.55, 0.8]);
     k.traffic(0xf59e0b, 1.9, GROUND + 0.07, 5, 0.65, [0.2, 0.05, 0.09]);
     k.traffic(0xfbbf24, 1.35, GROUND + 0.07, 4, -0.5, [0.2, 0.05, 0.09]);
-    const glow = new THREE.PointLight(0xf59e0b, 1.4, 5, 2);
+    const glow = new THREE.PointLight(0xf59e0b, 1.0, 5, 2);
     glow.position.set(0, 1.4, 0);
     k.city.add(glow);
   },

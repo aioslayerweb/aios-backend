@@ -76,6 +76,8 @@ test("runtime event APIs fail closed without organization authorization", async 
           type: "EXECUTION_START",
           timestamp: Date.now(),
           contextId: "synthetic-context",
+          organization_id: "organization-b",
+          org_id: "organization-b",
           payload: { module: "Synthetic Test", source: "user" },
         }),
       })

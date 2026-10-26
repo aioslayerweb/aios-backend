@@ -146,51 +146,84 @@ const executiveRoles = [
 export function PublicHomepageExperience() {
   const [activeRole, setActiveRole] = useState<(typeof roles)[number]["id"]>("ceo")
   const [activeStep, setActiveStep] = useState(0)
+  const [scenarioTeamSize, setScenarioTeamSize] = useState(450)
+  const [scenarioHoursPerWeek, setScenarioHoursPerWeek] = useState(1.5)
+  const [scenarioHourlyCost, setScenarioHourlyCost] = useState(50)
   const selectedRole = roles.find((role) => role.id === activeRole) ?? roles[0]
   const selectedStep = flow[activeStep]
+  const scenarioAnnualHours = Math.round(scenarioTeamSize * scenarioHoursPerWeek * 48)
+  const scenarioAnnualValue = scenarioAnnualHours * scenarioHourlyCost
+  const formatScenarioValue = new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(scenarioAnnualValue)
 
   return (
     <PublicPageShell activeHref="/">
-      <PublicStructuredData
-        name="AIOS"
-        description="AIOS is a business intelligence operating layer that connects signals, business memory, role-based intelligence, recommendations, and governed workflows."
-        path="/"
-      />
+      <div className="public-home-spatial">
+        <PublicStructuredData
+          name="AIOS"
+          description="AIOS is a business intelligence operating layer that connects signals, business memory, role-based intelligence, recommendations, and governed workflows."
+          path="/"
+        />
 
-      <section className="public-home-hero">
+      <section className="public-home-hero public-home-spatial-hero">
+        <div className="public-home-orbit-art" aria-hidden="true">
+          <span className="public-home-orbit public-home-orbit-one" />
+          <span className="public-home-orbit public-home-orbit-two" />
+          <span className="public-home-orbit public-home-orbit-three" />
+          <span className="public-home-orbit-core"><BrainCircuit size={38} /></span>
+          <span className="public-home-orbit-node public-home-orbit-node-one" />
+          <span className="public-home-orbit-node public-home-orbit-node-two" />
+          <span className="public-home-orbit-node public-home-orbit-node-three" />
+        </div>
         <div className="public-container-wide public-home-hero-content">
           <div className="public-home-hero-copy">
             <div className="public-home-eyebrow">
               <span aria-hidden="true" />
-              AIOS · Business intelligence operating layer
+              AIOS · Business intelligence operating system
             </div>
             <h1 className="public-home-title">
-              Your entire business.<br className="hidden sm:block" />
-              <span>One intelligent operating layer.</span>
+              Your business,<br className="hidden sm:block" />
+              {" "}<span>with the context to move forward.</span>
             </h1>
             <p className="public-home-lede">
-              For leaders who need context across customers, finance, and operations. AIOS connects business signals and memory to help teams understand what changed, why it matters, and what deserves review.
+              AIOS connects business signals, memory, and knowledge to help leaders see what changed, understand why it matters, and decide what deserves attention.
             </p>
             <div className="public-home-actions">
               <Link href="/demo-platform/executive" data-analytics-event="demo_click" className="public-button public-button-primary public-home-primary">
-                Explore synthetic demo <ArrowRight aria-hidden="true" size={17} />
+                Explore the synthetic demo <ArrowRight aria-hidden="true" size={17} />
               </Link>
               <Link href="/platform" className="public-button public-button-secondary public-home-platform-link">
-                Explore platform <Network aria-hidden="true" size={17} />
+                Explore the platform <Network aria-hidden="true" size={17} />
               </Link>
             </div>
           </div>
 
           <div className="public-home-capabilities" aria-label="AIOS operating concepts">
-            <div><span>Business signals</span><strong>Information from across the business</strong></div>
-            <div><span>Role context</span><strong>Priorities shaped around the decision-maker</strong></div>
-            <div><span>Governed workflows</span><strong>People and policies remain in control</strong></div>
+            <div><span>01 · Understand</span><strong>Connect signals with relevant context</strong></div>
+            <div><span>02 · Decide</span><strong>Make evidence and reasoning visible</strong></div>
+            <div><span>03 · Govern</span><strong>Keep people and policy in control</strong></div>
           </div>
 
+        </div>
+      </section>
+
+      <nav className="public-home-spatial-nav" aria-label="Homepage sections">
+        <a href="#cockpit">Executive cockpit</a>
+        <a href="#matrix">How it works</a>
+        <a href="#agents">Business functions</a>
+        <a href="#roi-engine">Scenario planner</a>
+        <a href="#trust">Governance</a>
+      </nav>
+
+      <section id="cockpit" className="public-home-section public-home-cockpit-section" aria-label="Illustrative executive cockpit">
+        <div className="public-container-wide">
           <div className="public-home-cockpit">
             <div className="public-home-cockpit-bar">
-              <div className="public-home-cockpit-brand"><span aria-hidden="true" /><span>AIOS · OPERATING MODEL</span></div>
-              <span className="public-home-cockpit-note">Illustrative product view · synthetic example</span>
+              <div className="public-home-cockpit-brand"><span aria-hidden="true" /><span>AIOS · EXECUTIVE COCKPIT</span></div>
+              <span className="public-home-cockpit-note">Illustrative product model · synthetic example</span>
             </div>
             <div className="public-home-cockpit-grid">
               <div className="public-home-cockpit-column">
@@ -213,7 +246,7 @@ export function PublicHomepageExperience() {
                 <div className="public-home-cockpit-row"><Workflow aria-hidden="true" size={16} /><span>Outcome learning</span><small>Memory</small></div>
               </div>
             </div>
-            <p className="public-home-cockpit-disclaimer">This illustration explains the AIOS product model. It is not a live connection, activity feed, or performance dashboard.</p>
+            <p className="public-home-cockpit-disclaimer">Illustrative only. This is not a live connection, customer activity feed, or performance dashboard.</p>
           </div>
         </div>
       </section>
@@ -234,7 +267,7 @@ export function PublicHomepageExperience() {
         </div>
       </section>
 
-      <section className="public-home-section public-home-flow-section" aria-labelledby="public-home-flow-title">
+      <section id="matrix" className="public-home-section public-home-flow-section" aria-labelledby="public-home-flow-title">
         <div className="public-container-wide">
           <div className="public-home-section-heading">
             <div>
@@ -405,7 +438,7 @@ export function PublicHomepageExperience() {
         </div>
       </section>
 
-      <section className="public-home-section public-home-operators-section" aria-labelledby="public-home-operators-title">
+      <section id="agents" className="public-home-section public-home-operators-section" aria-labelledby="public-home-operators-title">
         <div className="public-container-wide">
           <div className="public-home-section-heading">
             <div>
@@ -426,7 +459,72 @@ export function PublicHomepageExperience() {
         </div>
       </section>
 
-      <section className="public-home-section public-home-trust-section" aria-labelledby="public-home-trust-title">
+      <section id="roi-engine" className="public-home-section public-home-scenario-section" aria-labelledby="public-home-scenario-title">
+        <div className="public-container-wide">
+          <div className="public-home-section-heading">
+            <div>
+              <p className="public-eyebrow">Scenario planner · illustrative only</p>
+              <h2 id="public-home-scenario-title" className="public-h2">Model the value of time differently.</h2>
+            </div>
+            <p>Explore a simple capacity scenario using assumptions you control. This is not an AIOS savings forecast, ROI promise, or verified customer result.</p>
+          </div>
+
+          <div className="public-home-scenario">
+            <div className="public-home-scenario-inputs">
+              <label>
+                <span>People in the scenario</span>
+                <output>{scenarioTeamSize.toLocaleString("en-IE")}</output>
+                <input
+                  type="range"
+                  min="25"
+                  max="2000"
+                  step="25"
+                  value={scenarioTeamSize}
+                  onChange={(event) => setScenarioTeamSize(Number(event.target.value))}
+                  aria-label="People included in the scenario"
+                />
+                <span className="public-home-scenario-range"><span>25</span><span>2,000</span></span>
+              </label>
+              <label>
+                <span>Hours potentially redirected per person each week</span>
+                <output>{scenarioHoursPerWeek.toLocaleString("en-IE")} hrs</output>
+                <input
+                  type="range"
+                  min="0"
+                  max="8"
+                  step="0.25"
+                  value={scenarioHoursPerWeek}
+                  onChange={(event) => setScenarioHoursPerWeek(Number(event.target.value))}
+                  aria-label="Potentially redirected hours per person each week"
+                />
+                <span className="public-home-scenario-range"><span>0 hrs</span><span>8 hrs</span></span>
+              </label>
+              <label>
+                <span>Blended hourly cost assumption</span>
+                <output>{new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(scenarioHourlyCost)}</output>
+                <input
+                  type="range"
+                  min="15"
+                  max="250"
+                  step="5"
+                  value={scenarioHourlyCost}
+                  onChange={(event) => setScenarioHourlyCost(Number(event.target.value))}
+                  aria-label="Blended hourly cost assumption in euros"
+                />
+                <span className="public-home-scenario-range"><span>€15</span><span>€250</span></span>
+              </label>
+            </div>
+            <div className="public-home-scenario-result" aria-live="polite">
+              <span className="public-home-scenario-result-label">Illustrative annual capacity value</span>
+              <strong>{formatScenarioValue}</strong>
+              <span>{scenarioAnnualHours.toLocaleString("en-IE")} modeled hours per year</span>
+              <p>Calculation: people × hours per week × 48 weeks × hourly cost. Your inputs are used only in this page state and are not submitted.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="trust" className="public-home-section public-home-trust-section" aria-labelledby="public-home-trust-title">
         <div className="public-container-wide">
           <div className="public-home-section-heading">
             <div>
@@ -467,7 +565,7 @@ export function PublicHomepageExperience() {
         </div>
       </section>
 
-      <section className="public-home-cta">
+      <section id="activation" className="public-home-cta">
         <div className="public-container-wide public-home-cta-inner">
           <div>
             <p className="public-eyebrow">Start with understanding</p>
@@ -480,6 +578,7 @@ export function PublicHomepageExperience() {
           </div>
         </div>
       </section>
+      </div>
     </PublicPageShell>
   )
 }

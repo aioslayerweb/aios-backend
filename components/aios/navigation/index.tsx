@@ -149,7 +149,7 @@ export function AIOSNavbar({
           </nav>
 
           <div className="flex items-center gap-3">
-            <AIOSPrimaryButton href={ctaHref} size="sm" className="hidden sm:inline-flex">{ctaLabel}</AIOSPrimaryButton>
+            <AIOSPrimaryButton href={ctaHref} size="sm" className="public-nav-cta hidden md:inline-flex">{ctaLabel}</AIOSPrimaryButton>
           </div>
         </AIOSContainer>
       </motion.header>

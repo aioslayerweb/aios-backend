@@ -32,6 +32,7 @@ import {
   WorkspaceRightPanel,
   WorkspaceSidebar,
 } from "@/components/workspace";
+import { formatStableDateTime } from "@/utils/date";
 import { cn } from "@/utils";
 import type { WorkspaceAction, WorkspaceBreadcrumb } from "@/components/workspace";
 import type {
@@ -171,7 +172,7 @@ export function OrganizationChart({ nodes }: { nodes: OrgChartNode[] }) {
 
   const renderNode = (node: OrgChartNode, depth: number) => {
     const hasChildren = (children.get(node.id)?.length ?? 0) > 0;
-    const isExpanded = expanded[node.id] ?? depth < 2;
+    const isExpanded = expanded[node.id] ?? depth === 0;
 
     return (
       <div key={node.id} className="space-y-2">
@@ -503,7 +504,7 @@ export function OrganizationActivityTimeline({ events }: { events: OrgActivityEv
                 {timelineIcon(event.type)}
                 {event.title}
               </p>
-              <span className="text-xs text-text-muted">{new Date(event.timestamp).toLocaleString()}</span>
+              <span className="text-xs text-text-muted">{formatStableDateTime(event.timestamp)}</span>
             </div>
             <p className="mt-1 text-xs text-text-secondary">{event.detail}</p>
           </motion.article>
@@ -513,9 +514,9 @@ export function OrganizationActivityTimeline({ events }: { events: OrgActivityEv
   );
 }
 
-export function RightInsightPanel({ insights }: { insights: InsightItem[] }) {
+export function RightInsightPanel({ insights, className }: { insights: InsightItem[]; className?: string }) {
   return (
-    <WorkspaceRightPanel ariaLabel="Organization right insight panel">
+    <WorkspaceRightPanel className={className} ariaLabel="Organization right insight panel">
       <Card className="border-border bg-white">
         <CardHeader className="py-3">
           <div className="flex items-center justify-between gap-2">

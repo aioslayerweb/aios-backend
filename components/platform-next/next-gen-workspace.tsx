@@ -330,7 +330,7 @@ export function NextGenWorkspace({
           </div>
         </div>
 
-        <div className="aios-demo-primary-card-grid mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="aios-demo-primary-card-grid mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {enterpriseKpis.map((kpi) => (
             <motion.article
               key={kpi.label}
@@ -395,15 +395,26 @@ export function NextGenWorkspace({
         subtitle="Unified operating context across all AIOS centers"
         actionLabel="AIOS"
       >
-        <div className="grid gap-3 xl:grid-cols-2">
-          {enterpriseDatasets.map((dataset) => (
-            <DatasetCard
-              key={dataset.title}
-              title={dataset.title}
-              entities={dataset.entities}
-            />
-          ))}
-        </div>
+        <details className="group rounded-2xl border border-slate-200 bg-white/90 shadow-sm">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-inset">
+            <span>Browse {enterpriseDatasets.length} connected datasets</span>
+            <span className="flex shrink-0 items-center gap-2">
+              <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">
+                {enterpriseDatasets.length} datasets
+              </span>
+              <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" aria-hidden="true" />
+            </span>
+          </summary>
+          <div className="grid gap-3 border-t border-slate-100 p-3 xl:grid-cols-2">
+            {enterpriseDatasets.map((dataset) => (
+              <DatasetCard
+                key={dataset.title}
+                title={dataset.title}
+                entities={dataset.entities}
+              />
+            ))}
+          </div>
+        </details>
       </WorkspaceSection>
     </WorkspaceShell>
   );

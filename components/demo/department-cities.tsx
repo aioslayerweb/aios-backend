@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import type * as THREE from "three";
-import { BrandLogo } from "@/components/branding";
+import { buildDepartmentCity, createAiosEmblem } from "./department-city-builders";
 import { Building2, RotateCcw, Waves } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -42,15 +42,6 @@ const departmentPositions: Record<string, [number, number]> = {
   product: [0, 8.8],
 };
 
-const departmentArchitecture: Record<string, { style: string; heights: number[] }> = {
-  sales: { style: "glass", heights: [2.5, 1.55, 1.1] },
-  marketing: { style: "creative", heights: [1.35, 1.9, 1.15] },
-  customers: { style: "park", heights: [1.25, 0.95, 0.8] },
-  finance: { style: "civic", heights: [2.0, 1.35, 1.1] },
-  operations: { style: "industrial", heights: [2.15, 1.35, 0.95] },
-  product: { style: "technology", heights: [2.2, 1.2, 1.05] },
-};
-
 function createCityScene(
   THREE: ThreeModule,
   mount: HTMLDivElement,
@@ -84,26 +75,6 @@ function createCityScene(
     const world = new THREE.Group();
     scene.add(world);
 
-    const groundMaterial = new THREE.MeshStandardMaterial({ color: 0xd9e7ed, roughness: 0.88 });
-    const islandMaterial = new THREE.MeshStandardMaterial({ color: 0x8bc7a0, roughness: 0.95 });
-    const roadMaterial = new THREE.MeshStandardMaterial({ color: 0x687c8a, roughness: 0.84 });
-    const roadMarkMaterial = new THREE.MeshBasicMaterial({ color: 0xf5fbff, transparent: true, opacity: 0.84 });
-    const waterMaterial = new THREE.MeshStandardMaterial({
-      color: 0x76c9e8,
-      roughness: 0.28,
-      metalness: 0.08,
-      transparent: true,
-      opacity: 0.8,
-    });
-    const windowMaterial = new THREE.MeshStandardMaterial({
-      color: 0xc8efff,
-      roughness: 0.22,
-      metalness: 0.2,
-      emissive: 0x315a72,
-      emissiveIntensity: 0.18,
-    });
-    const treeMaterial = new THREE.MeshStandardMaterial({ color: 0x3e8a59, roughness: 0.95 });
-    const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x805d42, roughness: 1 });
     const hitMaterial = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
@@ -111,6 +82,7 @@ function createCityScene(
       colorWrite: false,
       depthWrite: false,
     });
+    const cityAnimators: Array<(seconds: number) => void> = [];
     const interactionTargets: THREE.Mesh[] = [];
     const selectionRings = new Map<string, THREE.Mesh<THREE.TorusGeometry, THREE.MeshBasicMaterial>>();
     const cityGroups = new Map<string, THREE.Group>();
@@ -118,123 +90,19 @@ function createCityScene(
     const pulseMarkers: Array<{ curve: THREE.QuadraticBezierCurve3; marker: THREE.Mesh; offset: number }> = [];
     world.add(synapseGroup);
 
-    const addBuilding = (
-      city: THREE.Group,
-      department: CityDepartment,
-      style: string,
-      x: number,
-      z: number,
-      height: number,
-      width: number,
-      color: number,
-      index: number,
-    ) => {
-      let geometry: THREE.BufferGeometry;
-      if (style === "civic" && index === 0) {
-        geometry = new THREE.CylinderGeometry(width * 0.43, width * 0.52, height, 12);
-      } else if (style === "technology" && index === 0) {
-        geometry = new THREE.CylinderGeometry(width * 0.45, width * 0.52, height, 6);
-      } else if (style === "industrial" && index === 1) {
-        geometry = new THREE.CylinderGeometry(width * 0.42, width * 0.42, height, 12);
-      } else {
-        geometry = new THREE.BoxGeometry(width, height, width * 0.82);
-      }
-
-      const facade = new THREE.MeshStandardMaterial({
-        color,
-        roughness: style === "glass" || style === "technology" ? 0.34 : 0.72,
-        metalness: style === "glass" || style === "technology" ? 0.18 : 0.02,
-      });
-      const building = new THREE.Mesh(geometry, facade);
-      building.position.set(x, 0.43 + height / 2, z);
-      city.add(building);
-
-      if (style !== "park") {
-        for (const level of [0.34, 0.66]) {
-          if (height < 1.15 || level * height > height - 0.18) continue;
-          for (const side of [-1, 1]) {
-            const window = new THREE.Mesh(new THREE.BoxGeometry(width * 0.16, 0.12, 0.025), windowMaterial);
-            window.position.set(
-              x + side * width * 0.22,
-              0.43 + height * level,
-              z + width * 0.82 * 0.5 + 0.014,
-            );
-            city.add(window);
-          }
-        }
-      }
-
-      const roofColor = new THREE.Color(department.accent);
-      if (style === "creative" && index === 0) {
-        const roof = new THREE.Mesh(
-          new THREE.ConeGeometry(width * 0.72, 0.55, 4),
-          new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.65 }),
-        );
-        roof.rotation.y = Math.PI / 4;
-        roof.position.set(x, 0.43 + height + 0.27, z);
-        city.add(roof);
-      } else if (style === "civic" && index === 0) {
-        const dome = new THREE.Mesh(
-          new THREE.SphereGeometry(width * 0.38, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
-          new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.4, metalness: 0.2 }),
-        );
-        dome.position.set(x, 0.43 + height, z);
-        city.add(dome);
-      } else if (style === "technology" && index === 0) {
-        const antenna = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.025, 0.05, 0.68, 6),
-          new THREE.MeshBasicMaterial({ color: roofColor }),
-        );
-        antenna.position.set(x, 0.78 + height, z);
-        city.add(antenna);
-      } else {
-        const roof = new THREE.Mesh(
-          new THREE.BoxGeometry(width * 1.04, 0.09, width * 0.87),
-          new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.55 }),
-        );
-        roof.position.set(x, 0.43 + height + 0.04, z);
-        city.add(roof);
-      }
-    };
-
-    const addTree = (city: THREE.Group, x: number, z: number, scale: number) => {
-      const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.065, 0.34 * scale, 5), trunkMaterial);
-      trunk.position.set(x, 0.58, z);
-      city.add(trunk);
-      const crown = new THREE.Mesh(new THREE.SphereGeometry(0.25 * scale, 7, 6), treeMaterial);
-      crown.position.set(x, 0.8, z);
-      city.add(crown);
-    };
-
-    departments.forEach((department) => {
+    departments.forEach((department, index) => {
       const position = departmentPositions[department.id];
       if (!position) return;
 
       const city = new THREE.Group();
       city.position.set(position[0], 0, position[1]);
+      city.userData = {
+        baseY: 0,
+        floatPhase: index * 1.1,
+        hoverScale: 1,
+        targetScale: 1,
+      };
       world.add(city);
-
-      const water = new THREE.Mesh(new THREE.CylinderGeometry(2.35, 2.5, 0.3, 28), waterMaterial);
-      water.position.y = 0.02;
-      city.add(water);
-
-      const island = new THREE.Mesh(new THREE.CylinderGeometry(2.14, 2.3, 0.36, 28), groundMaterial);
-      island.position.y = 0.2;
-      city.add(island);
-
-      const plaza = new THREE.Mesh(new THREE.CylinderGeometry(1.82, 1.82, 0.12, 28), islandMaterial);
-      plaza.position.y = 0.42;
-      city.add(plaza);
-
-      const road = new THREE.Mesh(new THREE.RingGeometry(1.8, 2.1, 32), roadMaterial);
-      road.rotation.x = -Math.PI / 2;
-      road.position.y = 0.42;
-      city.add(road);
-
-      const laneMarking = new THREE.Mesh(new THREE.RingGeometry(1.95, 1.98, 32), roadMarkMaterial);
-      laneMarking.rotation.x = -Math.PI / 2;
-      laneMarking.position.y = 0.431;
-      city.add(laneMarking);
 
       const ringMaterial = new THREE.MeshBasicMaterial({
         color: department.accent,
@@ -248,29 +116,42 @@ function createCityScene(
       selectionRings.set(department.id, ring);
       cityGroups.set(department.id, city);
 
-      const architecture = departmentArchitecture[department.id] ?? departmentArchitecture.sales!;
-      const colors: Record<string, number[]> = {
-        sales: [0x6192b4, 0x8ba9bd, 0xb8c9d6],
-        marketing: [0xc98491, 0xd5b071, 0xa78ac9],
-        customers: [0x87b69a, 0xb6cda5, 0x9cc8c4],
-        finance: [0xc2a873, 0xd2bc8a, 0x9f8d72],
-        operations: [0x66838a, 0x889ba0, 0xa17755],
-        product: [0x617f9a, 0x78a7b5, 0x8998c3],
-      };
-      const departmentColors = colors[department.id] ?? colors.sales!;
-      const buildingPositions: Array<[number, number, number]> = [
-        [-0.45, -0.38, 0.8],
-        [0.68, -0.05, 0.62],
-        [-0.75, 0.76, 0.55],
-      ];
-      architecture.heights.forEach((height, index) => {
-        const [x, z, width] = buildingPositions[index]!;
-        addBuilding(city, department, architecture.style, x, z, height, width, departmentColors[index]!, index);
-      });
+      cityAnimators.push(buildDepartmentCity(THREE, city, department.id));
 
-      addTree(city, -1.2, 0.2, 0.9);
-      addTree(city, 1.18, 0.88, 0.82);
-      addTree(city, 0.15, 1.35, 0.72);
+      const badgeCanvas = document.createElement("canvas");
+      badgeCanvas.width = 420;
+      badgeCanvas.height = 128;
+      const badgeContext = badgeCanvas.getContext("2d");
+      if (!badgeContext) throw new Error("Unable to create department city label.");
+      badgeContext.fillStyle = "rgba(255, 255, 255, 0.94)";
+      badgeContext.beginPath();
+      badgeContext.roundRect(8, 8, 404, 112, 24);
+      badgeContext.fill();
+      badgeContext.strokeStyle = department.accent;
+      badgeContext.lineWidth = 4;
+      badgeContext.stroke();
+      badgeContext.fillStyle = department.accent;
+      badgeContext.beginPath();
+      badgeContext.arc(40, 49, 10, 0, Math.PI * 2);
+      badgeContext.fill();
+      badgeContext.fillStyle = "#0f172a";
+      badgeContext.font = "700 28px system-ui, sans-serif";
+      badgeContext.fillText(department.label.toUpperCase(), 66, 55, 325);
+      badgeContext.fillStyle = "#475569";
+      badgeContext.font = "500 21px system-ui, sans-serif";
+      badgeContext.fillText(department.health, 66, 91, 325);
+      const badgeTexture = new THREE.CanvasTexture(badgeCanvas);
+      badgeTexture.colorSpace = THREE.SRGBColorSpace;
+      const badge = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: badgeTexture,
+          transparent: true,
+          depthTest: false,
+        }),
+      );
+      badge.scale.set(4.6, 1.4, 1);
+      badge.position.set(0, 4.5, 0);
+      city.add(badge);
 
       const hitTarget = new THREE.Mesh(new THREE.SphereGeometry(2.15, 12, 8), hitMaterial);
       hitTarget.position.y = 1.25;
@@ -295,43 +176,8 @@ function createCityScene(
     corePlatform.position.y = 0.68;
     core.add(corePlatform);
 
-    const coreHalo = new THREE.Mesh(
-      new THREE.TorusGeometry(1.68, 0.095, 8, 48),
-      new THREE.MeshBasicMaterial({ color: 0x55b9ed, transparent: true, opacity: 0.82 }),
-    );
-    coreHalo.rotation.x = Math.PI / 2;
-    coreHalo.position.y = 0.91;
-    core.add(coreHalo);
-
-    [0x2f9de0, 0x3f72d8, 0x4f65bc, 0x28b9c7].forEach((color, index) => {
-      const segment = new THREE.Mesh(
-        new THREE.TorusGeometry(0.88, 0.13, 8, 24, Math.PI * 0.36),
-        new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.18, metalness: 0.2, roughness: 0.36 }),
-      );
-      segment.rotation.x = Math.PI / 2;
-      segment.rotation.y = index * (Math.PI / 2);
-      segment.position.y = 1.14;
-      core.add(segment);
-    });
-
-    const logoMark = new THREE.Group();
-    logoMark.position.y = 1.55;
-    core.add(logoMark);
-    const markMaterial = new THREE.MeshStandardMaterial({ color: 0xe7f6ff, metalness: 0.3, roughness: 0.28 });
-    const leftStroke = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.98, 0.12), markMaterial);
-    leftStroke.position.x = -0.23;
-    leftStroke.rotation.z = -0.38;
-    logoMark.add(leftStroke);
-    const rightStroke = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.98, 0.12), markMaterial);
-    rightStroke.position.x = 0.23;
-    rightStroke.rotation.z = 0.38;
-    logoMark.add(rightStroke);
-    const crossbar = new THREE.Mesh(
-      new THREE.BoxGeometry(0.42, 0.12, 0.13),
-      new THREE.MeshBasicMaterial({ color: 0x50d5f0 }),
-    );
-    crossbar.position.y = -0.18;
-    logoMark.add(crossbar);
+    const emblem = createAiosEmblem(THREE);
+    core.add(emblem.group);
 
     const coreTarget = new THREE.Mesh(new THREE.SphereGeometry(1.38, 16, 10), hitMaterial);
     coreTarget.position.y = 1.12;
@@ -421,10 +267,15 @@ function createCityScene(
       world.rotation.y += (targetRotationY - world.rotation.y) * 0.07;
       world.rotation.x += (targetRotationX - world.rotation.x) * 0.07;
       if (!drag) targetRotationY += 0.00035;
-      logoMark.rotation.y = seconds * 0.22;
-      coreHalo.material.opacity = 0.72 + Math.sin(seconds * 1.2) * 0.1;
+      emblem.update(seconds);
+      cityAnimators.forEach((animateCity) => animateCity(seconds));
       cityGroups.forEach((city) => {
-        city.position.y = Math.sin(seconds * 0.8 + city.position.x + city.position.z) * 0.025;
+        const { baseY, floatPhase } = city.userData as { baseY: number; floatPhase: number; hoverScale: number; targetScale: number };
+        city.position.y = baseY + Math.sin(seconds * 0.8 + floatPhase) * 0.045;
+        city.rotation.y = Math.sin(seconds * 0.24 + floatPhase) * 0.045;
+        city.userData.targetScale = city === cityGroups.get(hoveredId ?? "") ? 1.07 : city === cityGroups.get(selectedId) ? 1.025 : 1;
+        city.userData.hoverScale += (city.userData.targetScale - city.userData.hoverScale) * 0.1;
+        city.scale.setScalar(city.userData.hoverScale);
       });
       pulseMarkers.forEach(({ curve, marker, offset }) => {
         marker.position.copy(curve.getPoint((seconds * 0.12 + offset) % 1));
@@ -568,7 +419,7 @@ function createCityScene(
         mediaQuery.removeEventListener("change", onMotionChange);
         window.removeEventListener("resize", resize);
         scene.traverse((object) => {
-          if (!(object instanceof THREE.Mesh || object instanceof THREE.Line)) return;
+          if (!(object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite || object instanceof THREE.Points)) return;
           object.geometry.dispose();
           const materials = Array.isArray(object.material) ? object.material : [object.material];
           materials.forEach((material) => {
@@ -661,8 +512,8 @@ export function DepartmentCities({
   }, [synapsesVisible]);
 
   return (
-    <div className="mt-3 min-w-0">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+    <div className="aios-demo-city-controls mt-3 min-w-0">
+      <div className="aios-demo-city-toolbar mb-2 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] text-slate-600">Drag to rotate · select a city to inspect · motion adapts to your device preference.</p>
         <div className="flex flex-wrap gap-2">
           <button
@@ -686,14 +537,15 @@ export function DepartmentCities({
       </div>
 
       <div
-        className="relative h-[17rem] min-w-0 overflow-hidden rounded-2xl border border-blue-100 bg-[radial-gradient(ellipse_at_50%_45%,#ffffff_0%,#e8f2fb_55%,#dceaf2_100%)] sm:h-[21rem] xl:h-[25rem]"
+        className="aios-demo-city-scene relative h-[20rem] min-w-0 overflow-hidden rounded-2xl border border-blue-100 bg-[radial-gradient(ellipse_at_50%_45%,#ffffff_0%,#e8f2fb_55%,#dceaf2_100%)] sm:h-[24rem] xl:h-[30rem] 2xl:h-[34rem]"
         role="group"
         aria-label="Interactive synthetic 3D city scene with six departments connected to the central AIOS core. Use the department buttons below to select a city."
       >
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[url('/images/aios-waterfall-backdrop.jpeg')] bg-cover bg-center opacity-20"
+        />
         <div ref={mountRef} aria-hidden="true" className="absolute inset-0" />
-        <div aria-hidden="true" className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-white/80 bg-white/75 p-2 shadow-[0_4px_16px_rgba(37,99,235,0.16)] backdrop-blur-sm">
-          <BrandLogo variant="square" width={32} height={32} alt="" />
-        </div>
         {sceneState === "loading" ? (
           <div className="absolute inset-x-3 bottom-3 rounded-lg bg-white/90 px-3 py-2 text-center text-xs text-slate-600" role="status">
             Preparing the synthetic city scene…
@@ -706,7 +558,7 @@ export function DepartmentCities({
             </p>
           </div>
         ) : null}
-        <div className="pointer-events-none absolute left-3 top-3 rounded-full border border-white/80 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
+        <div className="pointer-events-none absolute left-3 top-3 z-20 rounded-full border border-white/80 bg-white/85 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-700 shadow-sm">
           {sceneState === "ready" ? "Synthetic 3D landscape" : "Synthetic landscape"}
         </div>
         <button
@@ -714,14 +566,14 @@ export function DepartmentCities({
           onClick={onCoreSelect}
           aria-expanded={coreOverviewOpen}
           aria-controls="company-wide-intelligence"
-          className="absolute bottom-3 right-3 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-blue-200 bg-white/90 px-3 text-xs font-semibold text-blue-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
+          className="aios-demo-city-core-action absolute bottom-3 right-3 z-20 inline-flex min-h-10 items-center gap-1.5 rounded-full border border-blue-200 bg-white/90 px-3 text-xs font-semibold text-blue-900 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700"
         >
           <Building2 aria-hidden="true" className="h-3.5 w-3.5" />
           AIOS overview
         </button>
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Select a synthetic business department">
+      <div className="aios-demo-city-selector mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-label="Select a synthetic business department">
         {departments.map(({ id, label, Icon, tone, edge, signal, health }) => {
           const selected = selectedDepartmentId === id;
           return (

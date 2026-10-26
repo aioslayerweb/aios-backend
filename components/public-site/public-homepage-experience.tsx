@@ -15,6 +15,7 @@ import {
 } from "lucide-react"
 import { PublicPageShell } from "@/components/aios"
 import { PublicStructuredData } from "@/components/public-site/storytelling-sections"
+import { SpatialNeuralCore } from "@/components/public-site/spatial-neural-core"
 
 const roles = [
   {
@@ -120,11 +121,35 @@ const memoryStages = [
 ] as const
 
 const operatorExamples = [
-  { title: "Revenue", body: "Bring pipeline, account context, and next steps together." },
-  { title: "Customer", body: "Connect service history, customer signals, and ownership." },
-  { title: "Operations", body: "Surface process dependencies and handoff context." },
-  { title: "Finance", body: "Relate financial signals to decisions and assumptions." },
-  { title: "People", body: "Connect capability, workforce planning, and team context." },
+  { title: "Sales City", body: "Bring pipeline signals, account context, and next steps together." },
+  { title: "Marketing City", body: "Connect campaign activity with customer and market context." },
+  { title: "Customer Success", body: "Relate service history, customer signals, and ownership." },
+  { title: "Finance City", body: "Review financial signals alongside decisions and assumptions." },
+  { title: "Operations City", body: "Surface process dependencies and cross-team handoffs." },
+  { title: "Product City", body: "Connect usage signals, customer intent, and roadmap context." },
+] as const
+
+const cockpitModes = [
+  {
+    label: "Causal intelligence",
+    summary: "Trace a meaningful change to the evidence and context around it.",
+    concepts: ["Signals", "Evidence", "Reasoning"],
+  },
+  {
+    label: "Role-based memory",
+    summary: "Bring relevant history into view without changing access permissions.",
+    concepts: ["History", "Knowledge", "Relevance"],
+  },
+  {
+    label: "Specialized operators",
+    summary: "Coordinate focused AI capabilities around shared business context.",
+    concepts: ["Functions", "Context", "Coordination"],
+  },
+  {
+    label: "Governed execution",
+    summary: "Keep recommendations distinct from actions and approval decisions.",
+    concepts: ["Policy", "Approval", "Learning"],
+  },
 ] as const
 
 const trustPrinciples = [
@@ -146,11 +171,13 @@ const executiveRoles = [
 export function PublicHomepageExperience() {
   const [activeRole, setActiveRole] = useState<(typeof roles)[number]["id"]>("ceo")
   const [activeStep, setActiveStep] = useState(0)
+  const [activeCockpitMode, setActiveCockpitMode] = useState(0)
   const [scenarioTeamSize, setScenarioTeamSize] = useState(450)
   const [scenarioHoursPerWeek, setScenarioHoursPerWeek] = useState(1.5)
   const [scenarioHourlyCost, setScenarioHourlyCost] = useState(50)
   const selectedRole = roles.find((role) => role.id === activeRole) ?? roles[0]
   const selectedStep = flow[activeStep]
+  const selectedCockpitMode = cockpitModes[activeCockpitMode]
   const scenarioAnnualHours = Math.round(scenarioTeamSize * scenarioHoursPerWeek * 48)
   const scenarioAnnualValue = scenarioAnnualHours * scenarioHourlyCost
   const formatScenarioValue = new Intl.NumberFormat("en-IE", {
@@ -169,42 +196,38 @@ export function PublicHomepageExperience() {
         />
 
       <section className="public-home-hero public-home-spatial-hero">
-        <div className="public-home-orbit-art" aria-hidden="true">
-          <span className="public-home-orbit public-home-orbit-one" />
-          <span className="public-home-orbit public-home-orbit-two" />
-          <span className="public-home-orbit public-home-orbit-three" />
-          <span className="public-home-orbit-core"><BrainCircuit size={38} /></span>
-          <span className="public-home-orbit-node public-home-orbit-node-one" />
-          <span className="public-home-orbit-node public-home-orbit-node-two" />
-          <span className="public-home-orbit-node public-home-orbit-node-three" />
+        <div className="public-home-neural-scene" aria-hidden="true">
+          <SpatialNeuralCore />
         </div>
         <div className="public-container-wide public-home-hero-content">
           <div className="public-home-hero-copy">
             <div className="public-home-eyebrow">
               <span aria-hidden="true" />
-              AIOS · Business intelligence operating system
+              Spatial Intelligence · Autonomous Business Core
             </div>
             <h1 className="public-home-title">
-              Your business,<br className="hidden sm:block" />
-              {" "}<span>with the context to move forward.</span>
+              The Autonomous Operating System for
+              <br className="hidden sm:block" />{" "}
+              <span>Modern Enterprise.</span>
             </h1>
             <p className="public-home-lede">
-              AIOS connects business signals, memory, and knowledge to help leaders see what changed, understand why it matters, and decide what deserves attention.
+              Connect business signals, institutional memory, and AI operators in one explainable, governed surface.
             </p>
             <div className="public-home-actions">
-              <Link href="/demo-platform/executive" data-analytics-event="demo_click" className="public-button public-button-primary public-home-primary">
-                Explore the synthetic demo <ArrowRight aria-hidden="true" size={17} />
+              <Link href="#cockpit" className="public-button public-button-primary public-home-primary">
+                <BrainCircuit aria-hidden="true" size={17} /> Launch Spatial Cockpit
               </Link>
-              <Link href="/platform" className="public-button public-button-secondary public-home-platform-link">
-                Explore the platform <Network aria-hidden="true" size={17} />
+              <Link href="/demo-platform/executive" data-analytics-event="demo_click" className="public-button public-button-secondary public-home-platform-link">
+                <ArrowRight aria-hidden="true" size={17} /> Experience Interactive Demo
               </Link>
             </div>
           </div>
 
           <div className="public-home-capabilities" aria-label="AIOS operating concepts">
-            <div><span>01 · Understand</span><strong>Connect signals with relevant context</strong></div>
-            <div><span>02 · Decide</span><strong>Make evidence and reasoning visible</strong></div>
-            <div><span>03 · Govern</span><strong>Keep people and policy in control</strong></div>
+            <div><span>01 · Signals</span><strong>Bring meaningful change into view</strong></div>
+            <div><span>02 · Memory</span><strong>Connect decisions with context</strong></div>
+            <div><span>03 · Intelligence</span><strong>Make evidence and reasoning visible</strong></div>
+            <div><span>04 · Governance</span><strong>Keep people and policy in control</strong></div>
           </div>
 
         </div>
@@ -225,6 +248,19 @@ export function PublicHomepageExperience() {
               <div className="public-home-cockpit-brand"><span aria-hidden="true" /><span>AIOS · EXECUTIVE COCKPIT</span></div>
               <span className="public-home-cockpit-note">Illustrative product model · synthetic example</span>
             </div>
+            <div className="public-home-cockpit-tabs" role="group" aria-label="Illustrative cockpit capabilities">
+              {cockpitModes.map((mode, index) => (
+                <button
+                  key={mode.label}
+                  type="button"
+                  aria-pressed={activeCockpitMode === index}
+                  onClick={() => setActiveCockpitMode(index)}
+                >
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  {mode.label}
+                </button>
+              ))}
+            </div>
             <div className="public-home-cockpit-grid">
               <div className="public-home-cockpit-column">
                 <span className="public-home-cockpit-label">Business context</span>
@@ -236,8 +272,10 @@ export function PublicHomepageExperience() {
                 <span className="public-home-cockpit-label">Intelligence layer</span>
                 <div className="public-home-core-mark"><BrainCircuit aria-hidden="true" size={28} /></div>
                 <strong>AIOS</strong>
-                <p>Signals → context → decision support</p>
-                <div className="public-home-cockpit-pills"><span>Evidence</span><span>Reasoning</span><span>Confidence</span></div>
+                <p aria-live="polite">{selectedCockpitMode.summary}</p>
+                <div className="public-home-cockpit-pills">
+                  {selectedCockpitMode.concepts.map((concept) => <span key={concept}>{concept}</span>)}
+                </div>
               </div>
               <div className="public-home-cockpit-column">
                 <span className="public-home-cockpit-label">Decision pathway</span>
@@ -443,7 +481,7 @@ export function PublicHomepageExperience() {
           <div className="public-home-section-heading">
             <div>
               <p className="public-eyebrow">Specialized intelligence</p>
-              <h2 id="public-home-operators-title" className="public-h2">Shared context across business functions.</h2>
+              <h2 id="public-home-operators-title" className="public-h2">Six specialized hubs. Shared business context.</h2>
             </div>
             <p>Illustrative areas of focus, not a claim that live operators or business integrations are active.</p>
           </div>

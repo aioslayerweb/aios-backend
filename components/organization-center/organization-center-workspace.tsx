@@ -11,7 +11,6 @@ import {
   OrganizationHeader,
   OrganizationLeftRail,
   OrganizationOverview,
-  OrganizationSummaryStrip,
   OrganizationAnalytics,
   PeopleDirectory,
   PermissionsOverview,
@@ -91,12 +90,10 @@ export function OrganizationCenterWorkspace() {
       />
       {notice ? <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900" role="status" aria-live="polite">{notice}</p> : null}
 
-      <WorkspaceGrid className="xl:grid-cols-[280px_minmax(0,1fr)_360px]">
+      <WorkspaceGrid className="xl:grid-cols-[250px_minmax(0,1fr)] 3xl:grid-cols-[250px_minmax(0,1fr)_320px]">
         <OrganizationLeftRail sections={orgSidebarSections} />
 
-        <main className="space-y-4" aria-label="Organization center main panel">
-          <OrganizationSummaryStrip metrics={organizationOverviewMetrics} />
-
+        <main className="min-w-0 space-y-5" aria-label="Organization center main panel">
           <WorkspaceSection id="organization-overview" title="Organization Overview" subtitle="Employees, departments, business units, and reporting model" actionLabel="AIOS">
             <OrganizationOverview metrics={organizationOverviewMetrics} />
           </WorkspaceSection>
@@ -138,7 +135,7 @@ export function OrganizationCenterWorkspace() {
           </WorkspaceSection>
         </main>
 
-        <RightInsightPanel insights={rightInsights} />
+        <RightInsightPanel className="xl:col-span-2 3xl:col-span-1" insights={rightInsights} />
       </WorkspaceGrid>
     </WorkspaceShell>
   );

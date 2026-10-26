@@ -442,8 +442,8 @@ export function DemoExecutiveCommandCenter() {
         </div>
       </section>
 
-      <div className="mt-5 grid min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(220px,0.82fr)_minmax(400px,1.4fr)_minmax(250px,0.92fr)]">
-        <section aria-labelledby="landscape-heading" className="order-1 min-w-0 rounded-[1.75rem] border border-white/90 bg-white/55 p-4 shadow-[0_16px_45px_rgba(73,112,165,0.1)] backdrop-blur-sm lg:col-span-2 xl:order-2 xl:col-span-1 xl:col-start-2">
+      <div className="aios-demo-city-dashboard mt-5 grid min-w-0 gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(220px,0.82fr)_minmax(400px,1.4fr)_minmax(250px,0.92fr)]">
+        <section aria-labelledby="landscape-heading" className="aios-demo-city-landscape order-1 min-w-0 rounded-[1.75rem] border border-white/90 bg-white/55 p-4 shadow-[0_16px_45px_rgba(73,112,165,0.1)] backdrop-blur-sm lg:col-span-2 xl:col-span-3 xl:col-start-1">
           <div className="flex min-w-0 flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3">
             <div className="w-full min-w-0 sm:w-auto sm:flex-1">
               <h2 id="landscape-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Connected operating landscape</h2>
@@ -463,11 +463,11 @@ export function DemoExecutiveCommandCenter() {
             coreOverviewOpen={coreOverviewOpen}
           />
 
-          <p className="mt-3 rounded-xl border border-blue-100/80 bg-white/75 px-3 py-2.5 text-xs leading-5 text-slate-700" aria-live="polite">
+          <p className="aios-demo-city-selected mt-3 rounded-xl border border-blue-100/80 bg-white/75 px-3 py-2.5 text-xs leading-5 text-slate-700" aria-live="polite">
             <strong className="text-slate-900">Selected · {selectedDomain.label}.</strong> {selectedDomain.signal} · {selectedDomain.health}. This is a synthetic demo signal.
           </p>
           {coreOverviewOpen ? (
-            <div id="company-wide-intelligence" className="mt-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm" aria-live="polite">
+            <div id="company-wide-intelligence" className="aios-demo-city-overview mt-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm" aria-live="polite">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-slate-900">Company-wide intelligence · {selectedRole} lens</h3>
                 <button type="button" onClick={() => setCoreOverviewOpen(false)} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Close overview</button>
@@ -480,7 +480,7 @@ export function DemoExecutiveCommandCenter() {
               <Link href="/demo-platform/insights" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Review sample insights <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
             </div>
           ) : null}
-          <div className="mt-3 grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white/90 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div className="aios-demo-city-detail mt-3 grid min-w-0 gap-3 rounded-xl border border-slate-200 bg-white/90 p-3 sm:grid-cols-[1fr_auto] sm:items-center">
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">{selectedDomain.label} department intelligence · synthetic</p>
               <p className="mt-1 text-xs font-semibold text-slate-900">{selectedDepartmentSummary.kpi}</p>
@@ -492,7 +492,7 @@ export function DemoExecutiveCommandCenter() {
           </div>
         </section>
 
-        <section aria-labelledby="pipeline-heading" className="order-2 min-w-0 rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)] xl:order-1 xl:col-start-1">
+        <section aria-labelledby="pipeline-heading" className="aios-demo-floating-card aios-demo-pipeline-card order-2 min-w-0 rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)] xl:order-1 xl:col-start-1">
           <div className="flex items-start justify-between gap-2">
             <div>
               <h2 id="pipeline-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Revenue pipeline</h2>
@@ -624,8 +624,8 @@ export function DemoExecutiveCommandCenter() {
           </div>
         </section>
 
-        <div className="order-3 min-w-0 space-y-4 xl:col-start-3">
-          <section aria-labelledby="health-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
+        <div className="aios-demo-floating-card aios-demo-side-stack order-3 min-w-0 space-y-4 xl:col-span-2 xl:col-start-2">
+          <section aria-labelledby="health-heading" className="aios-demo-floating-panel rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
             <div className="flex items-start justify-between gap-2">
               <div>
                 <h2 id="health-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Customer health map</h2>
@@ -694,7 +694,7 @@ export function DemoExecutiveCommandCenter() {
             ) : null}
           </section>
 
-          <section aria-labelledby="risk-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
+          <section aria-labelledby="risk-heading" className="aios-demo-floating-panel rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
             <div className="flex items-center justify-between gap-2">
               <div>
                 <h2 id="risk-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Churn risk alerts</h2>
@@ -772,7 +772,7 @@ export function DemoExecutiveCommandCenter() {
             <Link href="/demo-platform/customer-intelligence" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-[10px] font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>View all churn risks <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
           </section>
 
-          <section aria-labelledby="agent-status-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
+          <section aria-labelledby="agent-status-heading" className="aios-demo-floating-panel aios-demo-agent-status rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
                 <h2 id="agent-status-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">AIOS demo status</h2>
@@ -789,7 +789,7 @@ export function DemoExecutiveCommandCenter() {
             <Link href="/demo-platform/agents" className={`mt-2 inline-flex min-h-10 items-center gap-1 text-xs font-semibold text-blue-800 underline underline-offset-2 ${focusStyle()}`}>Open agent status <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
           </section>
 
-          <section aria-labelledby="activity-heading" className="rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
+          <section aria-labelledby="activity-heading" className="aios-demo-floating-panel rounded-[1.5rem] border border-white/90 bg-white/80 p-4 shadow-[0_12px_35px_rgba(73,112,165,0.08)]">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Activity aria-hidden="true" className="h-4 w-4 text-blue-700" />
@@ -854,7 +854,7 @@ export function DemoExecutiveCommandCenter() {
           </section>
         </div>
 
-        <section aria-labelledby="recommendations-heading" className="order-4 min-w-0 rounded-[1.5rem] border border-blue-100 bg-white/85 px-4 py-4 shadow-[0_14px_38px_rgba(73,112,165,0.09)] lg:col-span-2 xl:col-span-3">
+        <section aria-labelledby="recommendations-heading" className="aios-demo-floating-card aios-demo-recommendations order-4 min-w-0 rounded-[1.5rem] border border-blue-100 bg-white/85 px-4 py-4 shadow-[0_14px_38px_rgba(73,112,165,0.09)] lg:col-span-2 xl:col-span-3">
           <div className="flex flex-wrap items-end justify-between gap-2 border-b border-blue-100 pb-3">
             <div>
               <h2 id="recommendations-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Executive recommendations</h2>

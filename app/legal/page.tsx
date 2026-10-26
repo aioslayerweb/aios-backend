@@ -17,15 +17,15 @@ export const metadata: Metadata = publicPageMetadata(
 const legalCards = [
   {
     title: "Security",
-    body: "AIOS is designed for enterprise-grade security, governed workflows, and resilient runtime operations.",
+    body: "Review the security controls, configuration, and evidence applicable to a specific deployment.",
   },
   {
     title: "Privacy",
-    body: "Business memory, signal handling, and intelligence surfaces are designed for controlled access and clear accountability.",
+    body: "Review how a deployment handles business data, access, retention, and accountability.",
   },
   {
     title: "Governance",
-    body: "Policy-gated approvals, execution controls, and auditability are built into the operating model rather than added later.",
+    body: "Confirm which approval policies, execution controls, and audit records are actually configured.",
   },
 ]
 
@@ -37,7 +37,8 @@ export default function LegalPage() {
           <PublicSectionHeader
             eyebrow="Legal"
             title="Enterprise trust, privacy, and governance"
-            body="Even the legal route now inherits the same AIOS public shell, surface hierarchy, and premium enterprise presentation."
+            titleAs="h1"
+            body="Review the public information available about AIOS privacy, security, and governance."
           />
 
           <div className="mt-14 grid gap-5 md:grid-cols-3">
@@ -53,8 +54,8 @@ export default function LegalPage() {
 
       <PublicFooterCta
         eyebrow="Questions"
-        title="Talk to AIOS about enterprise governance and deployment requirements"
-        body="Legal, privacy, and workflow governance now sit inside the same unified public design system as the rest of the site."
+        title="Review governance and deployment topics"
+        body="Contact intake is not configured on this website. The linked pages describe public AIOS product principles and policy information."
       />
     </PublicPageShell>
   )

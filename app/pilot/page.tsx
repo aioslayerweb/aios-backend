@@ -11,7 +11,7 @@ export const metadata: Metadata = publicPageMetadata(
 
 export default function PilotPage() {
   return (
-    <PublicPageShell activeHref="/contact" includeFooter={true} includeNewsletter={false}>
+    <PublicPageShell activeHref="/pilot" includeFooter={true} includeNewsletter={false}>
       <PublicStructuredData name="Pilot Program" description="AIOS pilot program and onboarding overview." path="/pilot" />
       <PublicSection>
         <PublicContainer>
@@ -19,20 +19,21 @@ export default function PilotPage() {
             <PublicSectionHeader
               eyebrow="Pilot Program"
               title="Start with a structured enterprise pilot"
-              body="AIOS pilots are built to validate business value quickly, with executive sponsorship and measurable outcomes."
+              titleAs="h1"
+              body="Use these topics to scope a possible evaluation. Scope, availability, timing, and outcomes must be agreed before any pilot begins."
             />
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Qualification</h2>
-                <p className="public-body mt-3">Ideal for businesses with clear operational complexity, strong ownership, and measurable goals.</p>
+                <p className="public-body mt-3">A possible evaluation should identify an accountable owner, a specific business question, and measurable goals.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Timeline</h2>
-                <p className="public-body mt-3">Discovery, integration, activation, and value review are typically completed in staged phases.</p>
+                <p className="public-body mt-3">Discovery, integration, activation, and review timing depends on the agreed scope and deployment needs.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Deliverables</h2>
-                <p className="public-body mt-3">You receive a pilot plan, architecture map, role setup, workflow blueprint, and outcome report.</p>
+                <p className="public-body mt-3">Potential deliverables should be agreed in advance, including any architecture, role, workflow, or outcome documentation.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Success metrics</h2>
@@ -45,8 +46,7 @@ export default function PilotPage() {
       <PublicSection>
         <PublicContainer>
           <div className="flex flex-wrap gap-4">
-            <PublicButtonLink href="/pilot/discovery" variant="secondary" size="lg">Start Business Discovery</PublicButtonLink>
-            <PublicButtonLink href="/contact" size="lg">Book Pilot</PublicButtonLink>
+            <PublicButtonLink href="/pilot/discovery" size="lg">Explore local business discovery</PublicButtonLink>
             <PublicButtonLink href="/products" variant="secondary" size="lg">Review Products</PublicButtonLink>
           </div>
         </PublicContainer>

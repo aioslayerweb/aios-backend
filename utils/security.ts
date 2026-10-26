@@ -13,6 +13,8 @@ import type {
   WorkspaceRecord,
 } from "@/types"
 
+const SECURITY_DEMO_NOW = Date.parse("2026-10-26T07:00:00.000Z")
+
 export function createSecurityDefaults(): SecurityState {
   const organizations: OrganizationRecord[] = [
     { id: "org-1", name: "Northwind Health", branding: "Northwind Blue", subscription: "Enterprise Plus", region: "US-East", environment: "production", status: "active", owner: "Ava Chen" },
@@ -91,12 +93,12 @@ export function createSecurityDefaults(): SecurityState {
   ]
 
   const auditLogs: SecurityAuditLog[] = [
-    { id: "audit-1", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: Date.now() - 1000 * 60 * 61, resource: "session", action: "user_login", metadata: { method: "passwordless", mfa: true }, actor: "Ava Chen", event: "user_login", detail: "Owner authenticated through Supabase session bridge.", source: "Supabase Authentication", result: "success" },
-    { id: "audit-2", organizationId: "org-1", workspaceId: "ws-4", userId: "user-3", timestamp: Date.now() - 1000 * 60 * 46, resource: "role", action: "role_changed", metadata: { roleId: "role-manager", permission: "approve_decisions" }, actor: "Marco Silva", event: "role_changed", detail: "Finance Governance role updated to allow decision approvals.", source: "RBAC", result: "warning" },
-    { id: "audit-3", organizationId: "org-1", workspaceId: "ws-3", userId: "user-2", timestamp: Date.now() - 1000 * 60 * 31, resource: "workflow", action: "workflow_executed", metadata: { workflowId: "support-recovery" }, actor: "Retention Agent", event: "workflow_executed", detail: "Support Recovery Workflow executed under Support workspace policy.", source: "Workflow Builder", result: "success" },
-    { id: "audit-4", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: Date.now() - 1000 * 60 * 22, resource: "decision", action: "settings_changed", metadata: { decisionId: "exec-escalation" }, actor: "Ava Chen", event: "settings_changed", detail: "Executive escalation decision approved for Northwind Health.", source: "Decision Engine", result: "success" },
-    { id: "audit-5", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: Date.now() - 1000 * 60 * 12, resource: "knowledge", action: "knowledge_modified", metadata: { nodes: 42 }, actor: "Knowledge Operations", event: "knowledge_modified", detail: "Scoped knowledge refresh published for compliance-reviewed references.", source: "Knowledge Graph", result: "success" },
-    { id: "audit-6", organizationId: "org-1", workspaceId: "ws-1", userId: "user-svc-1", timestamp: Date.now() - 1000 * 60 * 4, resource: "api_key", action: "api_key_created", metadata: { keyId: "key-2", status: "rotating" }, actor: "Security System", event: "api_key_created", detail: "One API key flagged for scheduled rotation after scope review.", source: "Enterprise Security", result: "warning" },
+    { id: "audit-1", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 61, resource: "session", action: "user_login", metadata: { method: "passwordless", mfa: true }, actor: "Ava Chen", event: "user_login", detail: "Owner authenticated through Supabase session bridge.", source: "Supabase Authentication", result: "success" },
+    { id: "audit-2", organizationId: "org-1", workspaceId: "ws-4", userId: "user-3", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 46, resource: "role", action: "role_changed", metadata: { roleId: "role-manager", permission: "approve_decisions" }, actor: "Marco Silva", event: "role_changed", detail: "Finance Governance role updated to allow decision approvals.", source: "RBAC", result: "warning" },
+    { id: "audit-3", organizationId: "org-1", workspaceId: "ws-3", userId: "user-2", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 31, resource: "workflow", action: "workflow_executed", metadata: { workflowId: "support-recovery" }, actor: "Retention Agent", event: "workflow_executed", detail: "Support Recovery Workflow executed under Support workspace policy.", source: "Workflow Builder", result: "success" },
+    { id: "audit-4", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 22, resource: "decision", action: "settings_changed", metadata: { decisionId: "exec-escalation" }, actor: "Ava Chen", event: "settings_changed", detail: "Executive escalation decision approved for Northwind Health.", source: "Decision Engine", result: "success" },
+    { id: "audit-5", organizationId: "org-1", workspaceId: "ws-1", userId: "user-1", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 12, resource: "knowledge", action: "knowledge_modified", metadata: { nodes: 42 }, actor: "Knowledge Operations", event: "knowledge_modified", detail: "Scoped knowledge refresh published for compliance-reviewed references.", source: "Knowledge Graph", result: "success" },
+    { id: "audit-6", organizationId: "org-1", workspaceId: "ws-1", userId: "user-svc-1", timestamp: SECURITY_DEMO_NOW - 1000 * 60 * 4, resource: "api_key", action: "api_key_created", metadata: { keyId: "key-2", status: "rotating" }, actor: "Security System", event: "api_key_created", detail: "One API key flagged for scheduled rotation after scope review.", source: "Enterprise Security", result: "warning" },
   ]
 
   const policies: SecurityPolicy[] = [

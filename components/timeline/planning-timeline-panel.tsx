@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import type { PlanningTimelineEvent } from "@/types"
+import { LocalTime } from "@/components/ui/local-date-time"
 
 type PlanningTimelinePanelProps = {
   timeline: PlanningTimelineEvent[]
@@ -27,7 +28,7 @@ export function PlanningTimelinePanel({ timeline }: PlanningTimelinePanelProps) 
               <span className="text-[11px] capitalize text-text-muted">{event.type.replace(/-/g, " ")}</span>
             </div>
             <p className="mt-1 text-[11px] text-text-secondary">{event.description}</p>
-            <p className="mt-1 text-[11px] text-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</p>
+            <p className="mt-1 text-[11px] text-text-muted"><LocalTime value={event.timestamp} /></p>
           </motion.article>
         ))}
       </div>

@@ -147,13 +147,17 @@ class IdentityAuthTests(unittest.TestCase):
 
     def test_invalid_signature_is_denied(self) -> None:
         token = self.encode(key=self.other_private_key)
-        self.assert_denied_without_identity(self.get(f"Bearer {token}"))
+        response = self.get(f"Bearer {token}")
+        self.assertEqual(response.status_code, 401)
+        self.assert_denied_without_identity(response)
 
     def test_expired_token_is_denied(self) -> None:
         token = self.encode(
             claims(exp=int((NOW - timedelta(seconds=1)).timestamp()))
         )
-        self.assert_denied_without_identity(self.get(f"Bearer {token}"))
+        response = self.get(f"Bearer {token}")
+        self.assertEqual(response.status_code, 401)
+        self.assert_denied_without_identity(response)
 
     def test_not_yet_valid_token_is_denied(self) -> None:
         token = self.encode(

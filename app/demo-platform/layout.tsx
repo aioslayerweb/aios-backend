@@ -1,8 +1,13 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import "@/styles/demo-platform.css";
 import { AIOSRuntimeProvider } from "@/components/layout/AIOSRuntimeContext";
 import { WorkspaceLayout } from "@/components/layout/foundation";
 import { AppProviders } from "@/providers";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Demo platform layout — full app shell, NO authentication gate.

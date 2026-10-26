@@ -95,10 +95,10 @@ const products = [
 ]
 
 const productProblemCards = [
-  { title: "Point-solution pricing", body: "Organizations buy many tools but still lack operating intelligence." },
-  { title: "Unclear capacity planning", body: "Leaders cannot model value across users, workflows, and data scope." },
-  { title: "Weak ROI narrative", body: "AI initiatives struggle to connect outputs to financial outcomes." },
-  { title: "Pilot fragmentation", body: "Pilot programs often fail to scale into enterprise operating systems." },
+  { title: "Narrow tool scope", body: "A tool focused on one task may not address the wider business context around a decision." },
+  { title: "Unclear evaluation scope", body: "A useful assessment needs to identify the relevant users, workflows, systems, and controls." },
+  { title: "Unverified value claims", body: "Potential benefits should be tied to evidence and measured outcomes." },
+  { title: "Pilot follow-through", body: "A pilot needs explicit scope and agreed criteria before any broader rollout is considered." },
 ]
 
 const productSolutionCards = [
@@ -135,8 +135,8 @@ export default function ProductsPage() {
         body="Review product concepts for connecting business signals, memory, role context, decision support, and governed workflows."
         actions={
           <>
-            <PublicButtonLink href="/contact" size="lg">
-              Contact
+            <PublicButtonLink href="/demo-platform/executive" size="lg">
+              Explore synthetic demo
             </PublicButtonLink>
             <PublicButtonLink href="/modules" variant="secondary" size="lg">
               Explore Modules
@@ -144,9 +144,9 @@ export default function ProductsPage() {
           </>
         }
         stats={[
-          { label: "Offerings", value: `${products.length}+`, detail: "Pilot, product packs, and enterprise pathways" },
-          { label: "Capacity model", value: "Role + Workflow", detail: "Plan by users, actions, and integrations" },
-          { label: "ROI focus", value: "Outcome-first", detail: "Time, revenue, cost, and payback visibility" },
+          { label: "Illustrated areas", value: `${products.length}`, detail: "Product concepts described on this page" },
+          { label: "Evaluation scope", value: "Use-case based", detail: "Set systems, roles, and controls during discovery" },
+          { label: "Evidence", value: "Measured per use case", detail: "No standard performance claims are made" },
         ]}
       />
 
@@ -155,7 +155,7 @@ export default function ProductsPage() {
         problemBody="Most product portfolios optimize feature lists, not enterprise intelligence outcomes."
         problemItems={productProblemCards}
         solutionTitle="AIOS offerings are structured for enterprise adoption"
-        solutionBody="Pilot-first, ROI-backed, and designed to scale into one governing intelligence layer."
+        solutionBody="The product model provides topics for evaluating a use case, its context, governance requirements, and evidence of value."
         solutionItems={productSolutionCards}
       />
 
@@ -241,7 +241,11 @@ export default function ProductsPage() {
       <PublicFooterCta
         eyebrow="Product Walkthrough"
         title="See which AIOS products fit your operating model"
-        body="Explore the product stack with one consistent system that scales from revenue and customer intelligence to executive decision orchestration."
+        body="Explore how the product areas relate, then use the synthetic demo to inspect representative screens with sample data."
+        primaryHref="/demo-platform/executive"
+        primaryLabel="Explore synthetic demo"
+        secondaryHref="/modules"
+        secondaryLabel="Review modules"
       />
     </PublicPageShell>
   )

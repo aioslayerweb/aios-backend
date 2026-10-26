@@ -159,25 +159,26 @@ export function PublicHomepageExperience() {
 
       <section className="public-home-hero">
         <div className="public-container-wide public-home-hero-content">
-          <div className="public-home-eyebrow">
-            <span aria-hidden="true" />
-            AIOS Core · Business Intelligence Operating Layer
-          </div>
-          <h1 className="public-home-title">
-            One intelligence layer.<br className="hidden sm:block" />
-            One business memory.<br className="hidden sm:block" />
-            <span>One operating system.</span>
-          </h1>
-          <p className="public-home-lede">
-            AIOS is designed to connect business signals, memory, and decisions in one operating layer—helping teams understand what changed, why it matters, and what deserves review.
-          </p>
-          <div className="public-home-actions">
-            <Link href="/demo-platform/executive" className="public-button public-button-primary public-home-primary">
-              Explore the demo <ArrowRight aria-hidden="true" size={17} />
-            </Link>
-            <Link href="/platform" className="public-button public-button-secondary public-home-platform-link">
-              Explore platform <Network aria-hidden="true" size={17} />
-            </Link>
+          <div className="public-home-hero-copy">
+            <div className="public-home-eyebrow">
+              <span aria-hidden="true" />
+              AIOS · Business intelligence operating layer
+            </div>
+            <h1 className="public-home-title">
+              Your entire business.<br className="hidden sm:block" />
+              <span>One intelligent operating layer.</span>
+            </h1>
+            <p className="public-home-lede">
+              For leaders who need context across customers, finance, and operations. AIOS connects business signals and memory to help teams understand what changed, why it matters, and what deserves review.
+            </p>
+            <div className="public-home-actions">
+              <Link href="/demo-platform/executive" data-analytics-event="demo_click" className="public-button public-button-primary public-home-primary">
+                Explore synthetic demo <ArrowRight aria-hidden="true" size={17} />
+              </Link>
+              <Link href="/platform" className="public-button public-button-secondary public-home-platform-link">
+                Explore platform <Network aria-hidden="true" size={17} />
+              </Link>
+            </div>
           </div>
 
           <div className="public-home-capabilities" aria-label="AIOS operating concepts">
@@ -474,7 +475,7 @@ export function PublicHomepageExperience() {
             <p>Explore the public demo or review the platform architecture—without connecting live business data.</p>
           </div>
           <div className="public-home-actions">
-            <Link href="/demo-platform/executive" className="public-button public-button-primary">Explore the demo <ArrowRight aria-hidden="true" size={17} /></Link>
+            <Link href="/demo-platform/executive" data-analytics-event="demo_click" className="public-button public-button-primary">Explore the demo <ArrowRight aria-hidden="true" size={17} /></Link>
             <Link href="/architecture" className="public-home-secondary">Read the architecture <ArrowRight aria-hidden="true" size={15} /></Link>
           </div>
         </div>

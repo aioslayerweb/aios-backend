@@ -1,4 +1,5 @@
 import type { SecurityAuditLog } from "@/types"
+import { LocalDateTime } from "@/components/ui/local-date-time"
 
 type SecurityAuditLogsPanelProps = {
   logs: SecurityAuditLog[]
@@ -20,7 +21,7 @@ export function SecurityAuditLogsPanel({ logs }: SecurityAuditLogsPanelProps) {
               <span className="rounded-full border border-border bg-white px-2 py-1 text-[11px] capitalize text-text-muted">{log.result}</span>
             </div>
             <p className="mt-2 text-xs leading-5 text-text-secondary">{log.detail}</p>
-            <p className="mt-2 text-[11px] text-text-muted">{new Date(log.timestamp).toLocaleString()}</p>
+            <p className="mt-2 text-[11px] text-text-muted"><LocalDateTime value={log.timestamp} /></p>
           </article>
         ))}
       </div>

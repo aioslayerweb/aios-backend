@@ -19,24 +19,25 @@ export default function SecurityPage() {
             <PublicSectionHeader
               eyebrow="Security"
               title="Enterprise security and governance"
-              body="AIOS is designed for enterprise trust with role-based access, human approvals, audit trails, and policy controls."
+              titleAs="h1"
+              body="Security depends on each deployment's configuration. This page describes controls to evaluate; it is not a certification or deployment attestation."
             />
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">RBAC</h2>
-                <p className="public-body mt-3">Role-based access ensures users only see and act on the data they are authorized to use.</p>
+                <p className="public-body mt-3">Verify server-side identity, organization membership, tenant boundaries, and permissions before protected data is returned or changed.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Human approval</h2>
-                <p className="public-body mt-3">High-impact actions can require explicit approval before execution.</p>
+                <p className="public-body mt-3">Configure and test approval requirements for each action that needs human review.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Audit trail</h2>
-                <p className="public-body mt-3">Recommendations, approvals, and outcomes are traceable for enterprise review.</p>
+                <p className="public-body mt-3">Define which recommendations, approvals, and outcomes are recorded and how those records are reviewed.</p>
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Compliance readiness</h2>
-                <p className="public-body mt-3">Security and governance controls are designed to support compliance workflows and reviews.</p>
+                <p className="public-body mt-3">Assess applicable obligations with the organization&apos;s security and compliance owners. No certification is claimed here.</p>
               </div>
             </div>
           </PublicCard>
@@ -46,7 +47,7 @@ export default function SecurityPage() {
         <PublicContainer>
           <div className="flex flex-wrap gap-4">
             <PublicButtonLink href="/architecture" size="lg">Review Architecture</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary" size="lg">Contact</PublicButtonLink>
+            <PublicButtonLink href="/demo-platform/executive" variant="secondary" size="lg">Explore synthetic demo</PublicButtonLink>
           </div>
         </PublicContainer>
       </PublicSection>

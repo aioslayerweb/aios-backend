@@ -7,8 +7,9 @@ import { AIOSCard } from "@/components/aios/cards"
 import { AIOSContainer, AIOSGrid, AIOSSection } from "@/components/aios/layout"
 import { AIOSTimelineList, type AIOSTimelineItem } from "@/components/aios/timeline"
 
-export function AIOSSectionHeader({ eyebrow, title, body, align = "left", className }: { eyebrow?: string; title: string; body?: string; align?: "left" | "center"; className?: string }) {
+export function AIOSSectionHeader({ eyebrow, title, body, align = "left", className, titleAs = "h2" }: { eyebrow?: string; title: string; body?: string; align?: "left" | "center"; className?: string; titleAs?: "h1" | "h2" | "h3" }) {
   const reduceMotion = useReducedMotion()
+  const TitleTag = titleAs
 
   return (
     <motion.div
@@ -19,7 +20,7 @@ export function AIOSSectionHeader({ eyebrow, title, body, align = "left", classN
       viewport={aiosMotionViewport}
     >
       {eyebrow ? <p className="public-eyebrow">{eyebrow}</p> : null}
-      <h2 className="public-h2 mt-5">{title}</h2>
+      <TitleTag className="public-h2 mt-5">{title}</TitleTag>
       {body ? <p className="public-body-lg mt-5 text-balance">{body}</p> : null}
     </motion.div>
   )

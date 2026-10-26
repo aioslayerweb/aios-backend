@@ -1,7 +1,7 @@
 from supabase_client import supabase
 
 
-def build_customer_insights(customer_id: str):
+def build_customer_insights(customer_id: str, organization_id: str):
     """
     AI-powered customer intelligence layer.
     Uses structured reasoning (MVP-safe AI layer).
@@ -11,6 +11,7 @@ def build_customer_insights(customer_id: str):
         supabase.table("customers")
         .select("*")
         .eq("id", customer_id)
+        .eq("organization_id", organization_id)
         .limit(1)
         .execute()
     )

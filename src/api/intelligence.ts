@@ -11,6 +11,13 @@ import { eventStore } from "../memory/eventStore"
 
 const router = express.Router()
 
+router.use((_req: Request, res: Response<ErrorResponse>) =>
+  res.status(503).json({
+    success: false,
+    error: "Organization-scoped runtime event access is not configured",
+  }),
+)
+
 // Kernel controls persistence through sink contract; route stays transport-only.
 setKernelEventSink({
   add(event: AIOSSystemEvent): void {

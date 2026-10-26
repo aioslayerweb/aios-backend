@@ -1,9 +1,20 @@
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket
+from fastapi.responses import JSONResponse
 from supabase_client import supabase
 import json
 from collections import defaultdict
 
 app = FastAPI()
+
+@app.middleware("http")
+async def block_unscoped_business_access(request, call_next):
+    path = request.url.path
+    if path.startswith("/timeline/") or path == "/autopilot" or path.startswith("/autopilot/"):
+        return JSONResponse(
+            status_code=503,
+            content={"detail": "Organization scope is not configured."},
+        )
+    return await call_next(request)
 
 
 # =========================
@@ -264,37 +275,7 @@ async def broadcast(msg):
 
 @app.websocket("/ws/autopilot")
 async def ws_autopilot(websocket: WebSocket):
-    await websocket.accept()
-    active_connections.add(websocket)
-
-    try:
-        while True:
-            raw = await websocket.receive_text()
-            event = json.loads(raw)
-
-            # Store raw event
-            supabase.table("events").insert(event).execute()
-
-            # AIOS Memory Layer
-            timeline_event = {
-                "user_id": event.get("user_id"),
-                "event_name": event.get("event_name"),
-                "event_data": event.get("event_data", {})
-            }
-
-            supabase.table("customer_timeline").insert(
-                timeline_event
-            ).execute()
-
-            user_id = event.get("user_id")
-
-            if user_id:
-                result = run_autopilot(user_id)
-
-                await broadcast({
-                    "type": "autopilot_update",
-                    "data": result
-                })
-
-    except WebSocketDisconnect:
-        active_connections.remove(websocket)
+    await websocket.close(
+        code=1013,
+        reason="Organization-scoped event ingestion is not configured.",
+    )

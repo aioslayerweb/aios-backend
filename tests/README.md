@@ -27,31 +27,55 @@ Provide a quality architecture that treats testing as a first-class platform cap
 
 ## Current Status
 
-The repository has architecture scaffolding and an offline security contract suite. Run the security suite from the repository root:
+The repository has architecture scaffolding and local security regression
+suites. Run the TypeScript suite from the repository root:
 
 ```sh
 npm run test:security
 ```
 
-The command uses the already-declared `tsx` development dependency and Node's built-in test runner. It does not require a database, credentials, migrations, or service startup.
+The command uses the already-declared `tsx` dependency and Node's built-in test
+runner. It requires no database, production credentials, migrations, or
+external service. The runtime event isolation test starts an ephemeral local
+HTTP server and uses synthetic requests.
 
-The suite reads local source files and synthetic fixtures only. It replaces `globalThis.fetch` with a throwing function during tests so accidental HTTP requests fail immediately. It does not import application entry points or initialize Supabase, Render, or Vercel clients.
+The suite uses source checks, synthetic fixtures, and local handler tests. The
+security-foundation contract test disables global `fetch` to prevent accidental
+external access; the isolated runtime event test exercises Express routes on a
+loopback ephemeral port. Neither test contacts a deployed service or
+initializes a production Supabase, Render, or Vercel client.
+
+Run the Python FastAPI security tests separately:
+
+```sh
+PATH=/path/to/approved-python-venv/bin:$PATH npm run test:security:backend
+```
+
+Those tests use synthetic signed tokens, fake membership/data repositories,
+and ASGI transports; they do not require a database or external identity
+provider.
 
 ## Security Suite Coverage
 
 - Active checks validate synthetic identity, organization, role, and mapped/unmapped record fixtures.
-- Active route-contract checks compare the frontend runtime paths against the Express replay route registrations.
+- Active route-contract checks compare frontend runtime paths against Express replay route registrations.
+- Local integration tests verify replay and event-ingestion routes fail closed before reading or mutating the event store, and that alternate FastAPI paths fail closed.
 - Demo isolation checks verify disabled runtime loaders are not invoked and demo insights/actions are explicitly synthetic.
-- A TODO requirement expects the selected deployed API to implement those paths. It is pending because the identified FastAPI app does not currently register the runtime `/aios/*` contract and the canonical API routing strategy has not been implemented.
-- TODO cases document the required denials for unauthenticated and invalid/expired identities, missing organization membership, cross-organization access, insufficient roles, unmapped records, and unauthorized service-role access.
+- Two TODO requirements remain: establish the selected deployed API's route ownership and prove cross-tenant runtime replay isolation against an approved deployment and database.
 
-TODO tests are intentionally not security assurances. They remain pending until a server-side identity and authorization boundary exists and can be exercised offline with injected fake dependencies. A passing test command means executable checks pass and pending requirements are reported; it does not mean those requirements are implemented.
+TODO tests are intentionally not security assurances. A passing local test
+command means only that the executable local checks pass and pending
+requirements are reported; it does not establish deployment routing or
+effective database policies.
 
 ## Limitations
 
-- These tests do not invoke live FastAPI or Express handlers, Supabase policies, or deployed hosting controls.
-- Source-text route checks can detect contract drift but do not prove production deployment wiring.
-- Security TODO tests do not establish API behavior. They should be replaced with mocked/injected handler tests when the security boundary is introduced.
+- Local handler tests do not invoke deployed FastAPI or Express services,
+  Supabase policies, or hosting controls.
+- Source-text route checks can detect contract drift but do not prove selected
+  deployment routing.
+- Database migrations and effective deployed grants/RLS are not exercised by
+  these suites.
 - No production credentials, network services, or customer data are used.
 
 ## FastAPI Identity Verification

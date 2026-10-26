@@ -39,7 +39,7 @@ export const metadata: Metadata = publicPageMetadata(
 const storyCards = [
   {
     title: "Mission",
-    body: "Reduce executive cognitive load by transforming fragmented operations into one continuously intelligent system.",
+    body: "Reduce executive cognitive load by making business context and decision pathways easier to understand.",
     icon: <Target size={18} />,
   },
   {
@@ -49,7 +49,7 @@ const storyCards = [
   },
   {
     title: "Why AIOS Exists",
-    body: "To create a new software category where intelligence, memory, and execution operate as one business operating surface.",
+    body: "To explore a software model where intelligence, memory, and governed execution can work together.",
     icon: <Flag size={18} />,
   },
   {
@@ -67,21 +67,21 @@ const pillars = [
   },
   {
     title: "Business Memory",
-    body: "Every signal, decision, and outcome contributes to persistent memory that improves future reasoning quality.",
+    body: "The product model considers how signals, decisions, and outcomes could inform future reasoning.",
     icon: <Database size={18} />,
   },
   {
     title: "Role-Based Intelligence",
-    body: "Intelligence adapts by role so CEOs, Finance, Operations, and Revenue teams each see decision-relevant context.",
+    body: "The design considers how different roles may need relevant context while access permissions stay independent.",
     icon: <Briefcase size={18} />,
   },
 ]
 
 const timeline = [
-  { label: "2024", title: "Category Thesis", body: "Defined the AI Operating System category and signal-memory architecture model." },
-  { label: "2025", title: "Core Intelligence Layer", body: "Shipped unified signal ingestion, business memory, and executive insight pipelines." },
-  { label: "2026", title: "Operator Runtime", body: "Introduced policy-governed AI operators and autonomous workflow runtime orchestration." },
-  { label: "2027", title: "Enterprise Scale", body: "Expanding enterprise architecture, integrations, and global intelligence operations." },
+  { label: "01", title: "Understand", body: "Connect business activity with relevant context before drawing a conclusion." },
+  { label: "02", title: "Explain", body: "Make the evidence and reasoning behind an insight visible." },
+  { label: "03", title: "Prioritize", body: "Help each role focus on information within its permitted access." },
+  { label: "04", title: "Govern", body: "Keep people, permissions, and approval policies in control of consequential actions." },
 ]
 
 const aboutProblems = [
@@ -94,15 +94,15 @@ const aboutProblems = [
 const aboutSolutions = [
   { title: "AI Operating System thesis", body: "AIOS was created to connect intelligence, memory, and execution as one layer." },
   { title: "Executive-first design", body: "Every product decision aims to reduce cognitive load for leaders." },
-  { title: "Compounding business memory", body: "The platform learns from outcomes and continuously improves recommendations." },
-  { title: "Governed autonomy", body: "Humans remain in control through explainability and policy-aware workflows." },
+  { title: "Business memory concept", body: "The product model explores how outcomes could inform future recommendations." },
+  { title: "Governed autonomy", body: "The design keeps explainability, human review, and policy-aware workflows in view." },
 ]
 
 const aboutHowItWorks = [
-  { label: "Principle 1", title: "Observe", body: "AIOS observes meaningful business signals across systems and teams." },
-  { label: "Principle 2", title: "Understand", body: "Memory and knowledge layers translate data into decision context." },
-  { label: "Principle 3", title: "Recommend", body: "AI reasoning surfaces explainable recommendations with confidence." },
-  { label: "Principle 4", title: "Learn", body: "Execution outcomes reinforce memory and improve future intelligence." },
+  { label: "Principle 1", title: "Observe", body: "The model starts with meaningful business signals from relevant sources." },
+  { label: "Principle 2", title: "Understand", body: "Memory and knowledge concepts provide context for interpretation." },
+  { label: "Principle 3", title: "Recommend", body: "Decision support should make evidence, reasoning, and uncertainty visible." },
+  { label: "Principle 4", title: "Learn", body: "Where outcome data is available, it can be used to evaluate future recommendations." },
 ]
 
 export default function AboutPage() {
@@ -110,13 +110,13 @@ export default function AboutPage() {
     <PublicPageShell activeHref="/about">
       <PublicStructuredData
         name="About AIOS"
-        description="Learn why AIOS exists, the mission behind the AI Operating System category, and the roadmap for enterprise intelligence."
+        description="Learn why AIOS is designed to connect business context, decision support, and governed workflows."
         path="/about"
       />
       <PublicHero
         eyebrow="About AIOS"
-        title="A new software category for autonomous businesses"
-        body="AIOS is not an add-on tool. It is a category shift: one intelligence layer coordinating memory, decisions, and execution for the whole business."
+        title="Business intelligence before automation"
+        body="AIOS is a proposed intelligence layer above business systems. This overview describes the product vision, not a claim that every capability is deployed."
         actions={
           <>
             <PublicButtonLink href="/products" size="lg">
@@ -136,10 +136,10 @@ export default function AboutPage() {
 
       <PublicProblemSolutionSection
         problemTitle="Why AIOS exists"
-        problemBody="Businesses need more than another AI assistant. They need an operating system for intelligence, decisions, and execution."
+        problemBody="The AIOS thesis is that businesses need more than task assistance: they need connected context for intelligence, decisions, and governed execution."
         problemItems={aboutProblems}
         solutionTitle="The AIOS vision"
-        solutionBody="AIOS is designed as the intelligence operating layer that helps leaders understand faster and act with confidence."
+        solutionBody="AIOS explores an intelligence operating model intended to help leaders understand business context before considering action."
         solutionItems={aboutSolutions}
       />
 
@@ -158,7 +158,7 @@ export default function AboutPage() {
           <PublicSectionHeader
             eyebrow="Story"
             title="Why AIOS exists"
-            body="The About page now uses the same premium cards, spacing, and hierarchy as every other public route."
+            body="AIOS starts from a business question: what changed, why does it matter, and what should a person consider next?"
           />
           <div className="mt-14">
             <PublicFeatureGrid items={storyCards} columns={2} />
@@ -170,8 +170,8 @@ export default function AboutPage() {
         <PublicContainer>
           <PublicSectionHeader
             eyebrow="Principles"
-            title="The product philosophy behind the design system"
-            body="The same ideas that shape AIOS architecture also shape the public experience: clarity, explainability, reuse, and compositional depth."
+            title="The principles behind the AIOS operating model"
+            body="Clarity, explainability, role-aware prioritization, and human oversight guide how the product is intended to support business decisions."
           />
           <div className="mt-14">
             <PublicFeatureGrid items={pillars} columns={3} />
@@ -182,9 +182,9 @@ export default function AboutPage() {
       <PublicSection>
         <PublicContainer>
           <PublicSectionHeader
-            eyebrow="Timeline"
-            title="From category thesis to enterprise operating system"
-            body="The company story is presented as a reusable timeline section that future narrative pages can inherit."
+            eyebrow="Principles"
+            title="A sequence from context to governed action"
+            body="These principles describe the intended decision-support model, not a company history or a claim about deployment status."
           />
           <div className="mt-14">
             <PublicTimeline items={timeline} />
@@ -194,10 +194,7 @@ export default function AboutPage() {
 
       <PublicTrustAndProofSection
         title="A mission built for enterprise trust"
-        body="AIOS combines deep architecture discipline with executive-grade clarity and responsible autonomy."
-        quote="AIOS provides the first coherent answer to the gap between analytics, decision support, and autonomous execution."
-        person="Enterprise Advisor"
-        role="AIOS Strategy Council"
+        body="AIOS is designed to make business context and decision reasoning clearer while keeping access control and human oversight explicit."
       />
 
       <PublicConversionRailSection />
@@ -205,7 +202,11 @@ export default function AboutPage() {
       <PublicFooterCta
         eyebrow="Talk To AIOS"
         title="Discuss the category, architecture, and operating model behind AIOS"
-        body="The public site now carries the same system-level confidence as the platform itself."
+        body="Explore the platform and architecture to understand the intended AIOS operating model."
+        primaryHref="/demo-platform/executive"
+        primaryLabel="Explore synthetic demo"
+        secondaryHref="/platform"
+        secondaryLabel="Review platform"
       />
     </PublicPageShell>
   )

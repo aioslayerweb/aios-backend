@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useState } from "react";
 import Link from "next/link";
-import { BrandLogo } from "@/components/branding";
 import { formatDemoEuro } from "@/lib/demo/currency";
 import {
   answerDemoQuestion,
@@ -11,6 +10,7 @@ import {
   demoExecutiveRoles,
   type DemoExecutiveRole,
 } from "@/lib/demo/executive-command-center-model";
+import { DepartmentCities } from "@/components/demo/department-cities";
 import {
   Activity,
   ArrowDownRight,
@@ -38,20 +38,19 @@ type Domain = {
   label: string;
   signal: string;
   health: string;
-  x: number;
-  y: number;
+  accent: string;
   Icon: LucideIcon;
   tone: string;
   edge: string;
 };
 
 const domains: Domain[] = [
-  { id: "sales", label: "Sales", signal: "Pipeline acceleration", health: "32 agents · steady", x: 50, y: 13, Icon: BriefcaseBusiness, tone: "text-blue-700", edge: "border-blue-200 bg-blue-50" },
-  { id: "marketing", label: "Marketing", signal: "Demand quality", health: "18 agents · steady", x: 18, y: 31, Icon: ChartNoAxesCombined, tone: "text-violet-700", edge: "border-violet-200 bg-violet-50" },
-  { id: "customers", label: "Customer success", signal: "Retention risk", health: "24 agents · attention", x: 82, y: 31, Icon: Users, tone: "text-emerald-700", edge: "border-emerald-200 bg-emerald-50" },
-  { id: "finance", label: "Finance", signal: "Margin guardrails", health: "12 agents · steady", x: 18, y: 65, Icon: CircleDollarSign, tone: "text-amber-700", edge: "border-amber-200 bg-amber-50" },
-  { id: "operations", label: "Operations", signal: "Throughput stability", health: "20 agents · steady", x: 82, y: 65, Icon: Factory, tone: "text-cyan-700", edge: "border-cyan-200 bg-cyan-50" },
-  { id: "product", label: "Product", signal: "Roadmap confidence", health: "16 agents · watch", x: 50, y: 82, Icon: ShoppingBag, tone: "text-indigo-700", edge: "border-indigo-200 bg-indigo-50" },
+  { id: "sales", label: "Sales", signal: "Pipeline acceleration", health: "32 agents · steady", accent: "#2563eb", Icon: BriefcaseBusiness, tone: "text-blue-700", edge: "border-blue-200 bg-blue-50" },
+  { id: "marketing", label: "Marketing", signal: "Demand quality", health: "18 agents · steady", accent: "#7c3aed", Icon: ChartNoAxesCombined, tone: "text-violet-700", edge: "border-violet-200 bg-violet-50" },
+  { id: "customers", label: "Customer success", signal: "Retention risk", health: "24 agents · attention", accent: "#059669", Icon: Users, tone: "text-emerald-700", edge: "border-emerald-200 bg-emerald-50" },
+  { id: "finance", label: "Finance", signal: "Margin guardrails", health: "12 agents · steady", accent: "#d97706", Icon: CircleDollarSign, tone: "text-amber-700", edge: "border-amber-200 bg-amber-50" },
+  { id: "operations", label: "Operations", signal: "Throughput stability", health: "20 agents · steady", accent: "#0891b2", Icon: Factory, tone: "text-cyan-700", edge: "border-cyan-200 bg-cyan-50" },
+  { id: "product", label: "Product", signal: "Roadmap confidence", health: "16 agents · watch", accent: "#4f46e5", Icon: ShoppingBag, tone: "text-indigo-700", edge: "border-indigo-200 bg-indigo-50" },
 ];
 
 const metrics = [
@@ -176,51 +175,6 @@ function MetricTrendChart({ id, label }: { id: string; label: string }) {
         <circle key={`${id}-${index}`} cx={(index / (values.length - 1)) * 100} cy={90 - value} r="1.7" fill="#1d4ed8">
         </circle>
       ))}
-    </svg>
-  );
-}
-
-const cityProfiles: Record<string, { front: string; side: string; roof: string; accent: string; towers: Array<[number, number, number]> }> = {
-  sales: { front: "#90b9dc", side: "#5d88b0", roof: "#d6e9f8", accent: "#3b82f6", towers: [[34, 19, 12], [51, 31, 19], [70, 15, 28], [91, 24, 17], [110, 36, 12], [130, 22, 22], [147, 17, 13]] },
-  marketing: { front: "#b7a6df", side: "#8772b4", roof: "#e9e1fa", accent: "#8b5cf6", towers: [[34, 22, 14], [53, 14, 24], [73, 34, 14], [94, 23, 20], [114, 30, 13], [133, 18, 27], [150, 25, 12]] },
-  customers: { front: "#8fcbb4", side: "#5b9a82", roof: "#d8f2e8", accent: "#10b981", towers: [[34, 17, 13], [53, 27, 21], [74, 19, 15], [94, 33, 25], [115, 20, 16], [135, 29, 20], [152, 18, 12]] },
-  finance: { front: "#d9be83", side: "#a88c50", roof: "#f6e8c7", accent: "#d97706", towers: [[34, 18, 12], [53, 29, 20], [73, 20, 17], [93, 34, 24], [114, 15, 13], [133, 26, 18], [151, 20, 12]] },
-  operations: { front: "#80becb", side: "#4f8f9e", roof: "#d6f0f4", accent: "#0891b2", towers: [[34, 21, 13], [53, 31, 19], [74, 18, 26], [94, 27, 16], [115, 17, 14], [134, 34, 20], [151, 21, 12]] },
-  product: { front: "#9eadd9", side: "#6e7eae", roof: "#e0e7fb", accent: "#6366f1", towers: [[34, 16, 12], [53, 25, 19], [74, 20, 14], [94, 34, 24], [115, 18, 13], [134, 28, 22], [152, 19, 12]] },
-};
-
-function CityPlatformIllustration({ departmentId }: { departmentId: string }) {
-  const profile = cityProfiles[departmentId] ?? cityProfiles.sales!;
-
-  return (
-    <svg aria-hidden="true" viewBox="0 0 180 100" className="h-full w-full overflow-visible">
-      <ellipse cx="90" cy="83" rx="70" ry="11" fill="#8199ad" opacity="0.2" />
-      <path d="M18 60c0-10 32-18 72-18s72 8 72 18v9c0 10-32 18-72 18s-72-8-72-18z" fill="#b9ccdc" />
-      <ellipse cx="90" cy="60" rx="72" ry="19" fill="#e8f1f8" stroke="#91abc0" strokeWidth="1.6" />
-      <ellipse cx="90" cy="57" rx="64" ry="14" fill="#f7fbff" stroke="#c7d9e8" />
-      <path d="M29 59c22 12 100 14 122-1M40 50c17 8 76 9 99 0" fill="none" stroke={profile.accent} strokeOpacity=".35" strokeWidth="1" />
-      {profile.towers.map(([x, width, height], index) => {
-        const base = 56 - (index % 2) * 2;
-        const right = x + width;
-        const depth = 5;
-        const top = base - height;
-        return (
-          <g key={`${departmentId}-tower-${index}`}>
-            <path d={`M${x} ${base}V${top}l${depth} -4v${height}z`} fill={profile.side} />
-            <path d={`M${x} ${top}l${depth} -4h${width}l-${depth} 4z`} fill={profile.roof} stroke="#ffffff" strokeOpacity=".75" strokeWidth=".6" />
-            <path d={`M${x} ${base}V${top}h${width}v${height}z`} fill={profile.front} />
-            <path d={`M${x + 2} ${base - 4}V${top + 5}M${x + 7} ${base - 4}V${top + 5}`} stroke="#f7fbff" strokeOpacity=".72" strokeWidth="1.3" strokeDasharray="2 3" />
-            <path d={`M${right - 2} ${base}V${top + 4}`} stroke={profile.accent} strokeWidth="1" strokeOpacity=".7" />
-            {index === 2 || index === 5 ? <path d={`M${x + width / 2} ${top}v-5`} stroke={profile.accent} strokeWidth="1.4" /> : null}
-          </g>
-        );
-      })}
-      <g fill="#6fa58a">
-        <circle cx="26" cy="52" r="3.2" /><circle cx="153" cy="53" r="3.5" /><circle cx="46" cy="43" r="2.7" /><circle cx="138" cy="43" r="2.8" />
-      </g>
-      <g stroke="#56826d" strokeWidth="1">
-        <path d="M26 55v5m127-3v5M46 46v4m92-4v4" />
-      </g>
     </svg>
   );
 }
@@ -493,113 +447,27 @@ export function DemoExecutiveCommandCenter() {
           <div className="flex min-w-0 flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3">
             <div className="w-full min-w-0 sm:w-auto sm:flex-1">
               <h2 id="landscape-heading" className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-800">Connected operating landscape</h2>
-              <p className="mt-1 text-xs text-slate-600">Select a domain to focus its sample signal.</p>
+              <p className="mt-1 text-xs text-slate-600">Select a department city to inspect its synthetic signal.</p>
             </div>
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-blue-100 bg-white/90 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-800">
               <Network aria-hidden="true" className="h-3 w-3" /> Sample network
             </span>
           </div>
 
-          <div className="aios-demo-spatial-stage mt-3 hidden aspect-[1.12] min-h-[360px] max-h-[490px] md:block">
-            <div className="relative h-full w-full overflow-hidden rounded-[1.5rem] bg-[radial-gradient(ellipse_at_50%_50%,rgba(219,234,254,0.76),rgba(248,251,255,0.42)_62%,transparent_100%)]">
-              <svg aria-hidden="true" className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-                {departmentConnections.map(({ from, to }) => {
-                  const source = domains.find((domain) => domain.id === from);
-                  const target = domains.find((domain) => domain.id === to);
-                  if (!source || !target) return null;
-                  const active = from === selectedDomainId || to === selectedDomainId;
-                  return (
-                    <line key={`${from}-${to}`} x1={source.x} y1={source.y} x2={target.x} y2={target.y} stroke="#7baed7" strokeWidth={active ? "0.45" : "0.25"} strokeDasharray="1 1.6" opacity={active ? "0.72" : "0.35"} />
-                  );
-                })}
-                {domains.map((domain) => {
-                  const active = selectedDomainId === domain.id;
-                  return (
-                    <line key={domain.id} x1="50" y1="50" x2={domain.x} y2={domain.y} stroke={active ? "#3b82f6" : "#a9c9ed"} strokeWidth={active ? "0.8" : "0.45"} strokeDasharray={active ? "0" : "1.4 1.4"} />
-                  );
-                })}
-                <circle cx="50" cy="50" r="16" fill="none" stroke="#dbeafe" strokeWidth="0.5" />
-              </svg>
-
-              {domains.map(({ id, x, y }) => (
-                <div
-                  key={`${id}-platform`}
-                  aria-hidden="true"
-                  style={{ left: `${x}%`, top: `calc(${y}% + 1rem)` }}
-                  className="pointer-events-none absolute z-[1] h-[4.5rem] w-[7.6rem] -translate-x-1/2"
-                >
-                  <CityPlatformIllustration departmentId={id} />
-                </div>
-              ))}
-
-              <div className="aios-demo-spatial-hub absolute left-1/2 top-1/2 z-10 h-32 w-36 -translate-x-1/2 -translate-y-1/2">
-                <div aria-hidden="true" className="absolute inset-x-1 bottom-0 h-10 rounded-[50%] border border-blue-200 bg-gradient-to-b from-white to-blue-100 shadow-[0_12px_25px_rgba(37,99,235,0.2)]" />
-                <div aria-hidden="true" className="absolute inset-x-3 bottom-2 h-8 rounded-[50%] border border-blue-100 bg-gradient-to-b from-blue-50 to-white shadow-inner" />
-                <button
-                  type="button"
-                  aria-expanded={coreOverviewOpen}
-                  aria-label="Open company-wide AIOS intelligence overview"
-                  onClick={() => setCoreOverviewOpen((open) => !open)}
-                  className={`absolute left-1/2 top-0 flex h-[5.5rem] w-[5.5rem] -translate-x-1/2 flex-col items-center justify-center rounded-[1.5rem] border border-blue-200 bg-white text-center shadow-[0_12px_35px_rgba(37,99,235,0.2)] hover:border-blue-500 hover:shadow-[0_14px_40px_rgba(37,99,235,0.28)] sm:h-24 sm:w-24 ${focusStyle()}`}
-                >
-                  <BrandLogo variant="square" width={35} height={35} alt="AIOS Pilot" />
-                  <span className="mt-0.5 text-[8px] font-bold tracking-[0.16em] text-blue-800">PILOT HUB</span>
-                </button>
-              </div>
-
-              {domains.map(({ id, label, signal, health, x, y, Icon, tone, edge }) => {
-                const isSelected = selectedDomainId === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    aria-pressed={isSelected}
-                    onClick={() => setSelectedDomainId(id)}
-                    style={{ left: `${x}%`, top: `${y}%` }}
-                    className={`aios-demo-spatial-node absolute z-20 flex min-h-[3.25rem] w-[7.3rem] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-xl border px-1.5 py-1.5 text-center shadow-[0_5px_18px_rgba(71,104,151,0.1)] sm:w-[8.5rem] sm:px-2 ${edge} ${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : "hover:shadow-md"} ${focusStyle()}`}
-                  >
-                    <span className={`flex items-center gap-1 text-[10px] font-bold uppercase leading-tight sm:text-[11px] ${tone}`}><Icon aria-hidden="true" className="h-3.5 w-3.5 shrink-0" />{label}</span>
-                    <span className="mt-1 text-[9px] leading-tight text-slate-600">{health}</span>
-                    <span className="sr-only">Sample signal: {signal}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="mt-4 md:hidden">
-            <div className="flex flex-col items-center rounded-2xl bg-gradient-to-b from-blue-50/80 to-white/80 px-4 py-5">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl border border-blue-200 bg-white shadow-[0_8px_22px_rgba(37,99,235,0.16)]">
-                <BrandLogo variant="square" width={38} height={38} alt="AIOS Pilot" />
-              </div>
-              <span className="mt-2 text-xs font-bold tracking-[0.2em] text-slate-800">AIOS PILOT · HUB</span>
-              <span aria-hidden="true" className="my-2 h-7 border-l border-dashed border-blue-400" />
-              <div className={`grid w-full min-w-0 grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2 gap-y-1 rounded-xl border px-3 py-3 ${selectedDomain.edge}`}>
-                <selectedDomain.Icon aria-hidden="true" className={`row-span-2 h-4 w-4 ${selectedDomain.tone}`} />
-                <span className="min-w-0 break-words font-semibold text-slate-800">{selectedDomain.label}</span>
-                <span className="min-w-0 break-words text-xs text-slate-600">{selectedDomain.signal}</span>
-              </div>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2" role="group" aria-label="Select a business domain">
-              {domains.map(({ id, label, Icon, tone }) => (
-                <button
-                  key={id}
-                  type="button"
-                  aria-pressed={selectedDomainId === id}
-                  onClick={() => setSelectedDomainId(id)}
-                  className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-2 text-xs font-semibold ${selectedDomainId === id ? "border-blue-400 bg-blue-50 text-blue-900" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"} ${focusStyle()}`}
-                >
-                  <Icon aria-hidden="true" className={`h-4 w-4 ${tone}`} />{label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <DepartmentCities
+            departments={domains}
+            connections={departmentConnections}
+            selectedDepartmentId={selectedDomainId}
+            onDepartmentSelect={setSelectedDomainId}
+            onCoreSelect={() => setCoreOverviewOpen((open) => !open)}
+            coreOverviewOpen={coreOverviewOpen}
+          />
 
           <p className="mt-3 rounded-xl border border-blue-100/80 bg-white/75 px-3 py-2.5 text-xs leading-5 text-slate-700" aria-live="polite">
             <strong className="text-slate-900">Selected · {selectedDomain.label}.</strong> {selectedDomain.signal} · {selectedDomain.health}. This is a synthetic demo signal.
           </p>
           {coreOverviewOpen ? (
-            <div className="mt-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm" aria-live="polite">
+            <div id="company-wide-intelligence" className="mt-3 rounded-xl border border-blue-200 bg-white p-3 shadow-sm" aria-live="polite">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-slate-900">Company-wide intelligence · {selectedRole} lens</h3>
                 <button type="button" onClick={() => setCoreOverviewOpen(false)} className={`min-h-10 rounded-md px-2 text-xs font-semibold text-blue-800 hover:bg-blue-50 ${focusStyle()}`}>Close overview</button>

@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { LocalDateTime } from "@/components/ui/local-date-time";
 import {
   AlertTriangle,
   Bot,
@@ -605,7 +606,7 @@ export function ExecutiveTimeline({ events }: { events: DecisionTimelineEvent[] 
           <motion.article key={event.id} variants={cardMotion} className="rounded-xl border border-border bg-surface-canvas p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold capitalize text-brand-navy">{event.stage}</p>
-              <span className="text-xs text-text-muted">{new Date(event.timestamp).toLocaleString()}</span>
+              <span className="text-xs text-text-muted"><LocalDateTime value={event.timestamp} /></span>
             </div>
             <p className="mt-1 text-xs text-text-secondary">{event.title}</p>
             <p className="mt-1 text-[11px] text-text-muted">{event.detail}</p>

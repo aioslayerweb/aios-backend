@@ -21,10 +21,6 @@ type AIOSButtonProps = {
 function inferAnalyticsEvent(href: string, label: string) {
   const normalized = label.toLowerCase()
 
-  if (normalized.includes("book demo") || href.includes("/contact")) {
-    return normalized.includes("pilot") ? "pilot_click" : "demo_click"
-  }
-
   if (normalized.includes("join pilot")) {
     return "pilot_application_click"
   }
@@ -35,6 +31,22 @@ function inferAnalyticsEvent(href: string, label: string) {
 
   if (normalized.includes("schedule discovery")) {
     return "discovery_click"
+  }
+
+  if (href.startsWith("/pilot/discovery") || normalized.includes("discovery")) {
+    return "discovery_click"
+  }
+
+  if (href.startsWith("/demo-platform") || normalized.includes("demo")) {
+    return "demo_click"
+  }
+
+  if (href.startsWith("/pilot") || normalized.includes("pilot")) {
+    return "pilot_click"
+  }
+
+  if (href.includes("/contact")) {
+    return "contact_click"
   }
 
   if (normalized.includes("download")) {

@@ -100,7 +100,7 @@ export const aiosTheme = {
 } as const
 
 export const aiosNavigationItems = [
-  { label: "Home", href: "/" },
+  { label: "Overview", href: "/" },
   { label: "Platform", href: "/platform" },
   { label: "Architecture", href: "/architecture" },
   { label: "Products", href: "/products" },
@@ -138,10 +138,10 @@ export const aiosFooterGroups = [
     ],
   },
   {
-    title: "Connect",
+    title: "Explore",
     links: [
-      { label: "Contact", href: "/contact" },
-      { label: "Launch AIOS", href: "/app" },
+      { label: "Synthetic demo", href: "/demo-platform/executive" },
+      { label: "Business discovery", href: "/pilot/discovery" },
     ],
   },
 ] as const

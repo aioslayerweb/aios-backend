@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
@@ -11,12 +11,14 @@ from backend.routes.organizations import (
     router as organizations_router,
 )
 from backend.routes.security import router as security_router
+from backend.security.authorization import (
+    AuthorizedOrganization,
+    BusinessPermission,
+    require_organization_permission,
+)
 from backend.services.organization_memberships import (
     SupabaseMembershipRepository,
 )
-
-from services.signals import extract_signals
-from services.executive_engine import build_executive_overview
 
 from services.business_memory import (
     get_company_memory,
@@ -40,6 +42,7 @@ app = FastAPI(
 app.include_router(security_router)
 app.include_router(organizations_router)
 app.state.organization_membership_repository = SupabaseMembershipRepository(supabase)
+read_business = require_organization_permission(BusinessPermission.READ)
 
 # ==========================================
 # Middleware
@@ -60,17 +63,11 @@ app.add_middleware(
 active_connections = set()
 
 # ==========================================
-# Helpers
-# ==========================================
-
-def get_user_events(user_id: str):
-    res = (
-        supabase.table("events")
-        .select("*")
-        .eq("user_id", user_id)
-        .execute()
+def require_event_organization_scope() -> None:
+    raise HTTPException(
+        status_code=503,
+        detail="Event organization scope is not configured.",
     )
-    return res.data or []
 
 # ==========================================
 # System
@@ -103,27 +100,33 @@ def ready():
 # ==========================================
 
 @app.get("/api/v1/executive/overview")
-def executive_overview():
-    res = supabase.table("events").select("*").execute()
-    events = res.data or []
-    return build_executive_overview(events)
+def executive_overview(
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    require_event_organization_scope()
 
 # ==========================================
 # Business Memory
 # ==========================================
 
 @app.get("/api/v1/memory/company")
-def company_memory():
+def company_memory(
+    _authorized: AuthorizedOrganization = Depends(read_business),
+):
     return get_company_memory()
 
 
 @app.get("/api/v1/memory/customers")
-def customer_memory():
+def customer_memory(
+    _authorized: AuthorizedOrganization = Depends(read_business),
+):
     return get_customer_memory()
 
 
 @app.get("/api/v1/memory/decisions")
-def decision_memory():
+def decision_memory(
+    _authorized: AuthorizedOrganization = Depends(read_business),
+):
     return get_decision_memory()
 
 # ==========================================
@@ -131,80 +134,95 @@ def decision_memory():
 # ==========================================
 
 @app.get("/api/v1/customers")
-def customers():
-    return {"customers": get_all_customers()}
+def customers(
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    return {"customers": get_all_customers(authorized.organization_id)}
 
 
 @app.get("/api/v1/customers/{customer_id}")
-def customer(customer_id: str):
-    data = get_customer(customer_id)
+def customer(
+    customer_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    data = get_customer(customer_id, authorized.organization_id)
     if not data:
-        return {"error": "Customer not found"}
+        raise HTTPException(status_code=404, detail="Customer not found.")
     return data
 
 
 @app.get("/api/v1/customers/{customer_id}/health")
-def customer_health(customer_id: str):
-    data = get_customer_health(customer_id)
+def customer_health(
+    customer_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    data = get_customer_health(customer_id, authorized.organization_id)
     if not data:
-        return {"error": "Customer not found"}
+        raise HTTPException(status_code=404, detail="Customer not found.")
     return data
 
 
 @app.get("/api/v1/customers/{customer_id}/insights")
-def customer_insights(customer_id: str):
-    data = build_customer_insights(customer_id)
+def customer_insights(
+    customer_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    data = build_customer_insights(customer_id, authorized.organization_id)
     if not data:
-        return {"error": "Customer not found"}
+        raise HTTPException(status_code=404, detail="Customer not found.")
     return data
 
 
 @app.get("/api/v1/customers/{customer_id}/churn")
-def customer_churn(customer_id: str):
-    return calculate_churn_probability(customer_id)
+def customer_churn(
+    customer_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    result = calculate_churn_probability(customer_id, authorized.organization_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Customer not found.")
+    return result
 
 # ==========================================
 # Signals
 # ==========================================
 
+def require_self_user_id(user_id: str, authorized: AuthorizedOrganization) -> None:
+    if user_id != authorized.user_id:
+        raise HTTPException(status_code=404, detail="Resource not found.")
+
+
 @app.get("/signals/{user_id}")
-def signals(user_id: str):
-    events = get_user_events(user_id)
-    return extract_signals(events)
+def signals(
+    user_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    require_self_user_id(user_id, authorized)
+    require_event_organization_scope()
 
 # ==========================================
 # Insights
 # ==========================================
 
 @app.get("/insights/{user_id}")
-def insights(user_id: str):
-    events = get_user_events(user_id)
-    return {
-        "user_id": user_id,
-        "event_count": len(events),
-        "insights": [
-            {
-                "title": "Supabase Connected",
-                "description": f"{len(events)} events loaded",
-                "type": "system"
-            }
-        ]
-    }
+def insights(
+    user_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    require_self_user_id(user_id, authorized)
+    require_event_organization_scope()
 
 # ==========================================
 # Autopilot
 # ==========================================
 
 @app.get("/autopilot/{user_id}")
-def autopilot(user_id: str):
-    events = get_user_events(user_id)
-    return {
-        "user_id": user_id,
-        "event_count": len(events),
-        "score": 42,
-        "segment": "mid_value",
-        "status": "supabase_mode"
-    }
+def autopilot(
+    user_id: str,
+    authorized: AuthorizedOrganization = Depends(read_business),
+):
+    require_self_user_id(user_id, authorized)
+    require_event_organization_scope()
 
 # ==========================================
 # WebSocket

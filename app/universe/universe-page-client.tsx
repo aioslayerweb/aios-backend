@@ -129,30 +129,30 @@ const timelineItems = signalFlow.map((title, index) => ({
 }))
 
 const universeProblemCards = [
-  { title: "Disconnected modules", body: "Enterprise tools operate as islands without shared intelligence." },
-  { title: "Static architecture diagrams", body: "Most platform maps fail to show live information movement." },
-  { title: "Siloed operators", body: "AI agents often act without shared memory and governance." },
-  { title: "Role blind spots", body: "Teams miss cross-functional dependencies and compounding risks." },
+  { title: "Scattered business context", body: "Information relevant to a decision may sit across separate business systems." },
+  { title: "Hard-to-follow relationships", body: "A static architecture view may not make links between concepts easy to explore." },
+  { title: "Unclear responsibilities", body: "People need to understand where human review and policy controls fit." },
+  { title: "Different role priorities", body: "Decision-makers may need different context while access rules remain consistent." },
 ]
 
 const universeSolutionCards = [
-  { title: "Interactive ecosystem", body: "Universe visualizes AIOS as one connected enterprise operating map." },
-  { title: "Clickable nodes", body: "Modules, operators, and layers can be explored as living system components." },
-  { title: "Animated intelligence flow", body: "Signal-to-outcome pathways are visible and explainable to every role." },
-  { title: "Unified control", body: "Humans, operators, and workflows coordinate in one governed runtime." },
+  { title: "Conceptual ecosystem", body: "The map groups AIOS concepts into an illustrative operating model." },
+  { title: "Explore product areas", body: "Public pages describe the intended roles of modules, memory, and workflows." },
+  { title: "Illustrative information flow", body: "The signal-to-outcome pathway explains how the product model is intended to work." },
+  { title: "Governance in view", body: "The model highlights human review and policy as important parts of execution." },
 ]
 
 const universeHowItWorks = [
-  { label: "Layer 1", title: "Core AIOS", body: "The AIOS core coordinates context, memory, and orchestration contracts." },
-  { label: "Layer 2", title: "Connected modules", body: "Every module contributes data and decisions to the same operating layer." },
-  { label: "Layer 3", title: "Operator collaboration", body: "Operators share memory and reasoning before execution." },
-  { label: "Layer 4", title: "Workflow outcomes", body: "Governed workflows execute actions and feed outcomes back into memory." },
+  { label: "Layer 1", title: "Business signals", body: "The model starts with relevant information from business systems." },
+  { label: "Layer 2", title: "Context and memory", body: "Related context can help explain the meaning of a signal." },
+  { label: "Layer 3", title: "Decision support", body: "Role context can shape what information and options are presented for review." },
+  { label: "Layer 4", title: "Governed workflows", body: "Where execution is configured, policy and human approval should guide actions." },
 ]
 
 const universeBenefits = [
-  { title: "Faster understanding", body: "Teams understand system relationships and intelligence flow within minutes." },
-  { title: "Better coordination", body: "Operators and modules work with shared context instead of isolated tasks." },
-  { title: "Enterprise confidence", body: "Architecture remains explainable across technical and executive stakeholders." },
+  { title: "Explore relationships", body: "Use the map to review how the product concepts are intended to relate." },
+  { title: "Consider coordination", body: "See where shared context could support work across business functions." },
+  { title: "Keep governance visible", body: "Review the roles of policy, human review, and explainability in the model." },
 ]
 
 export default function UniversePageClient() {
@@ -160,20 +160,20 @@ export default function UniversePageClient() {
     <PublicPageShell activeHref="/universe">
       <PublicStructuredData
         name="AIOS Universe"
-        description="Explore the AIOS ecosystem: core intelligence, modules, operators, memory, workflows, and governed enterprise outcomes."
+        description="Explore an illustrative map of AIOS concepts, including signals, memory, role context, and governed workflows."
         path="/universe"
       />
       <PublicHero
         eyebrow="AIOS Universe"
         title="The connected operating map for the autonomous enterprise"
-        body="Universe translates the full AIOS ecosystem into one spatial system: modules, intelligence layers, memory loops, and role-aware surfaces working as a single operating model."
+        body="Universe presents an illustrative map of AIOS concepts: modules, intelligence layers, memory, and role-aware surfaces in the intended operating model."
         actions={
           <>
             <PublicButtonLink href="/platform" size="lg">
               Explore Platform
             </PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Contact
+            <PublicButtonLink href="/demo-platform/executive" variant="secondary" size="lg">
+              Explore synthetic demo
             </PublicButtonLink>
           </>
         }
@@ -255,15 +255,15 @@ export default function UniversePageClient() {
 
       <PublicTrustAndProofSection
         title="Designed for technical depth and executive clarity"
-        body="The universe overview connects the product concepts described across AIOS public pages. No customer endorsements or measured outcomes are represented here."
+        body="This illustrative map connects AIOS product concepts. It does not represent a live business connection or measured customer outcome."
       />
 
       <PublicConversionRailSection />
 
       <PublicFooterCta
         eyebrow="See The Universe In Context"
-        title="Map your enterprise onto one connected AI operating model"
-        body="AIOS unifies modules, memory, intelligence, and execution into one coherent system that scales across future pages and product surfaces alike."
+        title="Explore the intended AIOS operating model"
+        body="Review how AIOS concepts relate across signals, memory, decision support, and governed workflows. This page does not connect to enterprise systems."
       />
     </PublicPageShell>
   )

@@ -6,6 +6,36 @@ export function formatDateTime(value: string | number | Date): string {
   }).format(date)
 }
 
+export function formatStableDateTime(value: string | number): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return "Invalid Date"
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    timeZone: "UTC",
+  }).format(date)
+}
+
+export function formatStableTime(value: string | number): string {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return "Invalid Date"
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+  }).format(date)
+}
+
 export function formatRelativeTime(value: string | number | Date): string {
   const date = new Date(value).getTime()
   const deltaSeconds = Math.round((date - Date.now()) / 1000)

@@ -331,7 +331,7 @@ export function PublicIntelligenceCapacitySection() {
           ))}
         </div>
         <div className="mt-8">
-          <PublicButtonLink href="/contact">Discuss fit and scope</PublicButtonLink>
+          <PublicButtonLink href="/pilot">Review pilot approach</PublicButtonLink>
         </div>
       </PublicContainer>
     </PublicSection>
@@ -362,8 +362,8 @@ export function PublicPilotProgramSection() {
           ))}
         </div>
         <div className="mt-8 flex flex-wrap gap-4">
-          <PublicButtonLink href="/contact" size="lg">Book Pilot</PublicButtonLink>
-          <PublicButtonLink href="/pilot/discovery" variant="secondary" size="lg">Explore discovery</PublicButtonLink>
+          <PublicButtonLink href="/pilot/discovery" size="lg">Explore business discovery</PublicButtonLink>
+          <PublicButtonLink href="/pilot" variant="secondary" size="lg">Review pilot overview</PublicButtonLink>
         </div>
       </PublicContainer>
     </PublicSection>
@@ -386,26 +386,27 @@ export function PublicSocialProofSection() {
 
 export function PublicCompetitorComparisonSection() {
   const rows = [
-    ["Core model", "AI Operating System", "Point applications", "Prompt assistance", "Task triggers", "Document retrieval", "Historical reporting"],
-    ["Business memory", "Persistent and compounding", "Siloed per tool", "Session-level", "Minimal", "Limited", "None"],
-    ["Governance", "Policy + human approval", "Varies", "Limited", "Rule-only", "Limited", "N/A"],
-    ["Decision support", "Executive-grade with confidence", "Operational only", "Partial", "No", "No", "Descriptive only"],
-    ["Role intelligence", "Native RBI", "Manual configuration", "Generic", "Generic", "Generic", "Static dashboards"],
+    ["Information traceability", "Can observations be linked to evidence and sources?"],
+    ["Access boundaries", "Are identity, membership, and permissions enforced server-side?"],
+    ["Human oversight", "Which actions require review or approval?"],
+    ["Memory and retention", "How is business context stored, scoped, updated, and deleted?"],
+    ["Outcome measurement", "What result should be measured, and how will it be verified?"],
+    ["Runtime availability", "Which capabilities are live, staged, or illustrative?"],
   ]
 
   return (
     <PublicSection>
       <PublicContainer>
         <PublicSectionHeader
-          eyebrow="Comparison"
-          title="Why AIOS is different"
-          body="AIOS unifies intelligence, memory, governance, and workflow execution in one enterprise operating layer."
+          eyebrow="Evaluation guide"
+          title="Questions for evaluating an AI operating model"
+          body="Use these questions to assess a proposed system. They are not a comparison of independently verified products or evidence that a capability is deployed."
         />
         <div className="mt-14 overflow-x-auto">
-          <table className="w-full min-w-[860px] border-separate border-spacing-0 overflow-hidden rounded-[22px] border border-[var(--public-color-border)] bg-white">
+          <table className="w-full min-w-[620px] border-separate border-spacing-0 overflow-hidden rounded-[22px] border border-[var(--public-color-border)] bg-white">
             <thead>
               <tr>
-                {["Category", "AIOS", "Traditional SaaS", "Copilots", "Automation Platforms", "Knowledge Bases", "BI Tools"].map((head) => (
+                {["Evaluation area", "Question to verify"].map((head) => (
                   <th key={head} className="border-b border-[var(--public-color-border)] px-4 py-4 text-left text-sm font-semibold text-[color:var(--public-color-navy)]">{head}</th>
                 ))}
               </tr>
@@ -469,7 +470,7 @@ export function PublicBuyerJourneySection() {
     { label: "Modules", href: "/modules" },
     { label: "Security", href: "/security" },
     { label: "Pilot", href: "/pilot" },
-    { label: "Contact", href: "/contact" },
+    { label: "Business Discovery", href: "/pilot/discovery" },
   ]
   return (
     <PublicSection>
@@ -500,12 +501,12 @@ export function PublicConversionRailSection() {
           <PublicSectionHeader
             eyebrow="Continue exploring"
             title="Choose a useful next step"
-            body="Explore a synthetic product walkthrough, review the architecture, or discuss a business use case."
+            body="Explore a synthetic product walkthrough, review the architecture, or use the local business-discovery preview."
           />
           <div className="mt-8 flex flex-wrap gap-3">
             <PublicButtonLink href="/demo-platform/executive">Explore the demo</PublicButtonLink>
             <PublicButtonLink href="/architecture" variant="secondary">Review architecture</PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary">Discuss a use case</PublicButtonLink>
+            <PublicButtonLink href="/pilot/discovery" variant="secondary">Explore business discovery</PublicButtonLink>
           </div>
         </PublicCard>
       </PublicContainer>

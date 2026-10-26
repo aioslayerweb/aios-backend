@@ -46,7 +46,7 @@ export function AIOSFooter() {
   )
 }
 
-export function AIOSCTASection({ eyebrow, title, body, primaryHref = "/contact", primaryLabel = "Contact", secondaryHref = "/products", secondaryLabel = "Explore Platform" }: { eyebrow: string; title: string; body: string; primaryHref?: string; primaryLabel?: string; secondaryHref?: string; secondaryLabel?: string }) {
+export function AIOSCTASection({ eyebrow, title, body, primaryHref = "/demo-platform/executive", primaryLabel = "Explore demo", secondaryHref = "/architecture", secondaryLabel = "Review architecture" }: { eyebrow: string; title: string; body: string; primaryHref?: string; primaryLabel?: string; secondaryHref?: string; secondaryLabel?: string }) {
   return (
     <AIOSSection>
       <AIOSContainer>

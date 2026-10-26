@@ -1,7 +1,7 @@
 from supabase_client import supabase
 
 
-def get_all_customers():
+def get_all_customers(organization_id: str):
     """
     Returns all customers ordered by company name.
     """
@@ -9,6 +9,7 @@ def get_all_customers():
     res = (
         supabase.table("customers")
         .select("*")
+        .eq("organization_id", organization_id)
         .order("company_name")
         .execute()
     )
@@ -16,7 +17,7 @@ def get_all_customers():
     return res.data or []
 
 
-def get_customer(customer_id: str):
+def get_customer(customer_id: str, organization_id: str):
     """
     Returns one customer by UUID.
     """
@@ -25,6 +26,7 @@ def get_customer(customer_id: str):
         supabase.table("customers")
         .select("*")
         .eq("id", customer_id)
+        .eq("organization_id", organization_id)
         .limit(1)
         .execute()
     )
@@ -35,12 +37,12 @@ def get_customer(customer_id: str):
     return res.data[0]
 
 
-def get_customer_health(customer_id: str):
+def get_customer_health(customer_id: str, organization_id: str):
     """
     Returns AIOS customer health summary.
     """
 
-    customer = get_customer(customer_id)
+    customer = get_customer(customer_id, organization_id)
 
     if customer is None:
         return None

@@ -39,15 +39,15 @@ export const metadata: Metadata = publicPageMetadata(
 )
 
 const architectureLayers = [
-  { title: "Data Layer", subtitle: "Signals from CRM, ERP, support, collaboration, and finance systems.", icon: <Database size={18} /> },
-  { title: "Business Memory", subtitle: "Persistent memory objects indexing evidence, timelines, and outcomes.", icon: <Blocks size={18} /> },
+  { title: "Data Layer", subtitle: "Illustrative sources include CRM, ERP, support, collaboration, and finance systems.", icon: <Database size={18} /> },
+  { title: "Business Memory", subtitle: "A product concept for relating evidence, timelines, and outcomes.", icon: <Blocks size={18} /> },
   { title: "Role-Based Intelligence", subtitle: "Context windows per executive role, function, and decision scope.", icon: <Briefcase size={18} /> },
   { title: "Intelligence Engine", subtitle: "Reasoning, confidence scoring, narrative synthesis, and prioritization.", icon: <BrainCircuit size={18} /> },
   { title: "Decision Engine", subtitle: "Governed recommendation pathways with approval and ownership control.", icon: <GitBranch size={18} /> },
-  { title: "AI Operators", subtitle: "Specialized autonomous operators for revenue, customer, finance, and operations.", icon: <Bot size={18} /> },
-  { title: "Workflow Runtime", subtitle: "Runtime orchestration of approved policies, tasks, and automation sequences.", icon: <Workflow size={18} /> },
-  { title: "External Integrations", subtitle: "Bidirectional sync with enterprise APIs, SDKs, and messaging systems.", icon: <Network size={18} /> },
-  { title: "Execution Layer", subtitle: "Measured actions, business outcomes, and feedback loops into memory.", icon: <Layers size={18} /> },
+  { title: "AI Operators", subtitle: "A concept for specialized assistance across business functions.", icon: <Bot size={18} /> },
+  { title: "Workflow Runtime", subtitle: "An intended model for policy-aware tasks and automation sequences.", icon: <Workflow size={18} /> },
+  { title: "External Integrations", subtitle: "Potential connections through enterprise APIs and messaging systems.", icon: <Network size={18} /> },
+  { title: "Execution Layer", subtitle: "A design for measuring actions and outcomes where configured.", icon: <Layers size={18} /> },
 ]
 
 const posterSteps = [
@@ -67,30 +67,30 @@ const roleBlocks = ["CTO", "Enterprise Architect", "Finance Leadership", "Operat
 const integrationBlocks = ["CRM", "ERP", "Email", "Slack", "Teams", "Support", "Finance", "HRIS", "Warehouse", "Custom APIs"]
 
 const architectureProblems = [
-  { title: "Siloed data paths", body: "Data pipelines, AI, and execution controls are often disconnected." },
-  { title: "Opaque AI reasoning", body: "Architecture reviews struggle to trace why recommendations appear." },
-  { title: "Governance gaps", body: "RBAC and policy controls are bolted on rather than core to design." },
-  { title: "Weak API cohesion", body: "Integrations lack a business-oriented capability model." },
+  { title: "Siloed data paths", body: "Teams may need to understand how data, analysis, and execution controls relate." },
+  { title: "Opaque AI reasoning", body: "Reviewers need a way to examine why recommendations are presented." },
+  { title: "Governance questions", body: "Identity, permissions, policy, and approval boundaries require explicit verification." },
+  { title: "Integration scope", body: "Each connection needs clear ownership, access rules, and supported business capabilities." },
 ]
 
 const architectureSolutions = [
-  { title: "Layered intelligence design", body: "Signals, memory, knowledge, AI, and execution are architected as one chain." },
-  { title: "Explainable decision engine", body: "Recommendations are linked to evidence, confidence, and ownership." },
-  { title: "Built-in enterprise controls", body: "Security, RBAC, and approvals are first-class platform capabilities." },
-  { title: "Capability-driven APIs", body: "APIs expose business capabilities instead of internal table structures." },
+  { title: "Layered intelligence model", body: "The conceptual model relates signals, memory, knowledge, decision support, and execution." },
+  { title: "Explainability requirements", body: "A recommendation should be reviewed alongside evidence, confidence, and ownership." },
+  { title: "Controls to verify", body: "Confirm authentication, tenant boundaries, permissions, and approvals in the target deployment." },
+  { title: "Business-oriented APIs", body: "Define supported business capabilities and access rules for each integration." },
 ]
 
 const architectureHowItWorks = [
-  { label: "Stage 1", title: "Data sources to memory", body: "Enterprise data sources become business signals and durable memory objects." },
-  { label: "Stage 2", title: "Knowledge and AI layers", body: "Knowledge graph and reasoning layers add explainable context." },
-  { label: "Stage 3", title: "RBI and operators", body: "Role-Based Intelligence and operators tailor decisions by stakeholder." },
-  { label: "Stage 4", title: "Executive outputs", body: "Decisions, workflows, and outcomes are delivered with governance and traceability." },
+  { label: "Stage 1", title: "Data sources to memory", body: "The model shows how business sources could contribute signals and memory objects." },
+  { label: "Stage 2", title: "Knowledge and AI layers", body: "Knowledge and reasoning concepts add context for review." },
+  { label: "Stage 3", title: "Role context and operators", body: "Role context can shape decision support without changing access permissions." },
+  { label: "Stage 4", title: "Executive outputs", body: "The intended model connects decisions and workflows to governance and traceability." },
 ]
 
 const architectureBenefits = [
   { title: "Architectural clarity", body: "CTOs and executives can reason about the same model with different depth." },
-  { title: "Security by design", body: "RBAC, policy checks, and auditability are integrated across layers." },
-  { title: "Faster integration", body: "Business capability APIs reduce implementation ambiguity and drift." },
+  { title: "Security review", body: "Evaluate identity, tenant isolation, policy checks, and auditability across each layer." },
+  { title: "Integration planning", body: "Define supported business capabilities, ownership, and access requirements for each connection." },
 ]
 
 const timelineItems = posterSteps.map((title, index) => ({
@@ -98,10 +98,10 @@ const timelineItems = posterSteps.map((title, index) => ({
   title,
   body:
     index === 0
-      ? "Business signals enter through existing enterprise systems and live feeds."
+      ? "The conceptual model begins with signals from relevant business sources."
       : index === posterSteps.length - 1
-        ? "Measured outcomes complete the learning loop and improve future recommendations."
-        : "Context and reasoning deepen as information progresses through the AIOS architecture.",
+        ? "Measured outcomes could inform future recommendations where those capabilities are configured."
+        : "The diagram illustrates how context and reasoning could progress through the proposed model.",
 }))
 
 export default function ArchitecturePage() {
@@ -115,14 +115,14 @@ export default function ArchitecturePage() {
       <PublicHero
         eyebrow="AIOS Architecture"
         title="Enterprise architecture for autonomous business operations"
-        body="Designed for CTOs and enterprise architects evaluating signal flow, explainability, policy governance, and execution reliability across the full AIOS stack."
+        body="This conceptual architecture guide is for teams evaluating signal flow, explainability, policy governance, and execution boundaries. It does not imply that every layer or integration is deployed."
         actions={
           <>
-            <PublicButtonLink href="/products" size="lg">
-              Explore Platform
+            <PublicButtonLink href="/demo-platform/executive" size="lg">
+              Explore synthetic demo
             </PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Contact
+            <PublicButtonLink href="/platform" variant="secondary" size="lg">
+              Review platform
             </PublicButtonLink>
           </>
         }
@@ -214,7 +214,11 @@ export default function ArchitecturePage() {
       <PublicFooterCta
         eyebrow="Architecture Review"
         title="Review the AIOS operating model against your current enterprise stack"
-        body="Map existing systems, governance needs, and runtime requirements onto a reusable public system that mirrors the product itself."
+        body="Use the architecture overview to compare the AIOS operating model with your systems, business context, and governance requirements."
+        primaryHref="/demo-platform/executive"
+        primaryLabel="Explore synthetic demo"
+        secondaryHref="/platform"
+        secondaryLabel="Review platform"
       />
     </PublicPageShell>
   )

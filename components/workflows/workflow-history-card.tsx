@@ -1,6 +1,7 @@
 "use client"
 
 import { useWorkflowHistory } from "@/hooks"
+import { LocalTime } from "@/components/ui/local-date-time"
 
 export function WorkflowHistoryCard() {
   const { history } = useWorkflowHistory()
@@ -13,7 +14,7 @@ export function WorkflowHistoryCard() {
           <article key={item.id} className="rounded border border-border bg-surface-muted p-2">
             <div className="flex items-center justify-between">
               <p className="text-xs font-semibold capitalize text-text-primary">{item.type}</p>
-              <p className="text-[11px] text-text-muted">{new Date(item.timestamp).toLocaleTimeString()}</p>
+              <p className="text-[11px] text-text-muted"><LocalTime value={item.timestamp} /></p>
             </div>
             <p className="mt-1 text-[11px] text-text-secondary">{item.summary}</p>
           </article>

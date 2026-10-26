@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import type { GovernanceEvidenceEvent } from "@/types"
+import { LocalTime } from "@/components/ui/local-date-time"
 
 type EvidenceTimelinePanelProps = {
   evidence: GovernanceEvidenceEvent[]
@@ -29,7 +30,7 @@ export function EvidenceTimelinePanel({ evidence }: EvidenceTimelinePanelProps) 
             </div>
             <p className="mt-1 text-[11px] uppercase tracking-wide text-text-muted">{item.source}</p>
             <p className="mt-2 text-xs leading-5 text-text-secondary">{item.detail}</p>
-            <p className="mt-2 text-[11px] text-text-muted">{new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</p>
+            <p className="mt-2 text-[11px] text-text-muted"><LocalTime value={item.timestamp} /></p>
           </motion.article>
         ))}
       </div>

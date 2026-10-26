@@ -12,6 +12,7 @@ import {
   CardHeader,
   Input,
 } from "@/components/ui";
+import { LocalDateTime, LocalTime } from "@/components/ui/local-date-time";
 import {
   ActionBar,
   ConfidenceBadge,
@@ -137,7 +138,7 @@ export function MemoryCard({ record, selected, onSelect }: { record: MemoryRecor
         <span>Owner: {record.owner}</span>
         <span>Department: {record.department}</span>
         <span>Retention: {record.retention}</span>
-        <span>Updated: {new Date(record.updatedAt).toLocaleString()}</span>
+        <span>Updated: <LocalDateTime value={record.updatedAt} /></span>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -189,7 +190,7 @@ export function MemoryCollectionCard({ collection }: { collection: MemoryCollect
         </div>
         <span className="rounded-full bg-brand-subtle px-2 py-0.5 text-[11px] font-semibold text-brand-navy">{collection.count}</span>
       </div>
-      <p className="mt-2 text-[11px] text-text-muted">Updated {new Date(collection.updatedAt).toLocaleString()}</p>
+      <p className="mt-2 text-[11px] text-text-muted">Updated <LocalDateTime value={collection.updatedAt} /></p>
     </article>
   );
 }
@@ -222,7 +223,7 @@ export function MemoryTimeline({ events }: { events: MemoryTimelineEvent[] }) {
           <motion.article key={event.id} variants={cardMotion} className="rounded-xl border border-border bg-surface-canvas p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold text-brand-navy">{event.stage}</p>
-              <span className="text-xs text-text-muted">{new Date(event.timestamp).toLocaleTimeString()}</span>
+              <span className="text-xs text-text-muted"><LocalTime value={event.timestamp} /></span>
             </div>
             <p className="mt-1 text-xs text-text-secondary">{event.description}</p>
           </motion.article>
@@ -408,7 +409,7 @@ export function MemoryInspector({ record, relatedMemories, context }: { record: 
           <section className="space-y-2">
             <p className="text-xs uppercase tracking-[0.18em] text-text-muted">Timeline</p>
             <div className="rounded-xl border border-border bg-surface-canvas px-3 py-2 text-xs text-text-secondary">
-              Updated {new Date(record.updatedAt).toLocaleString()}
+              Updated <LocalDateTime value={record.updatedAt} />
             </div>
           </section>
 

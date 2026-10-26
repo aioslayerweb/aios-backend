@@ -66,12 +66,37 @@ gap, not a pixel-match claim.
 
 ## Limitations
 
-- The city platforms are deliberately lightweight inline SVG, not full
-  rendered 3D assets. A reference-faithful cityscape remains future design
-  work.
+- This earlier report described the original SVG-only city platforms. The
+  follow-up below supersedes that visualization limitation.
 - Local browser checks do not verify the production deployment, production
   data isolation, or live authentication configuration.
 - Nine security test cases are TODO and must not be treated as passing
   security checks.
-- No production build, deployment, database access, or backend service access
-  was performed.
+- No production deployment, database access, or backend service access was
+  performed.
+
+## Cities 3D follow-up
+
+- The connected landscape now renders six distinct procedural Three.js city
+  dioramas around the AIOS core. It reuses the dashboard's existing synthetic
+  department summaries and relationships.
+- The scene is loaded locally as an application dependency; it does not load
+  third-party scripts or call business APIs. Department selection, synapse
+  visibility, and camera reset remain local UI interactions.
+- Accessible department buttons remain available at every viewport. The
+  scene has a readable WebGL fallback, adapts animation to
+  `prefers-reduced-motion`, pauses off-screen/when hidden, and disposes its
+  renderer, observers, listeners, and scene resources on unmount.
+- `three` is a runtime dependency and `@types/three` is a development
+  dependency. No backend, database, route, or live-data behavior changed.
+- `npm run validate` passed, including lint, typecheck, and a production build
+  that generated 127 static pages.
+- `npm run test:security` passed 75 tests with 0 failures and 0 skips; 2
+  infrastructure-dependent TODOs remain.
+- `git diff --check` passed. Local browser checks at 320, 375, 390, 768,
+  1024, 1280, and 1440 CSS pixels found no horizontal document overflow.
+  Department selection, synthetic detail updates, core overview, synapse
+  toggle, direct 3D selection, and camera drag/reset were exercised. The
+  camera interactions also changed the rendered scene with reduced motion
+  enabled.
+- These checks do not establish production behavior or tenant isolation.

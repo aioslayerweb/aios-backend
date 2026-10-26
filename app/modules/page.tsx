@@ -131,7 +131,7 @@ const modulesProblemCards = [
 
 const modulesSolutionCards = [
   { title: "One operating system", body: "Modules are specialized products on one shared intelligence core." },
-  { title: "Reusable design system", body: "Every module uses the same visual language and interaction patterns." },
+  { title: "Connected product areas", body: "Each module represents a focused business capability within the AIOS operating model." },
   { title: "Shared memory and runtime", body: "Context, policies, and workflows remain unified across modules." },
   { title: "Compounding value", body: "Insights in one module strengthen the full enterprise system." },
 ]
@@ -160,29 +160,29 @@ export default function ModulesPage() {
       <PublicHero
         eyebrow="AIOS Modules"
         title="One operating surface, specialized intelligence modules"
-        body="Every module shares the same intelligence layer, business memory, motion system, spacing scale, and premium visual language."
+        body="Explore illustrative product concepts for executive insight, business memory, knowledge, organization, and governed workflows. Descriptions do not confirm that a capability or integration is deployed."
         actions={
           <>
             <PublicButtonLink href="/products" size="lg">
-              Explore Platform
+              Explore products
             </PublicButtonLink>
-            <PublicButtonLink href="/contact" variant="secondary" size="lg">
-              Contact
+            <PublicButtonLink href="/demo-platform/executive" variant="secondary" size="lg">
+              Explore synthetic demo
             </PublicButtonLink>
           </>
         }
         stats={[
-          { label: "Core modules", value: `${modules.length}`, detail: "All connected by one design and data system" },
-          { label: "Shared runtime", value: "1", detail: "Execution, governance, and memory stay unified" },
-          { label: "Role views", value: "Adaptive", detail: "Context changes without breaking consistency" },
+          { label: "Illustrated areas", value: `${modules.length}`, detail: "Product concepts described on this page" },
+          { label: "Operating model", value: "Connected by design", detail: "Intended relationships between capabilities" },
+          { label: "Availability", value: "Deployment-dependent", detail: "Confirm scope during evaluation" },
         ]}
       />
 
       <PublicProblemSolutionSection
-        problemTitle="Most module ecosystems feel like disconnected products"
-        problemBody="They look consistent at first glance but diverge in data model, UX, and operational logic over time."
+        problemTitle="Business capabilities often live in separate tools"
+        problemBody="Context can be difficult to carry from executive decisions to memory, knowledge, workflows, and operational oversight."
         problemItems={modulesProblemCards}
-        solutionTitle="AIOS modules are products inside one operating system"
+        solutionTitle="AIOS modules are product concepts within one operating model"
         solutionBody="Executive Center, Knowledge Center, Memory Center, Workflow Builder, Organization, Developer, Security, and Runtime all share one core."
         solutionItems={modulesSolutionCards}
       />
@@ -197,8 +197,8 @@ export default function ModulesPage() {
         <PublicContainer>
           <PublicSectionHeader
             eyebrow="Explorer"
-            title="Dive into the module stack without leaving the system"
-            body="The modules page now reuses the same card system, interaction language, and typography tokens as the rest of the public site."
+            title="Explore each product area"
+            body="Select a module to review its purpose and how it relates to the broader AIOS operating model."
           />
           <div className="mt-14">
             <PublicTabbedPanel
@@ -219,8 +219,8 @@ export default function ModulesPage() {
         <PublicContainer>
           <PublicSectionHeader
             eyebrow="Shared Principles"
-            title="Reusable patterns keep every module part of the same AIOS ecosystem"
-            body="The design system avoids page-specific drift by standardizing card behavior, layout rhythm, motion, and surface hierarchy."
+            title="Shared context across product areas"
+            body="Signals, memory, organization, and governance connect the product areas without changing the permissions that control access."
           />
           <div className="mt-14">
             <PublicFeatureGrid
@@ -251,7 +251,11 @@ export default function ModulesPage() {
       <PublicFooterCta
         eyebrow="Module Walkthrough"
         title="See how the full AIOS stack feels as one connected operating system"
-        body="From Executive Center to Runtime Center, every module now inherits a single reusable public design language."
+        body="Explore the synthetic demo to see representative product areas using sample data and local-only interactions."
+        primaryHref="/demo-platform/executive"
+        primaryLabel="Explore synthetic demo"
+        secondaryHref="/platform"
+        secondaryLabel="Review platform"
       />
     </PublicPageShell>
   )

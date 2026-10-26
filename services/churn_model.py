@@ -1,14 +1,14 @@
 from services.customer_engine import get_customer
 
 
-def calculate_churn_probability(customer_id: str):
+def calculate_churn_probability(customer_id: str, organization_id: str):
     """
     Probabilistic churn model (MVP version).
 
     Produces a 0–1 score based on weighted signals.
     """
 
-    customer = get_customer(customer_id)
+    customer = get_customer(customer_id, organization_id)
 
     if not customer:
         return None

@@ -7,6 +7,7 @@ import { answerDemoQuestion, demoDepartmentSummaries } from "@/lib/demo/executiv
 
 const projectRoot = process.cwd()
 const componentPath = join(projectRoot, "components/demo/executive-command-center-demo.tsx")
+const cityComponentPath = join(projectRoot, "components/demo/department-cities.tsx")
 const homeRoutePath = join(projectRoot, "app/demo-platform/page.tsx")
 const executiveRoutePath = join(projectRoot, "app/demo-platform/executive/page.tsx")
 const demoLayoutPath = join(projectRoot, "app/demo-platform/layout.tsx")
@@ -33,6 +34,21 @@ test("synthetic command center has deterministic local fixtures and no live data
   assert.match(component, /deterministic demo assistant/)
   assert.match(component, /No prompt or business data is sent/)
   assert.match(component, /flex-col items-start gap-2 sm:flex-row/)
+})
+
+test("department city scene stays local and retains accessible fallbacks", async () => {
+  const cityComponent = await readFile(cityComponentPath, "utf8")
+
+  assert.doesNotMatch(cityComponent, /(?:supabase|runtime-live-context|useBusinessMetrics)/i)
+  assert.doesNotMatch(cityComponent, /\b(?:fetch|XMLHttpRequest|WebSocket)\s*\(/)
+  assert.doesNotMatch(cityComponent, /https?:\/\//)
+  assert.match(cityComponent, /void import\("three"\)/)
+  assert.match(cityComponent, /prefers-reduced-motion/)
+  assert.match(cityComponent, /aria-label="Select a synthetic business department"/)
+  assert.match(cityComponent, /3D rendering is unavailable in this browser/)
+  assert.match(cityComponent, /resizeObserver\?\.disconnect\(\)/)
+  assert.match(cityComponent, /intersectionObserver\?\.disconnect\(\)/)
+  assert.match(cityComponent, /pointercancel/)
 })
 
 test("public demo disables Auth.js session polling without changing the app default", async () => {

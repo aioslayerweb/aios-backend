@@ -2,6 +2,7 @@
 
 import { lazy, memo, Suspense } from "react";
 import { motion } from "framer-motion";
+import { LocalDateTime } from "@/components/ui/local-date-time";
 import {
   BookOpen,
   CheckCircle2,
@@ -153,7 +154,7 @@ export function KnowledgeCard({ record, selected, onSelect }: { record: Knowledg
         <span>Department: {record.department}</span>
         <span>Business area: {record.businessArea}</span>
         <span>Version: {record.version}</span>
-        <span>Updated: {new Date(record.updatedAt).toLocaleString()}</span>
+        <span>Updated: <LocalDateTime value={record.updatedAt} /></span>
         <span>Compliance: {record.compliance}</span>
       </div>
 
@@ -293,7 +294,7 @@ export function KnowledgeTimeline({ events }: { events: KnowledgeLifecycleEvent[
           <motion.article key={event.id} variants={cardMotion} className="rounded-xl border border-border bg-surface-canvas p-3">
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-semibold text-brand-navy">{event.type}</p>
-              <span className="text-xs text-text-muted">{new Date(event.timestamp).toLocaleString()}</span>
+              <span className="text-xs text-text-muted"><LocalDateTime value={event.timestamp} /></span>
             </div>
             <p className="mt-1 text-xs text-text-secondary">{event.title}</p>
             <p className="mt-1 text-[11px] text-text-muted">{event.detail}</p>
@@ -503,7 +504,7 @@ export function KnowledgeInspector({
 
           <section className="space-y-2">
             <p className="text-xs uppercase tracking-[0.18em] text-text-muted">Timeline</p>
-            <div className="rounded-xl border border-border bg-surface-canvas px-3 py-2 text-xs text-text-secondary">Updated {new Date(record.updatedAt).toLocaleString()}</div>
+            <div className="rounded-xl border border-border bg-surface-canvas px-3 py-2 text-xs text-text-secondary">Updated <LocalDateTime value={record.updatedAt} /></div>
           </section>
 
           <section className="space-y-2">

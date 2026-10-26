@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion"
 import type { GovernanceAuditTrailEntry } from "@/types"
+import { LocalDateTime } from "@/components/ui/local-date-time"
 
 type AuditTrailPanelProps = {
   auditTrail: GovernanceAuditTrailEntry[]
@@ -31,7 +32,7 @@ export function AuditTrailPanel({ auditTrail }: AuditTrailPanelProps) {
               <span className="rounded-full border border-border bg-white px-2 py-1 text-[11px] capitalize text-text-muted">{entry.result}</span>
             </div>
             <p className="mt-2 text-xs leading-5 text-text-secondary">{entry.reason}</p>
-            <p className="mt-2 text-[11px] text-text-muted">{new Date(entry.timestamp).toLocaleString()}</p>
+            <p className="mt-2 text-[11px] text-text-muted"><LocalDateTime value={entry.timestamp} /></p>
           </motion.article>
         ))}
       </div>

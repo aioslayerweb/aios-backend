@@ -19,7 +19,8 @@ export default function TermsPage() {
             <PublicSectionHeader
               eyebrow="Terms"
               title="Terms of service"
-              body="AIOS is provided under enterprise terms that emphasize governance, security, and responsible use."
+              titleAs="h1"
+              body="This page summarizes topics relevant to enterprise access. The applicable signed agreement, where one exists, governs service use."
             />
             <div className="mt-8 grid gap-4 md:grid-cols-2">
               <div className="public-card public-card-feature">
@@ -36,7 +37,7 @@ export default function TermsPage() {
               </div>
               <div className="public-card public-card-feature">
                 <h2 className="public-h4">Contact and review</h2>
-                <p className="public-body mt-3">Enterprise legal review and custom contractual needs can be handled through AIOS sales and support.</p>
+                <p className="public-body mt-3">This website does not currently collect legal inquiries. For an existing deployment, refer to its agreed legal or support channel.</p>
               </div>
             </div>
           </PublicCard>
@@ -45,7 +46,7 @@ export default function TermsPage() {
       <PublicSection>
         <PublicContainer>
           <div className="flex flex-wrap gap-4">
-            <PublicButtonLink href="/contact" size="lg">Talk to Sales</PublicButtonLink>
+            <PublicButtonLink href="/pilot" size="lg">Review pilot approach</PublicButtonLink>
             <PublicButtonLink href="/privacy" variant="secondary" size="lg">Review Privacy</PublicButtonLink>
           </div>
         </PublicContainer>

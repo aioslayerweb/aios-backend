@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Brain, CheckCircle2, Clock3, PlayCircle, Save, Sparkles, Target } from "lucide-react"
+import { Brain, CheckCircle2, PlayCircle, Save, Sparkles, Target } from "lucide-react"
 import { PublicButtonLink, PublicCard, PublicContainer, PublicSection, PublicSectionHeader } from "@/components/aios"
 import { BusinessBlueprintViewer } from "@/components/business-blueprint"
 import { analyzeDiscovery, getDiscoveryQuestions, getNextQuestionId, getQuestionById, type DiscoveryAnswers, type DiscoverySessionDraft, type DiscoveryStage } from "@/src/features/business-discovery"
@@ -18,7 +18,7 @@ function stageLabel(stage: DiscoveryStage): string {
   if (stage === "review") {
     return "Review"
   }
-  return "Approved"
+  return "Preview complete"
 }
 
 function parseDraft(raw: string | null): DiscoverySessionDraft | undefined {
@@ -177,14 +177,18 @@ export function BusinessDiscoveryExperience() {
           <PublicCard variant="floating" className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="public-caption text-[color:var(--public-color-text-soft)]">M10.0 Intelligent Business Discovery</p>
-                <h1 className="public-h2 mt-2">Let&apos;s get to know your business</h1>
+                <p className="public-caption text-[color:var(--public-color-text-soft)]">Browser-only business discovery preview</p>
+                <h1 className="public-h2 mt-2">Explore a draft business blueprint</h1>
                 <p className="public-body mt-3 max-w-3xl text-[color:var(--public-color-text-soft)]">
-                  AIOS runs an adaptive executive interview to understand your operating model and generate a live Business Blueprint.
+                  Answer adaptive questions to build a draft operating model in this browser. This preview does not connect to AIOS services or submit your answers.
                 </p>
               </div>
-              <span className="public-chip flex items-center gap-2"><Clock3 size={14} /> 15-20 minutes</span>
+              <span className="public-chip flex items-center gap-2"><Sparkles size={14} /> Local preview</span>
             </div>
+
+            <p role="note" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+              Answers are processed in your browser. If you save a draft, it stays in this browser&apos;s local storage. Do not enter confidential, personal, or customer information.
+            </p>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-[color:var(--public-color-text-soft)]">
@@ -198,7 +202,7 @@ export function BusinessDiscoveryExperience() {
 
             <div className="flex flex-wrap gap-3">
               <button type="button" className="public-button public-button-secondary" onClick={() => saveDraft()}>
-                <Save size={16} /> Save and resume later
+                <Save size={16} /> Save draft in this browser
               </button>
               {draftSavedAt ? (
                 <button type="button" className="public-button public-button-secondary" onClick={resumeDraft}>
@@ -216,19 +220,19 @@ export function BusinessDiscoveryExperience() {
           <PublicContainer>
             <div className="grid gap-4 md:grid-cols-3">
               <PublicCard variant="feature" className="space-y-2">
-                <span className="public-chip"><Brain size={14} /> Adaptive interview</span>
+                <span className="public-chip"><Brain size={14} /> Adaptive questions</span>
                 <h2 className="public-h4">Conversational discovery</h2>
-                <p className="public-body">Questions adapt to previous answers. AIOS explores your business model like a strategy consultant.</p>
+                <p className="public-body">Questions adapt to previous answers. The preview logic runs locally in this browser.</p>
               </PublicCard>
               <PublicCard variant="feature" className="space-y-2">
-                <span className="public-chip"><Sparkles size={14} /> Live blueprint</span>
-                <h2 className="public-h4">Business Blueprint in real time</h2>
-                <p className="public-body">See organization, systems, goals, and KPI structure form while you answer.</p>
+                <span className="public-chip"><Sparkles size={14} /> Draft blueprint</span>
+                <h2 className="public-h4">A draft that updates as you answer</h2>
+                <p className="public-body">Review a browser-generated outline of organization, systems, goals, and suggested measures.</p>
               </PublicCard>
               <PublicCard variant="feature" className="space-y-2">
-                <span className="public-chip"><Target size={14} /> Actionable output</span>
-                <h2 className="public-h4">Recommendations included</h2>
-                <p className="public-body">AIOS proposes dashboards, reports, operators, integrations, and automation opportunities.</p>
+                <span className="public-chip"><Target size={14} /> Sample suggestions</span>
+                <h2 className="public-h4">Ideas to review</h2>
+                <p className="public-body">See example dashboard, integration, and workflow ideas based on your answers. They are not AI-generated or submitted.</p>
               </PublicCard>
             </div>
             <div className="mt-6">
@@ -244,9 +248,9 @@ export function BusinessDiscoveryExperience() {
             <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
               <PublicCard variant="floating" className="space-y-4">
                 <PublicSectionHeader
-                  eyebrow="Adaptive AI Conversation"
+                  eyebrow="Adaptive local preview"
                   title={currentQuestion ? currentQuestion.prompt : "Interview complete"}
-                  body={currentQuestion?.hint ?? "AIOS has enough context to move to review."}
+                  body={currentQuestion?.hint ?? "Your local preview is ready to review."}
                 />
 
                 {currentQuestion ? (
@@ -288,7 +292,7 @@ export function BusinessDiscoveryExperience() {
                   </>
                 ) : (
                   <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
-                    Adaptive interview complete. Move to review to approve the generated Business Blueprint.
+                    Questions complete. Review the draft generated in this browser.
                   </div>
                 )}
 
@@ -323,9 +327,9 @@ export function BusinessDiscoveryExperience() {
 
               <PublicCard variant="floating" className="space-y-4">
                 <PublicSectionHeader
-                  eyebrow="Live Blueprint"
-                  title="AIOS learning preview"
-                  body="This preview updates as answers are captured so stakeholders can validate direction early."
+                  eyebrow="Browser-generated draft"
+                  title="Business model preview"
+                  body="This local outline updates as you answer. It is not sent to an AIOS service."
                 />
                 <BusinessBlueprintViewer
                   blueprint={analysis.blueprint}
@@ -350,7 +354,7 @@ export function BusinessDiscoveryExperience() {
                 />
                 <dl className="grid gap-2 rounded-2xl border border-[var(--public-color-border)] bg-[var(--public-color-surface)] p-4 text-sm">
                   <div className="flex items-start justify-between gap-3">
-                    <dt className="font-semibold">Detected Industry</dt>
+                    <dt className="font-semibold">Suggested industry</dt>
                     <dd>{analysis.detectedIndustry.industry} / {analysis.detectedIndustry.subIndustry}</dd>
                   </div>
                   <div className="flex items-start justify-between gap-3">
@@ -358,7 +362,7 @@ export function BusinessDiscoveryExperience() {
                     <dd>{analysis.detectedIndustry.businessModel}</dd>
                   </div>
                   <div className="flex items-start justify-between gap-3">
-                    <dt className="font-semibold">Business Confidence Score</dt>
+                    <dt className="font-semibold">Preview confidence estimate</dt>
                     <dd>{analysis.detectedIndustry.confidence}%</dd>
                   </div>
                 </dl>
@@ -415,7 +419,7 @@ export function BusinessDiscoveryExperience() {
                     <ul className="space-y-1 text-sm text-[color:var(--public-color-text-soft)]">
                       {[...analysis.conflicts, ...analysis.suggestions].length
                         ? [...analysis.conflicts, ...analysis.suggestions].map((item) => <li key={item}>{item}</li>)
-                        : <li>No conflicts detected</li>}
+                        : <li>No conflicts surfaced in this local preview</li>}
                     </ul>
                   </PublicCard>
                 </div>
@@ -425,16 +429,16 @@ export function BusinessDiscoveryExperience() {
                     Continue interview
                   </button>
                   <button type="button" className="public-button public-button-primary" onClick={approveBlueprint}>
-                    Approve and generate Business Blueprint
+                    Finish local preview
                   </button>
                 </div>
               </PublicCard>
 
               <PublicCard variant="floating" className="space-y-4">
                 <PublicSectionHeader
-                  eyebrow="Live Blueprint"
-                  title="Final preview before approval"
-                  body="Validate structure, confidence, and section quality before promoting this blueprint as the AIOS foundation."
+                  eyebrow="Browser-generated draft"
+                  title="Review your draft"
+                  body="Check the structure and suggestions. Finishing this preview does not submit answers or configure an AIOS environment."
                 />
                 <BusinessBlueprintViewer
                   blueprint={analysis.blueprint}
@@ -452,12 +456,12 @@ export function BusinessDiscoveryExperience() {
           <PublicContainer>
             <PublicCard variant="floating" className="space-y-5">
               <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">
-                <CheckCircle2 size={14} /> Business Blueprint approved
+                <CheckCircle2 size={14} /> Local preview complete
               </div>
               <PublicSectionHeader
-                eyebrow="Foundation Ready"
-                title="AIOS can now initialize the platform from your approved Business Blueprint"
-                body="The discovery output is now ready to seed Business Memory, role-based intelligence, recommended dashboards, integration sequencing, and automation planning."
+                eyebrow="Draft ready"
+                title="Your browser-generated business blueprint is ready to review"
+                body="This local draft has not been submitted to AIOS or used to configure a service. You can review the example memory structure and workflow ideas below."
               />
               <div className="grid gap-3 md:grid-cols-2">
                 <PublicCard variant="feature">

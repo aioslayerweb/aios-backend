@@ -4,6 +4,12 @@ import { type AIOSEventType } from "../kernel/eventContract"
 
 const router = express.Router()
 
+router.use((_req: Request, res: Response<ErrorResponse>) =>
+  res.status(503).json({
+    error: "Organization-scoped runtime event access is not configured",
+  }),
+)
+
 type EventsResponse = {
   count: number
   events: StoredEvent[]

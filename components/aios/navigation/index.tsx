@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { BrandLogo } from "@/components/branding"
-import { AIOSPrimaryButton, AIOSSecondaryButton } from "@/components/aios/buttons"
+import { AIOSPrimaryButton } from "@/components/aios/buttons"
 import { aiosMotion } from "@/components/aios/animations"
 import { AIOSContainer } from "@/components/aios/layout"
 import { cx } from "@/components/aios/layout/utils"
@@ -24,8 +24,8 @@ function isActive(currentHref: string, itemHref: string) {
 
 export function AIOSNavbar({
   activeHref,
-  ctaHref = "/contact",
-  ctaLabel = "Contact",
+  ctaHref = "/demo-platform/executive",
+  ctaLabel = "Explore demo",
   desktopNavigationItems = aiosNavigationItems,
   mobileNavigationItems,
 }: {
@@ -39,6 +39,7 @@ export function AIOSNavbar({
   const reduceMotion = useReducedMotion()
   const menuPanelRef = useRef<HTMLDivElement | null>(null)
   const menuButtonRef = useRef<HTMLButtonElement | null>(null)
+  const menuWasOpenRef = useRef(false)
   const resolvedMobileNavigationItems = mobileNavigationItems ?? desktopNavigationItems
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export function AIOSNavbar({
   useEffect(() => {
     const body = document.body
     if (menuOpen) {
+      menuWasOpenRef.current = true
       body.style.overflow = "hidden"
       const panel = menuPanelRef.current
       if (panel) {
@@ -69,7 +71,10 @@ export function AIOSNavbar({
     }
 
     body.style.overflow = ""
-    menuButtonRef.current?.focus()
+    if (menuWasOpenRef.current) {
+      menuWasOpenRef.current = false
+      menuButtonRef.current?.focus()
+    }
   }, [menuOpen])
 
   useEffect(() => {
@@ -144,8 +149,7 @@ export function AIOSNavbar({
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link href="/demo-platform/executive" className="hidden text-sm font-medium text-[color:var(--public-color-text)] transition-colors hover:text-[color:var(--public-color-primary)] sm:inline-flex">View demo</Link>
-            <AIOSSecondaryButton href={ctaHref} size="sm" className="hidden sm:inline-flex">{ctaLabel}</AIOSSecondaryButton>
+            <AIOSPrimaryButton href={ctaHref} size="sm" className="hidden sm:inline-flex">{ctaLabel}</AIOSPrimaryButton>
           </div>
         </AIOSContainer>
       </motion.header>
@@ -187,14 +191,9 @@ export function AIOSNavbar({
               </div>
 
               <div className="mt-auto pt-8">
-                <Link href="/demo-platform/executive" onClick={() => setMenuOpen(false)} className="public-button public-button-secondary w-full justify-center">
-                  Explore the demo
-                </Link>
-                <div className="mt-3">
                 <AIOSPrimaryButton href={ctaHref} className="w-full justify-center" size="lg">
                   {ctaLabel}
                 </AIOSPrimaryButton>
-                </div>
               </div>
             </motion.div>
           </motion.div>

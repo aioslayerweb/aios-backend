@@ -59,11 +59,4 @@ test("frontend runtime calls match the explicit Express replay route contract", 
 })
 
 test.todo("selected deployed API implements every frontend runtime route; current FastAPI source lacks /aios/* and deployment ownership is unresolved")
-test.todo("unauthenticated request to a protected data route returns 401")
-test.todo("invalid Supabase Auth identity token returns 401")
-test.todo("expired Supabase Auth identity token returns 401")
-test.todo("authenticated user without active organization membership is denied")
 test.todo("user cannot read or replay a record owned by another organization")
-test.todo("user with an insufficient role is denied")
-test.todo("record without a verified organization mapping remains inaccessible")
-test.todo("service-role data access occurs only after authentication, membership, role, and tenant authorization")

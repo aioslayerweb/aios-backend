@@ -4,6 +4,7 @@ import dynamic from "next/dynamic"
 import { useMemo } from "react"
 import { useReducedMotion } from "framer-motion"
 import { Activity, Layers3, Search, Shield, Workflow } from "lucide-react"
+import { LocalTime } from "@/components/ui/local-date-time"
 import { useAgentCommunication, useAgentHealth, useAgentNetwork, useExecutionQueue, useMemorySync, useRuntimeMetrics } from "@/hooks"
 import { useExecutionTimeline as useOrchestratorExecutionTimeline } from "@/hooks/orchestrator/use-execution-timeline"
 import { AgentHealthPanel } from "@/components/agent-health/agent-health-panel"
@@ -124,7 +125,7 @@ export function OrchestratorDashboard() {
                 <article key={event.id} className="rounded-xl border border-border bg-surface-muted p-3">
                   <div className="flex items-center justify-between gap-2 text-[11px] text-text-muted">
                     <span className="capitalize">{event.type.replace(/-/g, " ")}</span>
-                    <span>{new Date(event.timestamp).toLocaleTimeString()}</span>
+                    <span><LocalTime value={event.timestamp} /></span>
                   </div>
                   <p className="mt-1 text-xs font-medium text-text-primary">{event.label}</p>
                   <p className="mt-1 text-[11px] text-text-secondary">{event.description}</p>

@@ -17,11 +17,14 @@ import {
 } from "@/components/public-site/storytelling-sections"
 import { publicPageMetadata } from "@/lib/seo/public-metadata"
 
-export const metadata: Metadata = publicPageMetadata(
-  "Contact AIOS",
-  "Contact intake is not configured yet. Explore the AIOS public demo, platform, architecture, security, and pilot information.",
-  "/contact",
-)
+export const metadata: Metadata = {
+  ...publicPageMetadata(
+    "Contact AIOS",
+    "Contact intake is not configured yet. Explore the AIOS public demo, platform, architecture, security, and pilot information.",
+    "/contact",
+  ),
+  robots: { index: false, follow: false },
+}
 
 const contactTracks = [
   {

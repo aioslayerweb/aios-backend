@@ -7,6 +7,7 @@ import { deriveRuntimeHealth } from "./runtime-health"
 import { deriveWorkflowCounts } from "./runtime-workflows"
 import type { RuntimeBackendEvent, RuntimeLiveSnapshot, RuntimeSource } from "./runtime-types"
 import { fetchRuntimeReplay, fetchRuntimeDebug } from "./runtime-replay"
+import type { RuntimeRequestOptions } from "./runtime-client"
 
 function buildExecutiveTimeline(events: RuntimeBackendEvent[]): ExecutiveTimelineItem[] {
   return events.slice(0, 8).map((event, index) => ({
@@ -33,12 +34,14 @@ function buildExecutiveTimeline(events: RuntimeBackendEvent[]): ExecutiveTimelin
   }))
 }
 
-export async function loadRuntimeLiveSnapshot(): Promise<RuntimeLiveSnapshot> {
+export async function loadRuntimeLiveSnapshot(
+  options: RuntimeRequestOptions = {},
+): Promise<RuntimeLiveSnapshot> {
   const [timelineEvents, rawEvents, memoryUpdates, businessMetrics] = await Promise.all([
-    fetchRuntimeTimeline(),
-    fetchRuntimeEvents(),
-    fetchRuntimeMemoryUpdates(),
-    fetchRuntimeBusinessMetrics(),
+    fetchRuntimeTimeline(options),
+    fetchRuntimeEvents(options),
+    fetchRuntimeMemoryUpdates(24, options),
+    fetchRuntimeBusinessMetrics(options),
   ])
 
   const source: RuntimeSource =
@@ -85,12 +88,7 @@ export async function loadRuntimeLiveSnapshot(): Promise<RuntimeLiveSnapshot> {
 }
 
 export async function loadRuntimeReplayContext(contextId: string): Promise<RuntimeBackendEvent[]> {
-  const events = await fetchRuntimeReplay(contextId)
-  if (events.length > 0) {
-    return events
-  }
-
-  return fetchRuntimeTimeline()
+  return fetchRuntimeReplay(contextId)
 }
 
 export { fetchRuntimeDebug }

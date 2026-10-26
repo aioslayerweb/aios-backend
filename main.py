@@ -1,7 +1,6 @@
 from datetime import datetime
-import json
 
-from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, HTTPException, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 
@@ -55,12 +54,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# ==========================================
-# State
-# ==========================================
-
-active_connections = set()
 
 # ==========================================
 def require_event_organization_scope() -> None:
@@ -230,20 +223,7 @@ def autopilot(
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    active_connections.add(websocket)
-
-    try:
-        while True:
-            raw = await websocket.receive_text()
-            payload = json.loads(raw)
-
-            await websocket.send_text(
-                json.dumps({"type": "ack", "received": payload})
-            )
-
-    except WebSocketDisconnect:
-        active_connections.remove(websocket)
+    await websocket.close(code=1008, reason="WebSocket access is disabled.")
 
 # ==========================================
 # Dashboard

@@ -1974,6 +1974,43 @@ pre {
   padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }
 
+.privacy-consent-panel {
+  bottom: 0.75rem;
+  scrollbar-gutter: stable;
+}
+
+.privacy-settings-trigger {
+  bottom: 0.75rem;
+}
+
+.privacy-storage-warning {
+  bottom: 4rem;
+}
+
+@media (min-width: 640px) {
+  .privacy-consent-panel,
+  .privacy-settings-trigger {
+    bottom: 1rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .privacy-consent-panel {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px) + var(--privacy-keyboard-inset, 0px));
+    max-height: calc(var(--privacy-viewport-height, 100dvh) - 7rem - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .privacy-settings-trigger {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px) + var(--privacy-keyboard-inset, 0px));
+  }
+
+  .privacy-storage-warning {
+    bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px) + var(--privacy-keyboard-inset, 0px));
+  }
+}
+
 .public-motion-reveal {
   transform: translateZ(0);
 }

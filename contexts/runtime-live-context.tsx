@@ -13,6 +13,7 @@ import { useAIAssistantContext } from "@/contexts/ai-assistant-context"
 import { useRuntimeContext } from "@/contexts/runtime-context"
 import { useRuntimeStatusContext } from "@/contexts/runtime-status-context"
 import { loadWhenEnabled } from "@/lib/runtime/live-data-boundary"
+import { RuntimeRequestError } from "@/lib/runtime/runtime-client"
 import type {
   ActivitySource,
   ExecutionQueueItem,
@@ -57,12 +58,14 @@ function toExecutionStatus(status: ExecutionQueueItem["status"]): "queued" | "ru
 export function RuntimeLiveProvider({
   children,
   liveDataEnabled,
+  authorizationUnavailable = false,
 }: {
   children: ReactNode
   liveDataEnabled: boolean
+  authorizationUnavailable?: boolean
 }) {
   const { setAiStatus, setMemoryStatus, setConnectionStatus } = useRuntimeContext()
-  const { setWebsocketState, setConnectionState, updateModuleStatus } = useRuntimeStatusContext()
+  const { setConnectionState, updateModuleStatus } = useRuntimeStatusContext()
   const {
     setAgentStatuses,
     setExecutionTimeline,
@@ -74,18 +77,68 @@ export function RuntimeLiveProvider({
   const [executions, setExecutions] = useState(createInitialExecutions)
   const [memoryUpdates, setMemoryUpdates] = useState(createInitialMemoryUpdates)
   const [health, setHealth] = useState<RuntimeHealth>(createInitialHealth)
+  const [runtimeError, setRuntimeError] = useState<RuntimeLiveState["runtimeError"]>(null)
   useEffect(() => {
     let active = true
+    let controller: AbortController | null = null
+
+    if (!liveDataEnabled) {
+      setEvents([])
+      setAgents([])
+      setExecutions([])
+      setMemoryUpdates([])
+      setHealth(createInitialHealth())
+      setRuntimeError(
+        authorizationUnavailable
+          ? {
+              message: "Organization-scoped runtime access is not configured.",
+              status: 503,
+            }
+          : null,
+      )
+      setAgentStatuses([])
+      setExecutionTimeline([])
+      setMemoryEntries([])
+      setAiStatus("idle")
+      setMemoryStatus("stale")
+      setConnectionStatus("disconnected")
+      setConnectionState("disconnected")
+      if (authorizationUnavailable) {
+        updateModuleStatus("ai-runtime", {
+          status: "offline",
+          label: "Unavailable",
+          description: "Runtime access is disabled until server-verified identity, membership, and event ownership are available.",
+        })
+        updateModuleStatus("memory", {
+          status: "offline",
+          label: "Unavailable",
+          description: "Runtime memory is unavailable until organization-scoped event access is verified.",
+        })
+        updateModuleStatus("supabase", {
+          status: "unknown",
+          label: "Not used for runtime",
+          description: "Browser-side database access is not used as runtime authorization.",
+        })
+      }
+      return () => {
+        active = false
+      }
+    }
+
     const syncSnapshot = async () => {
+      controller?.abort()
+      const requestController = new AbortController()
+      controller = requestController
       try {
         const snapshot = await loadWhenEnabled(liveDataEnabled, async () => {
           const { loadRuntimeLiveSnapshot } = await import("@/lib/runtime")
-          return loadRuntimeLiveSnapshot()
+          return loadRuntimeLiveSnapshot({ signal: requestController.signal })
         })
-        if (!active || !snapshot) {
+        if (!active || requestController.signal.aborted || !snapshot) {
           return
         }
 
+        setRuntimeError(null)
         setEvents(snapshot.events)
         setAgents(snapshot.agents)
         setExecutions(snapshot.executions)
@@ -134,10 +187,6 @@ export function RuntimeLiveProvider({
         setMemoryStatus(snapshot.memoryUpdates.length > 0 ? "syncing" : "synced")
         setConnectionStatus(snapshot.source === "fallback" ? "disconnected" : "connected")
 
-        setWebsocketState({
-          mode: snapshot.source === "fallback" ? "connecting" : "connected",
-          enabled: snapshot.source !== "fallback",
-        })
         setConnectionState(snapshot.source === "fallback" ? "reconnecting" : "connected")
         updateModuleStatus("ai-runtime", {
           status: snapshot.runningAgents > 0 ? "active" : "healthy",
@@ -165,20 +214,37 @@ export function RuntimeLiveProvider({
           description: snapshot.source === "fallback" ? "Backend data is unavailable; using fallback state." : "Backend runtime data is connected.",
         })
 
-      } catch {
-        if (!active) {
+      } catch (error: unknown) {
+        if (!active || requestController.signal.aborted) {
           return
         }
+        setEvents([])
+        setAgents([])
+        setExecutions([])
+        setMemoryUpdates([])
+        setHealth(createInitialHealth())
+        setRuntimeError({
+          message:
+            error instanceof RuntimeRequestError && (error.status === 401 || error.status === 403)
+              ? "Runtime access was denied."
+              : error instanceof RuntimeRequestError && error.status === 503
+                ? "Organization-scoped runtime access is not configured."
+                : error instanceof RuntimeRequestError
+                  ? `Runtime request failed with status ${error.status}.`
+                  : "Runtime data could not be loaded due to a network or response error.",
+          status: error instanceof RuntimeRequestError ? error.status : null,
+        })
+        setAgentStatuses([])
+        setExecutionTimeline([])
+        setMemoryEntries([])
+        setAiStatus("degraded")
+        setMemoryStatus("stale")
+        setConnectionStatus("disconnected")
+        setConnectionState("disconnected")
       }
     }
 
     void syncSnapshot()
-    if (!liveDataEnabled) {
-      return () => {
-        active = false
-      }
-    }
-
     const timer = window.setInterval(() => {
       void syncSnapshot()
     }, 3500)
@@ -186,6 +252,7 @@ export function RuntimeLiveProvider({
     return () => {
       active = false
       window.clearInterval(timer)
+      controller?.abort()
     }
   }, [
     setAgentStatuses,
@@ -194,10 +261,11 @@ export function RuntimeLiveProvider({
     setAiStatus,
     setMemoryStatus,
     setConnectionStatus,
-    setWebsocketState,
     setConnectionState,
     updateModuleStatus,
     liveDataEnabled,
+    authorizationUnavailable,
+    updateModuleStatus,
   ])
 
   const runningAgents = agents.filter((agent) => agent.status === "running").length
@@ -206,16 +274,17 @@ export function RuntimeLiveProvider({
 
   const value = useMemo<RuntimeLiveContextValue>(
     () => ({
-      events,
-      agents,
-      executions,
-      memoryUpdates,
-      health,
-      runningAgents,
-      pendingTasks,
-      queueDepth,
+      events: liveDataEnabled ? events : [],
+      agents: liveDataEnabled ? agents : [],
+      executions: liveDataEnabled ? executions : [],
+      memoryUpdates: liveDataEnabled ? memoryUpdates : [],
+      health: liveDataEnabled ? health : createInitialHealth(),
+      runtimeError: liveDataEnabled ? runtimeError : null,
+      runningAgents: liveDataEnabled ? runningAgents : 0,
+      pendingTasks: liveDataEnabled ? pendingTasks : 0,
+      queueDepth: liveDataEnabled ? queueDepth : 0,
     }),
-    [agents, events, executions, health, memoryUpdates, pendingTasks, queueDepth, runningAgents]
+    [agents, events, executions, health, liveDataEnabled, memoryUpdates, pendingTasks, queueDepth, runningAgents, runtimeError]
   )
 
   return <RuntimeLiveContext.Provider value={value}>{children}</RuntimeLiveContext.Provider>

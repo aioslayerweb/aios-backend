@@ -35,6 +35,7 @@ import { MCPPlatformProvider } from "@/contexts/mcp-platform-context"
 import { RuntimePlatformProvider } from "@/contexts/runtime-platform-context"
 import { InfrastructureProvider } from "@/contexts/infrastructure-context"
 import { AuthSessionProvider } from "@/providers/auth-session-provider"
+import { RUNTIME_AUTHORIZATION_VERIFIED } from "@/lib/runtime/live-data-boundary"
 
 export function AppProviders({
   children,
@@ -45,6 +46,8 @@ export function AppProviders({
   liveDataEnabled: boolean
   authSessionEnabled?: boolean
 }) {
+  const runtimeDataEnabled = liveDataEnabled && RUNTIME_AUTHORIZATION_VERIFIED
+
   return (
     <AuthSessionProvider enabled={authSessionEnabled}>
       <AIOSThemeProvider>
@@ -57,11 +60,14 @@ export function AppProviders({
                   <NotificationProvider>
                     <CommandPaletteProvider>
                       <RuntimeStatusProvider>
-                          <RuntimeLiveProvider liveDataEnabled={liveDataEnabled}>
+                          <RuntimeLiveProvider
+                            liveDataEnabled={runtimeDataEnabled}
+                            authorizationUnavailable={liveDataEnabled && !RUNTIME_AUTHORIZATION_VERIFIED}
+                          >
                             <ActivityFeedProvider>
                               <AgentWorkspaceProvider>
                                 <GlobalSearchProvider>
-                                  <ExecutiveWorkspaceProvider liveDataEnabled={liveDataEnabled}>
+                                  <ExecutiveWorkspaceProvider liveDataEnabled={runtimeDataEnabled}>
                                     <IntegrationProvider>
                                       <PromptOSProvider>
                                         <WorkflowBuilderProvider>

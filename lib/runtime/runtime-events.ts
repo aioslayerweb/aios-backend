@@ -6,7 +6,7 @@ import type {
   RuntimeEvent,
   MemoryUpdate,
 } from "@/types"
-import { runtimeFetchJson } from "./runtime-client"
+import { runtimeFetchJson, type RuntimeRequestOptions } from "./runtime-client"
 import type {
   RuntimeBackendEvent,
   RuntimeDebugResponse,
@@ -237,71 +237,87 @@ export function mapRuntimeEventToRuntimeEvent(event: RuntimeBackendEvent): Runti
   }
 }
 
-export async function fetchRuntimeEvents(): Promise<RuntimeBackendEvent[]> {
+export async function fetchRuntimeEvents(options: RuntimeRequestOptions = {}): Promise<RuntimeBackendEvent[]> {
   const response = await runtimeFetchJson<RuntimeEventResponse>("/aios/events", {
-    ttlMs: 7_500,
-    cacheKey: "runtime-events",
+    ...options,
     retries: 1,
   })
 
-  return response.events ?? []
-}
-
-export async function fetchRuntimeTimeline(): Promise<RuntimeBackendEvent[]> {
-  const response = await runtimeFetchJson<RuntimeTimelineResponse>("/aios/timeline", {
-    ttlMs: 7_500,
-    cacheKey: "runtime-timeline",
-    retries: 1,
-  })
-
-  return response.timeline ?? []
-}
-
-export async function fetchRuntimeReplay(contextId: string): Promise<RuntimeBackendEvent[]> {
-  const response = await runtimeFetchJson<RuntimeReplayResponse>(`/aios/replay/${encodeURIComponent(contextId)}`, {
-    ttlMs: 7_500,
-    cacheKey: `runtime-replay:${contextId}`,
-    retries: 1,
-  })
-
-  return response.timeline ?? []
-}
-
-export async function fetchRuntimeDebug(contextId: string): Promise<RuntimeDebugResponse | null> {
-  try {
-    return await runtimeFetchJson<RuntimeDebugResponse>(`/aios/debug/${encodeURIComponent(contextId)}`, {
-      ttlMs: 7_500,
-      cacheKey: `runtime-debug:${contextId}`,
-      retries: 1,
-    })
-  } catch {
-    return null
+  if (!Array.isArray(response.events)) {
+    throw new Error("Runtime API returned an invalid events response.")
   }
+
+  return response.events
 }
 
-export async function pollRuntimeTimeline(onUpdate: (events: RuntimeBackendEvent[]) => void, intervalMs = 3500): Promise<() => void> {
+export async function fetchRuntimeTimeline(options: RuntimeRequestOptions = {}): Promise<RuntimeBackendEvent[]> {
+  const response = await runtimeFetchJson<RuntimeTimelineResponse>("/aios/timeline", {
+    ...options,
+    retries: 1,
+  })
+
+  if (!Array.isArray(response.timeline)) {
+    throw new Error("Runtime API returned an invalid timeline response.")
+  }
+
+  return response.timeline
+}
+
+export async function fetchRuntimeReplay(contextId: string, options: RuntimeRequestOptions = {}): Promise<RuntimeBackendEvent[]> {
+  const response = await runtimeFetchJson<RuntimeReplayResponse>(`/aios/replay/${encodeURIComponent(contextId)}`, {
+    ...options,
+    retries: 1,
+  })
+
+  if (!Array.isArray(response.timeline)) {
+    throw new Error("Runtime API returned an invalid replay response.")
+  }
+
+  return response.timeline
+}
+
+export async function fetchRuntimeDebug(contextId: string, options: RuntimeRequestOptions = {}): Promise<RuntimeDebugResponse> {
+  const response = await runtimeFetchJson<RuntimeDebugResponse>(`/aios/debug/${encodeURIComponent(contextId)}`, {
+    ...options,
+    retries: 1,
+  })
+
+  if (!Array.isArray(response.events) || typeof response.summary !== "object" || response.summary === null) {
+    throw new Error("Runtime API returned an invalid debug response.")
+  }
+
+  return response
+}
+
+export function pollRuntimeTimeline(
+  onUpdate: (events: RuntimeBackendEvent[]) => void,
+  onError: (error: unknown) => void,
+  intervalMs = 3500,
+): () => void {
   let disposed = false
+  const controller = new AbortController()
 
   const tick = async () => {
     try {
-      const events = await fetchRuntimeTimeline()
+      const events = await fetchRuntimeTimeline({ signal: controller.signal })
       if (!disposed) {
         onUpdate(events)
       }
-    } catch {
-      if (!disposed) {
-        onUpdate([])
+    } catch (error) {
+      if (!disposed && !controller.signal.aborted) {
+        onError(error)
       }
     }
   }
 
   void tick()
-  const timer = window.setInterval(() => {
+  const timer = globalThis.setInterval(() => {
     void tick()
   }, intervalMs)
 
   return () => {
     disposed = true
-    window.clearInterval(timer)
+    globalThis.clearInterval(timer)
+    controller.abort()
   }
 }

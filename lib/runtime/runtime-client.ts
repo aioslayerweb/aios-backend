@@ -4,41 +4,20 @@ const DEFAULT_RUNTIME_API_BASE =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   "http://localhost:3001"
 
-type CacheEntry = {
-  expiresAt: number
-  value: unknown
-}
-
-const responseCache = new Map<string, CacheEntry>()
-
 export type RuntimeRequestOptions = RequestInit & {
-  cacheKey?: string
-  ttlMs?: number
   retries?: number
   retryDelayMs?: number
 }
 
+export class RuntimeRequestError extends Error {
+  constructor(readonly status: number) {
+    super(`Runtime request failed with status ${status}`)
+    this.name = "RuntimeRequestError"
+  }
+}
+
 export function getRuntimeApiBase(): string {
   return DEFAULT_RUNTIME_API_BASE.replace(/\/$/, "")
-}
-
-export function clearRuntimeCache(prefix?: string): void {
-  if (!prefix) {
-    responseCache.clear()
-    return
-  }
-
-  for (const key of Array.from(responseCache.keys())) {
-    if (key.startsWith(prefix)) {
-      responseCache.delete(key)
-    }
-  }
-}
-
-function buildCacheKey(pathname: string, options: RuntimeRequestOptions): string {
-  const body = typeof options.body === "string" ? options.body : ""
-  const method = options.method ?? "GET"
-  return `${pathname}::${method}::${body}`
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -46,51 +25,38 @@ async function sleep(ms: number): Promise<void> {
 }
 
 export async function runtimeFetchJson<T>(pathname: string, options: RuntimeRequestOptions = {}): Promise<T> {
-  const method = options.method ?? "GET"
-  const ttlMs = options.ttlMs ?? 15_000
-  const retries = options.retries ?? 1
-  const retryDelayMs = options.retryDelayMs ?? 250
-  const cacheKey = options.cacheKey ?? buildCacheKey(pathname, options)
-  const now = Date.now()
-
-  if (method === "GET") {
-    const cached = responseCache.get(cacheKey)
-    if (cached && cached.expiresAt > now) {
-      return cached.value as T
-    }
-  }
-
+  const {
+    retries = 1,
+    retryDelayMs = 250,
+    ...requestOptions
+  } = options
+  const method = requestOptions.method ?? "GET"
   const url = `${getRuntimeApiBase()}${pathname.startsWith("/") ? pathname : `/${pathname}`}`
+  const headers = new Headers(requestOptions.headers)
+  if (!headers.has("content-type")) {
+    headers.set("content-type", "application/json")
+  }
 
   let lastError: unknown = null
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     try {
       const response = await fetch(url, {
-        ...options,
+        ...requestOptions,
         method,
         cache: "no-store",
-        headers: {
-          "content-type": "application/json",
-          ...(options.headers ?? {}),
-        },
+        headers,
       })
 
       if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`)
+        throw new RuntimeRequestError(response.status)
       }
 
-      const data = (await response.json()) as T
-
-      if (method === "GET") {
-        responseCache.set(cacheKey, {
-          expiresAt: now + ttlMs,
-          value: data,
-        })
-      }
-
-      return data
+      return (await response.json()) as T
     } catch (error) {
+      if (requestOptions.signal?.aborted) {
+        throw error
+      }
       lastError = error
       if (attempt < retries) {
         await sleep(retryDelayMs * (attempt + 1))

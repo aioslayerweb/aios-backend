@@ -1,4 +1,5 @@
 import asyncio
+import json
 import sys
 import types
 import unittest
@@ -363,6 +364,68 @@ class ProtectedApiTests(unittest.TestCase):
                 )
                 self.assertNotIn("event-a", response.text)
                 self.assertNotIn("event-b", response.text)
+        self.assertEqual(self.database.queries, [])
+
+    def test_primary_websocket_is_disabled_before_accept_or_message_processing(self) -> None:
+        async def connect(headers: list[tuple[bytes, bytes]], query: bytes) -> tuple[list[dict[str, object]], int]:
+            messages: list[dict[str, object]] = []
+            received_count = 0
+
+            async def receive() -> dict[str, object]:
+                nonlocal received_count
+                received_count += 1
+                if received_count == 1:
+                    return {"type": "websocket.connect"}
+                return {
+                    "type": "websocket.receive",
+                    "text": json.dumps({"organization_id": ORG_B, "message": "synthetic"}),
+                }
+
+            async def send(message: dict[str, object]) -> None:
+                messages.append(message)
+
+            scope: dict[str, object] = {
+                "type": "websocket",
+                "asgi": {"version": "3.0", "spec_version": "2.3"},
+                "http_version": "1.1",
+                "scheme": "ws",
+                "server": ("synthetic-api.test", 80),
+                "client": ("synthetic-client", 1234),
+                "root_path": "",
+                "path": "/ws",
+                "raw_path": b"/ws",
+                "query_string": query,
+                "headers": headers,
+                "subprotocols": [],
+                "state": {},
+            }
+            await main.app(scope, receive, send)
+            return messages, received_count
+
+        unauthenticated, unauthenticated_reads = asyncio.run(connect([], b""))
+        authenticated, authenticated_reads = asyncio.run(
+            connect(
+                [(b"authorization", f"Bearer {self.token(USER_A)}".encode())],
+                f"organization_id={ORG_A}".encode(),
+            )
+        )
+        forged_tenant, forged_tenant_reads = asyncio.run(
+            connect([], f"organization_id={ORG_B}".encode())
+        )
+
+        expected_close = [{
+            "type": "websocket.close",
+            "code": 1008,
+            "reason": "WebSocket access is disabled.",
+        }]
+        self.assertEqual(unauthenticated, expected_close)
+        self.assertEqual(authenticated, expected_close)
+        self.assertEqual(forged_tenant, expected_close)
+        self.assertEqual(
+            (unauthenticated_reads, authenticated_reads, forged_tenant_reads),
+            (0, 0, 0),
+        )
+        self.assertEqual(self.repository.calls, [])
         self.assertEqual(self.database.queries, [])
 
     def test_legacy_service_role_routes_and_websocket_fail_closed(self) -> None:

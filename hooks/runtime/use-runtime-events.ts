@@ -13,7 +13,7 @@ export function useRuntimeEvents(intervalMs = 3500) {
     let dispose: (() => void) | undefined
     let active = true
 
-    void pollRuntimeTimeline((nextEvents) => {
+    dispose = pollRuntimeTimeline((nextEvents) => {
       if (!active) {
         return
       }
@@ -21,18 +21,17 @@ export function useRuntimeEvents(intervalMs = 3500) {
       setEvents(nextEvents)
       setLoading(false)
       setError(null)
-    }, intervalMs)
-      .then((unsubscribe) => {
-        dispose = unsubscribe
-      })
-      .catch((catchError) => {
-        if (!active) {
-          return
-        }
+    }, (catchError) => {
+      if (!active) {
+        return
+      }
 
-        setError(catchError instanceof Error ? catchError.message : "Unable to load runtime events")
-        setLoading(false)
-      })
+      setEvents([])
+      setError(
+        catchError instanceof Error ? catchError.message : "Unable to load runtime events",
+      )
+      setLoading(false)
+    }, intervalMs)
 
     return () => {
       active = false

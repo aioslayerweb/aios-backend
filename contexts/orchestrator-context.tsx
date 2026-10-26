@@ -140,7 +140,10 @@ export function OrchestratorProvider({ children }: { children: ReactNode }) {
   const [liveMode, setLiveMode] = useState(defaults.liveMode)
 
   useEffect(() => {
-    const nextAgents = defaults.agents.map((fallback, index) => mapRuntimeAgent(runtimeLive.agents[index] ?? runtimeLive.agents[0] ?? fallback, fallback))
+    const nextAgents = defaults.agents.map((fallback, index) => {
+      const runtimeAgent = runtimeLive.agents[index] ?? runtimeLive.agents[0]
+      return runtimeAgent ? mapRuntimeAgent(runtimeAgent, fallback) : fallback
+    })
     const nextExecutions = defaults.executions.map((fallback, index) => mapRuntimeExecution(runtimeLive.executions[index] ?? runtimeLive.executions[0] ?? { id: fallback.id, label: fallback.title, status: "queued", updatedAt: fallback.updatedAt }, fallback))
     const nextMemorySync = runtimeLive.memoryUpdates.slice(0, 4).map((item, index) => ({
       id: item.id,

@@ -2,13 +2,39 @@ import assert from "node:assert/strict"
 import { test } from "node:test"
 import { syntheticDemoInsights } from "@/lib/demo/synthetic-insights"
 import { formatSimulationActivity } from "@/lib/demo/simulation"
-import { loadWhenEnabled } from "@/lib/runtime/live-data-boundary"
+import {
+  loadWhenEnabled,
+  RUNTIME_AUTHORIZATION_VERIFIED,
+} from "@/lib/runtime/live-data-boundary"
+import { readFileSync } from "node:fs"
+import { resolve } from "node:path"
 
 test("disabled live-data boundary does not invoke its loader", async () => {
   let loadCount = 0
   const result = await loadWhenEnabled(false, async () => {
     loadCount += 1
     throw new Error("Live loader must not run in synthetic mode")
+  })
+
+  assert.equal(result, null)
+  assert.equal(loadCount, 0)
+})
+
+test("runtime loaders remain disabled until server identity, membership, and ownership are verified", async () => {
+  assert.equal(RUNTIME_AUTHORIZATION_VERIFIED, false)
+  const providers = readFileSync(
+    resolve(process.cwd(), "providers/app-providers.tsx"),
+    "utf8",
+  )
+  assert.match(
+    providers,
+    /liveDataEnabled && RUNTIME_AUTHORIZATION_VERIFIED/,
+  )
+
+  let loadCount = 0
+  const result = await loadWhenEnabled(RUNTIME_AUTHORIZATION_VERIFIED, async () => {
+    loadCount += 1
+    return "unscoped runtime data"
   })
 
   assert.equal(result, null)

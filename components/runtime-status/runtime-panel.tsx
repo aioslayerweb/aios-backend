@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { X } from "lucide-react"
 import { useBreakpoint, useRuntimeStatus } from "@/hooks"
+import { useRuntimeLiveContext } from "@/contexts/runtime-live-context"
 import { drawerVariants, modalVariants, slideUpVariants } from "@/theme"
 import { Button } from "@/components/ui"
 import { ConnectionStatus } from "./connection-status"
@@ -23,6 +24,7 @@ type RuntimePanelProps = {
 export function RuntimePanel({ open, onClose }: RuntimePanelProps) {
   const { isMobile, isTablet } = useBreakpoint()
   const { modules, lastUpdated } = useRuntimeStatus()
+  const { runtimeError } = useRuntimeLiveContext()
 
   return (
     <AnimatePresence>
@@ -40,7 +42,7 @@ export function RuntimePanel({ open, onClose }: RuntimePanelProps) {
               aria-modal="true"
               aria-label="Runtime status panel"
             >
-              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} />
+              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} runtimeError={runtimeError} />
             </motion.section>
           ) : isTablet ? (
             <motion.aside
@@ -54,7 +56,7 @@ export function RuntimePanel({ open, onClose }: RuntimePanelProps) {
               aria-modal="true"
               aria-label="Runtime status panel"
             >
-              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} />
+              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} runtimeError={runtimeError} />
             </motion.aside>
           ) : (
             <motion.section
@@ -68,7 +70,7 @@ export function RuntimePanel({ open, onClose }: RuntimePanelProps) {
               aria-modal="true"
               aria-label="Runtime status panel"
             >
-              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} />
+              <PanelContent modules={modules} lastUpdated={lastUpdated} onClose={onClose} runtimeError={runtimeError} />
             </motion.section>
           )}
         </div>
@@ -81,10 +83,12 @@ function PanelContent({
   modules,
   lastUpdated,
   onClose,
+  runtimeError,
 }: {
   modules: ReturnType<typeof useRuntimeStatus>["modules"]
   lastUpdated: number
   onClose: () => void
+  runtimeError: ReturnType<typeof useRuntimeLiveContext>["runtimeError"]
 }) {
   return (
     <div className="flex min-h-full flex-col">
@@ -99,6 +103,14 @@ function PanelContent({
       </header>
 
       <div className="grid gap-3 p-4 lg:grid-cols-2">
+        {runtimeError ? (
+          <div
+            className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950 lg:col-span-2"
+            role="status"
+          >
+            {runtimeError.message}
+          </div>
+        ) : null}
         <RuntimeHealthCard lastUpdated={lastUpdated} />
         <RuntimeSummary modules={modules} />
         <ConnectionStatus />

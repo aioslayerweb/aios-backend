@@ -65,6 +65,10 @@ export type RuntimeHealth = {
 }
 
 export type RuntimeLiveState = {
+  runtimeError: {
+    message: string
+    status: number | null
+  } | null
   events: RuntimeEvent[]
   agents: LiveAgent[]
   executions: ExecutionQueueItem[]

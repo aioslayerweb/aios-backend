@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui"
 import {
@@ -32,6 +32,11 @@ const allowedClickEvents = new Set([
 type PosthogEvent = {
   event: string
   properties: Record<string, string | number>
+}
+
+type PrivacyViewportStyle = CSSProperties & {
+  "--privacy-viewport-height": string
+  "--privacy-keyboard-inset": string
 }
 
 declare global {
@@ -101,6 +106,10 @@ export function PublicAnalytics() {
   const [consent, setConsent] = useState<AnalyticsConsent>("undecided")
   const [editingChoice, setEditingChoice] = useState(false)
   const [storageWarning, setStorageWarning] = useState("")
+  const [privacyViewportStyle, setPrivacyViewportStyle] = useState<PrivacyViewportStyle>({
+    "--privacy-viewport-height": "100dvh",
+    "--privacy-keyboard-inset": "0px",
+  })
   const consentRef = useRef(false)
   const trackedScroll = useRef(new Set<number>())
   const providerState = useRef({
@@ -243,6 +252,32 @@ export function PublicAnalytics() {
   }, [])
 
   useEffect(() => {
+    const viewport = window.visualViewport
+    const updateViewport = () => {
+      const height = viewport?.height ?? window.innerHeight
+      const keyboardInset = viewport
+        ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+        : 0
+
+      setPrivacyViewportStyle({
+        "--privacy-viewport-height": `${Math.round(height)}px`,
+        "--privacy-keyboard-inset": `${Math.round(keyboardInset)}px`,
+      })
+    }
+
+    updateViewport()
+    window.addEventListener("resize", updateViewport)
+    viewport?.addEventListener("resize", updateViewport)
+    viewport?.addEventListener("scroll", updateViewport)
+
+    return () => {
+      window.removeEventListener("resize", updateViewport)
+      viewport?.removeEventListener("resize", updateViewport)
+      viewport?.removeEventListener("scroll", updateViewport)
+    }
+  }, [])
+
+  useEffect(() => {
     const allowed = consent === "granted"
     consentRef.current = allowed
     controller.setConsent(allowed)
@@ -321,14 +356,20 @@ export function PublicAnalytics() {
   return (
     <>
       {storageWarning ? (
-        <p className="fixed bottom-16 left-4 z-[100] max-w-[calc(100vw-2rem)] rounded-lg border border-amber-300 bg-white px-4 py-3 text-sm text-amber-950 shadow-lg" role="status" aria-live="polite">
+        <p
+          className="privacy-storage-warning fixed left-4 z-[100] max-w-[calc(100vw-2rem)] rounded-lg border border-amber-300 bg-white px-4 py-3 text-sm text-amber-950 shadow-lg"
+          style={privacyViewportStyle}
+          role="status"
+          aria-live="polite"
+        >
           {storageWarning}
         </p>
       ) : null}
 
       {showChoices ? (
         <section
-          className="fixed inset-x-3 bottom-3 z-[99] mx-auto max-w-2xl rounded-xl border border-border bg-white p-4 shadow-xl sm:inset-x-4 sm:bottom-4 sm:p-5"
+          className="privacy-consent-panel fixed inset-x-3 z-[99] mx-auto max-w-2xl rounded-xl border border-border bg-white p-4 shadow-xl sm:inset-x-4 sm:p-5"
+          style={privacyViewportStyle}
           role="region"
           aria-label="Analytics privacy choices"
           aria-describedby="analytics-consent-description"
@@ -351,7 +392,8 @@ export function PublicAnalytics() {
           type="button"
           variant="secondary"
           size="sm"
-          className="fixed bottom-3 right-3 z-[99] shadow-md sm:bottom-4 sm:right-4"
+          className="privacy-settings-trigger fixed right-3 z-[99] shadow-md sm:right-4"
+          style={privacyViewportStyle}
           aria-expanded={editingChoice}
           onClick={() => setEditingChoice(true)}
         >

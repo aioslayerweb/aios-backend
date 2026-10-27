@@ -1171,6 +1171,14 @@ Motion requirements:
 - Performance-stable on laptop and mobile
 - Reduced motion alternatives must preserve meaning
 
+Rendering and interaction boundaries:
+
+- Keep the homepage composition in `components/public-site/public-homepage-experience.tsx` as a Server Component so static narrative content and structured data are server-rendered.
+- Keep interactive state local to the cockpit, intelligence-stage tabs, role selector, and scenario planner in `components/public-site/homepage-interactive-islands.tsx`.
+- Render public structured data through `components/public-site/public-structured-data-server.tsx`; share its payload builder with the legacy storytelling component rather than coupling homepage rendering to that client module.
+- Keep the spatial neural scene in its own client-only component and defer Three.js initialization until after page load and browser idle. Preserve reduced-motion and software-renderer behavior.
+- Do not prefetch the full demo dashboard from public homepage calls to action; load it when a visitor follows the link.
+
 Visual requirements:
 
 - Built from AIOS brand tokens only

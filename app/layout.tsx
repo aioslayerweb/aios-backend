@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import "./globals.css"
 import { brandAssets, brandTheme } from "@/components/branding"
+import { AIOSMotionProvider } from "@/components/aios/motion-provider"
 import { PublicAnalytics } from "@/components/public-site/public-analytics"
 
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? ""
@@ -75,7 +76,7 @@ export default function RootLayout({
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }} />
       </head>
       <body className="bg-surface-app text-text-primary antialiased">
-        {children}
+        <AIOSMotionProvider>{children}</AIOSMotionProvider>
         <PublicAnalytics />
       </body>
     </html>

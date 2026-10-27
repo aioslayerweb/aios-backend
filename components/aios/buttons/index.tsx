@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import type { ReactNode } from "react"
-import { motion, useMotionValue, useReducedMotion, useSpring } from "framer-motion"
+import { m, useMotionValue, useReducedMotion, useSpring } from "framer-motion"
 import { ArrowRight } from "lucide-react"
 import { cx } from "@/components/aios/layout/utils"
 import { aiosSpring } from "@/components/aios/animations"
@@ -72,7 +72,7 @@ export function AIOSButtonLink({ href, children, icon, className, size = "md", v
   const sizeClass = size === "lg" ? "px-7 py-4 text-base" : size === "sm" ? "px-4 py-2.5 text-sm" : "px-6 py-3 text-sm"
 
   return (
-    <motion.div
+    <m.div
       className="inline-flex"
       style={reduceMotion ? undefined : { x, y }}
       whileTap={reduceMotion ? undefined : { scale: 0.985 }}
@@ -89,11 +89,11 @@ export function AIOSButtonLink({ href, children, icon, className, size = "md", v
         offsetY.set(0)
       }}
     >
-      <Link href={href} aria-label={ariaLabel} data-analytics-event={resolvedAnalyticsEvent} className={cx("public-button", `public-button-${variant}`, sizeClass, className)}>
+      <Link href={href} prefetch={href.startsWith("/demo-platform") ? false : undefined} aria-label={ariaLabel} data-analytics-event={resolvedAnalyticsEvent} className={cx("public-button", `public-button-${variant}`, sizeClass, className)}>
         <span>{children}</span>
         {icon ?? (variant === "primary" ? <ArrowRight size={16} /> : null)}
       </Link>
-    </motion.div>
+    </m.div>
   )
 }
 

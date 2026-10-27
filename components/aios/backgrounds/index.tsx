@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
+import { m, useReducedMotion } from "framer-motion"
 import type { ReactNode } from "react"
 
 export function AIOSMeshGradient() {
@@ -40,7 +40,7 @@ export function AIOSFloatingParticles({ count = 14 }: { count?: number }) {
   return (
     <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       {particles.map((particle) => (
-        <motion.span
+        <m.span
           key={particle.id}
           style={{ left: particle.left }}
           initial={{ y: "110vh", opacity: 0 }}

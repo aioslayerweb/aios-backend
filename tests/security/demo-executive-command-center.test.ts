@@ -108,3 +108,40 @@ test("department intelligence is synthetic and routes within the public demo", (
   assert.ok(demoDepartmentSummaries.every((department) => department.href.startsWith("/demo-platform/")))
   assert.ok(demoDepartmentSummaries.every((department) => /sample|synthetic/i.test(`${department.kpi} ${department.issue} ${department.recommendation}`)))
 })
+
+test("department city selection opens one synchronized, dismissible department card", async () => {
+  const [component, cityComponent, builders, css] = await Promise.all([
+    readFile(componentPath, "utf8"),
+    readFile(cityComponentPath, "utf8"),
+    readFile(join(projectRoot, "components/demo/department-city-builders.ts"), "utf8"),
+    readFile(join(projectRoot, "styles/foundation.css"), "utf8"),
+  ])
+
+  // Single authoritative selection drives both the city emphasis and the card.
+  assert.match(component, /onDepartmentSelect=\{handleDepartmentSelect\}/)
+  assert.match(component, /selectedDepartmentId=\{departmentCardOpen \? selectedDomainId : ""\}/)
+  assert.match(component, /aria-labelledby="department-card-heading"/)
+  assert.match(component, /Close \$\{selectedDomain\.label\} department card/)
+  assert.match(component, /event\.key === "Escape"/)
+  assert.equal((component.match(/aria-labelledby="department-card-heading"/g) ?? []).length, 1)
+
+  // Every department rendered by the scene has a builder and a selection hit target.
+  for (const id of ["sales", "marketing", "customers", "finance", "operations", "product"]) {
+    assert.match(builders, new RegExp(`\\b${id}: \\(k\\)`))
+    assert.ok(demoDepartmentSummaries.some((summary) => summary.id === id), `${id} has a department summary`)
+  }
+  assert.match(cityComponent, /hitTarget\.userData\.targetId = department\.id/)
+  assert.match(cityComponent, /aria-pressed=\{selected\}/)
+
+  // Only the selected city is emphasised; reduced motion applies it immediately.
+  assert.match(cityComponent, /emphasis\.target = id === selectedId \? 1 : 0/)
+  assert.match(cityComponent, /if \(reducedMotion\) stepEmphasis\(true\)/)
+
+  // Marketing is calm and Finance is lifted out of near-black.
+  assert.match(builders, /marketing: \(k\) => \{[\s\S]*?k\.setSpeed\(0\.2\)/)
+  assert.doesNotMatch(builders, /0x090d16/)
+
+  // The desktop card must stay visible, and the mobile card must be a safe-area bottom sheet.
+  assert.doesNotMatch(css, /aios-demo-city-detail/)
+  assert.match(css, /section\.aios-demo-department-card\[aria-labelledby\] \{[^}]*position: fixed[^}]*safe-area-inset-bottom/)
+})

@@ -16,12 +16,17 @@ export function SpatialNeuralCore() {
     let renderer: import("three").WebGLRenderer | undefined
     let scene: import("three").Scene | undefined
     let isVisible = true
+    let idleHandle = 0
+    let idleIsCallback = false
+    let lastFrameTime = 0
     let mouseX = 0
     let mouseY = 0
     let targetX = 0
     let targetY = 0
     let render: () => void = () => undefined
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    // Static mode renders a single frame: reduced motion, or a software GL renderer where a continuous loop would only block the main thread.
+    let staticMode = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const FRAME_INTERVAL_MS = 1000 / 30
 
     const onPointerMove = (event: PointerEvent) => {
       mouseX = (event.clientX / window.innerWidth - 0.5) * 2
@@ -30,13 +35,17 @@ export function SpatialNeuralCore() {
 
     const renderFrame = (render: () => void) => {
       if (disposed || !isVisible) return
-      render()
-      if (!reducedMotion) frameId = window.requestAnimationFrame(() => renderFrame(render))
+      const now = performance.now()
+      if (staticMode || now - lastFrameTime >= FRAME_INTERVAL_MS - 2) {
+        lastFrameTime = now
+        render()
+      }
+      if (!staticMode) frameId = window.requestAnimationFrame(() => renderFrame(render))
     }
 
     window.addEventListener("pointermove", onPointerMove, { passive: true })
 
-    void import("three")
+    const load = () => void import("three")
       .then((THREE) => {
         if (disposed || !container) return
 
@@ -60,7 +69,11 @@ export function SpatialNeuralCore() {
 
         scene = localScene
         renderer = localRenderer
-        localRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5))
+        const gl = localRenderer.getContext()
+        const debugInfo = gl.getExtension("WEBGL_debug_renderer_info")
+        const gpuName = debugInfo ? String(gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)) : ""
+        if (/swiftshader|llvmpipe|software|softpipe/i.test(gpuName)) staticMode = true
+        localRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 640 ? 1 : 1.5))
         localRenderer.setSize(width, height)
         localRenderer.setClearColor(0x000000, 0)
         localRenderer.domElement.setAttribute("aria-hidden", "true")
@@ -209,7 +222,7 @@ export function SpatialNeuralCore() {
 
         observer = new IntersectionObserver(([entry]) => {
           isVisible = entry.isIntersecting
-          if (isVisible && !frameId) {
+          if (isVisible && !frameId && !staticMode) {
             frameId = window.requestAnimationFrame(() => {
               frameId = 0
               renderFrame(render)
@@ -222,8 +235,12 @@ export function SpatialNeuralCore() {
         observer.observe(container)
 
         const startTime = performance.now()
+        let previousTime = startTime
         render = () => {
-          const elapsedTime = (performance.now() - startTime) / 1000
+          const frameTime = performance.now()
+          const frameScale = Math.min((frameTime - previousTime) / (1000 / 60), 4)
+          previousTime = frameTime
+          const elapsedTime = (frameTime - startTime) / 1000
           targetX += (mouseX - targetX) * 0.035
           targetY += (mouseY - targetY) * 0.035
 
@@ -242,7 +259,7 @@ export function SpatialNeuralCore() {
           ringGroup.rotation.x = -targetY * 0.16
 
           for (const node of agentNodes) {
-            node.userData.angle += node.userData.speed
+            node.userData.angle += node.userData.speed * frameScale
             node.position.x = Math.cos(node.userData.angle) * node.userData.radius
             node.position.z = Math.sin(node.userData.angle) * node.userData.radius
             node.position.y =
@@ -261,9 +278,27 @@ export function SpatialNeuralCore() {
         if (!disposed) console.warn("Spatial hero animation failed to load.", error)
       })
 
+    // Keep Three.js and scene construction off the critical path: start once the page has loaded and the browser is idle.
+    const scheduleLoad = () => {
+      if (disposed) return
+      if (typeof window.requestIdleCallback === "function") {
+        idleIsCallback = true
+        idleHandle = window.requestIdleCallback(load, { timeout: 3000 })
+      } else {
+        idleHandle = window.setTimeout(load, 1)
+      }
+    }
+    if (document.readyState === "complete") scheduleLoad()
+    else window.addEventListener("load", scheduleLoad, { once: true })
+
     return () => {
       disposed = true
       window.removeEventListener("pointermove", onPointerMove)
+      window.removeEventListener("load", scheduleLoad)
+      if (idleHandle) {
+        if (idleIsCallback) window.cancelIdleCallback(idleHandle)
+        else window.clearTimeout(idleHandle)
+      }
       window.cancelAnimationFrame(frameId)
       observer?.disconnect()
       resizeObserver?.disconnect()

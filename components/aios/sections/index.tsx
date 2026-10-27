@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "framer-motion"
+import { m, useReducedMotion } from "framer-motion"
 import { aiosMotion, aiosMotionViewport } from "@/components/aios/animations"
 import { AIOSCard } from "@/components/aios/cards"
 import { AIOSContainer, AIOSGrid, AIOSSection } from "@/components/aios/layout"
@@ -12,7 +12,7 @@ export function AIOSSectionHeader({ eyebrow, title, body, align = "left", classN
   const TitleTag = titleAs
 
   return (
-    <motion.div
+    <m.div
       className={`${align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"} ${className ?? ""}`.trim()}
       variants={aiosMotion.sectionReveal}
       initial={reduceMotion ? "reduced" : "hidden"}
@@ -22,7 +22,7 @@ export function AIOSSectionHeader({ eyebrow, title, body, align = "left", classN
       {eyebrow ? <p className="public-eyebrow">{eyebrow}</p> : null}
       <TitleTag className="public-h2 mt-5">{title}</TitleTag>
       {body ? <p className="public-body-lg mt-5 text-balance">{body}</p> : null}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -32,11 +32,11 @@ export function AIOSFeatureGrid({ items, columns = 3 }: { items: AIOSFeatureItem
   const reduceMotion = useReducedMotion()
 
   return (
-    <motion.div variants={aiosMotion.staggerChildren} initial={reduceMotion ? "show" : "hidden"} whileInView="show" viewport={aiosMotionViewport}>
+    <m.div variants={aiosMotion.staggerChildren} initial={reduceMotion ? "show" : "hidden"} whileInView="show" viewport={aiosMotionViewport}>
       <AIOSGrid columns={columns}>
         {items.map((item) => {
           return (
-            <motion.div key={item.title} variants={aiosMotion.fadeUp} className="public-motion-reveal">
+            <m.div key={item.title} variants={aiosMotion.fadeUp} className="public-motion-reveal">
               <AIOSCard variant="feature" hover className="h-full">
                 {item.badge ? <p className="public-eyebrow">{item.badge}</p> : null}
                 {item.icon ? <span className="mb-5 inline-flex rounded-2xl bg-[var(--public-color-muted)] p-3 text-[color:var(--public-color-primary)]">{item.icon}</span> : null}
@@ -44,11 +44,11 @@ export function AIOSFeatureGrid({ items, columns = 3 }: { items: AIOSFeatureItem
                 <p className="public-body mt-3">{item.body}</p>
                 {item.detail ? <p className="public-small mt-4">{item.detail}</p> : null}
               </AIOSCard>
-            </motion.div>
+            </m.div>
           )
         })}
       </AIOSGrid>
-    </motion.div>
+    </m.div>
   )
 }
 

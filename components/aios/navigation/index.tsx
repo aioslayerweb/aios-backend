@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, m, useReducedMotion } from "framer-motion"
 import { Menu, X } from "lucide-react"
 import { BrandLogo } from "@/components/branding"
 import { AIOSPrimaryButton } from "@/components/aios/buttons"
@@ -114,7 +114,7 @@ export function AIOSNavbar({
 
   return (
     <>
-      <motion.header
+      <m.header
         className="public-nav sticky top-0 z-header border-b border-[rgba(220,229,246,0.8)] bg-[rgba(255,255,255,0.9)] backdrop-blur-xl"
         initial={false}
         animate="show"
@@ -152,12 +152,12 @@ export function AIOSNavbar({
             <AIOSPrimaryButton href={ctaHref} size="sm" className="public-nav-cta hidden md:inline-flex">{ctaLabel}</AIOSPrimaryButton>
           </div>
         </AIOSContainer>
-      </motion.header>
+      </m.header>
 
       <AnimatePresence>
         {menuOpen ? (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0.15 : 0.24 }} className="fixed inset-0 z-[120] bg-[rgba(7,19,61,0.28)] backdrop-blur-sm lg:hidden" onClick={() => setMenuOpen(false)}>
-            <motion.div
+          <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0.15 : 0.24 }} className="fixed inset-0 z-[120] bg-[rgba(7,19,61,0.28)] backdrop-blur-sm lg:hidden" onClick={() => setMenuOpen(false)}>
+            <m.div
               id="mobile-navigation-drawer"
               ref={menuPanelRef}
               variants={aiosMotion.drawer}
@@ -181,11 +181,11 @@ export function AIOSNavbar({
                 {resolvedMobileNavigationItems.map((item, index) => {
                   const active = isActive(activeHref ?? "", item.href)
                   return (
-                    <motion.div key={item.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: aiosTheme.motion.state }}>
+                    <m.div key={item.href} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.03, duration: aiosTheme.motion.state }}>
                       <Link href={item.href} aria-current={active ? "page" : undefined} onClick={() => setMenuOpen(false)} className={cx("block min-h-[44px] rounded-[24px] border px-4 py-4 text-base font-semibold transition-colors", active ? "border-[color:var(--public-color-primary)] bg-[var(--public-color-hover)] text-[color:var(--public-color-primary)]" : "border-[color:var(--public-color-border)] bg-white text-[color:var(--public-color-navy)]")}>
                         {item.label}
                       </Link>
-                    </motion.div>
+                    </m.div>
                   )
                 })}
               </div>
@@ -195,8 +195,8 @@ export function AIOSNavbar({
                   {ctaLabel}
                 </AIOSPrimaryButton>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </>

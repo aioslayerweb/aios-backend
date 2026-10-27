@@ -3,7 +3,7 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
 import { useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
+import { AnimatePresence, m, useReducedMotion } from "framer-motion"
 import { BrandLogo } from "@/components/branding"
 import { AIOSArchitectureOrbit } from "@/components/aios/architecture"
 import { AIOSFloatingCard, AIOSGlassCard } from "@/components/aios/cards"
@@ -63,7 +63,7 @@ export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: str
       </div>
       <AnimatePresence mode="wait">
         {active ? (
-          <motion.div
+          <m.div
             key={active.key}
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -83,7 +83,7 @@ export function AIOSTabbedPanel({ items, initialKey }: { items: Array<{ key: str
                 ))}
               </div>
             </AIOSFloatingCard>
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
     </div>
@@ -97,11 +97,11 @@ export function AIOSLogoMarquee({ items }: { items: string[] }) {
     <div className="relative overflow-hidden">
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent sm:w-32" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-white to-transparent sm:w-32" />
-      <motion.div animate={reduceMotion ? undefined : { x: ["0%", "-50%"] }} transition={{ duration: 28, ease: "linear", repeat: Infinity }} className="flex min-w-max items-center gap-4">
+      <m.div animate={reduceMotion ? undefined : { x: ["0%", "-50%"] }} transition={{ duration: 28, ease: "linear", repeat: Infinity }} className="flex min-w-max items-center gap-4">
         {track.map((item, index) => (
           <AIOSGlassCard key={`${item}-${index}`} className="rounded-full px-5 py-3 text-sm font-semibold text-[color:var(--public-color-text)]">{item}</AIOSGlassCard>
         ))}
-      </motion.div>
+      </m.div>
     </div>
   )
 }

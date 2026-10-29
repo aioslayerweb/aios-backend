@@ -8,6 +8,7 @@
     "start": "next start",
     "test:security": "tsx --test tests/security/*.test.ts",
     "test:security:backend": "python3 -m unittest discover -s tests/security -p 'test_*.py' -v",
+    "test:e2e:smoke": "playwright test --config=playwright.config.ts",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "quality:gates": "npm run lint && npm run typecheck && npm run build",
@@ -46,6 +47,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/express": "^5.0.6",
     "@types/node": "^20",
     "@types/react": "^18.3.28",

@@ -52,3 +52,8 @@ build/
 *.swp
 node_modules
 *.tsbuildinfo
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/

@@ -68,7 +68,9 @@ export function AIOSArchitectureOrbit({ label, title, nodes }: { label: string; 
         const angle = Math.atan2(numericY - 50, numericX - 50)
         const length = Math.hypot(numericX - 50, numericY - 50)
 
-        return <m.span key={`${node.title}-line`} className="pointer-events-none absolute left-1/2 top-1/2 block h-px origin-left bg-gradient-to-r from-[rgba(127,177,255,0.78)] to-transparent" style={{ width: `${length * 0.7}%`, rotate: `${(angle * 180) / Math.PI}deg` }} animate={reduceMotion ? { opacity: 0.36 } : { opacity: [0.18, 0.82, 0.18] }} transition={{ duration: 2 + index * 0.16, repeat: reduceMotion ? 0 : Infinity }} />
+        const rotationDegrees = ((angle * 180) / Math.PI).toFixed(2)
+
+        return <m.span key={`${node.title}-line`} className="pointer-events-none absolute left-1/2 top-1/2 block h-px origin-left bg-gradient-to-r from-[rgba(127,177,255,0.78)] to-transparent" style={{ width: `${length * 0.7}%`, rotate: `${rotationDegrees}deg` }} animate={reduceMotion ? { opacity: 0.36 } : { opacity: [0.18, 0.82, 0.18] }} transition={{ duration: 2 + index * 0.16, repeat: reduceMotion ? 0 : Infinity }} />
       })}
     </m.div>
   )
